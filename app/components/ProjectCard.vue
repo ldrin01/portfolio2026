@@ -4,24 +4,29 @@ defineProps<{ title: string; category: string; year: string; color: string; blur
 
 <template>
   <article class="card">
-    <div class="art" :style="{ background: color }" role="img" :aria-label="`${title} cover`">
-      <span>{{ title.charAt(0) }}</span>
+    <div class="frame">
+      <div class="art" :style="{ '--tone': color }" role="img" :aria-label="`${title} cover`">
+        <span>{{ title.charAt(0) }}</span>
+      </div>
     </div>
-    <div class="meta">
-      <h3>{{ title }}</h3>
-      <span class="year">{{ year }}</span>
-    </div>
-    <p class="cat">{{ category }}</p>
+    <p class="cat">{{ category }} · {{ year }}</p>
+    <h3>{{ title }}</h3>
     <p class="blurb">{{ blurb }}</p>
   </article>
 </template>
 
 <style scoped>
-.art { aspect-ratio: 4 / 3; border-radius: 6px; display: grid; place-items: center; overflow: hidden; transition: transform .4s ease, border-radius .4s ease; }
-.art span { font: 400 clamp(80px, 12vw, 160px)/1 var(--serif); color: rgba(255, 255, 255, .85); }
-.card:hover .art { transform: translateY(-4px); border-radius: 24px; }
-.meta { display: flex; justify-content: space-between; align-items: baseline; margin-top: 16px; }
-h3 { font-size: 28px; }
-.year, .cat { color: var(--muted); font-size: 14px; margin: 4px 0 0; }
-.blurb { margin: 8px 0 0; }
+.card { text-align: center; }
+/* arched, double-ruled frame */
+.frame { border: 1.5px solid var(--gold); border-radius: 999px 999px 8px 8px; padding: 8px; transition: transform .5s ease; }
+.card:hover .frame { transform: translateY(-6px); }
+.art {
+  aspect-ratio: 3 / 4; border-radius: 999px 999px 4px 4px; display: grid; place-items: center; overflow: hidden;
+  background: radial-gradient(circle at 50% 30%, color-mix(in srgb, var(--tone) 70%, white), var(--tone) 70%);
+  border: 1px solid color-mix(in srgb, var(--gold) 60%, transparent);
+}
+.art span { font: italic 400 clamp(88px, 12vw, 150px)/1 var(--serif); color: rgba(248, 241, 224, .88); }
+.cat { margin: 20px 0 4px; font-size: 12px; letter-spacing: .24em; text-transform: uppercase; color: var(--muted); }
+h3 { font-size: 32px; font-style: italic; }
+.blurb { margin: 8px auto 0; max-width: 28ch; color: var(--muted); }
 </style>
