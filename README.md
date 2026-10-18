@@ -1,75 +1,21 @@
-# Nuxt Minimal Starter
+# Eldrin Bernardino — Portfolio
 
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+**Live site: https://ldrin01.github.io/portfolio2026/**
 
-## Setup
+Built with [Nuxt](https://nuxt.com) and deployed to GitHub Pages.
 
-Make sure to install dependencies:
+## Run locally
 
 ```bash
-# npm
 npm install
-
-# pnpm
-pnpm install
-
-# yarn
-yarn install
-
-# bun
-bun install
+npm run dev      # http://localhost:3000
 ```
 
-## Development Server
+## Edit the content
 
-Start the development server on `http://localhost:3000`:
+- Text, roles, projects and the timeline: `app/data/site.ts`
+- Colors (the design tokens): `app/assets/css/main.css`
 
-```bash
-# npm
-npm run dev
+## Deploy
 
-# pnpm
-pnpm dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
-```
-
-## Production
-
-Build the application for production:
-
-```bash
-# npm
-npm run build
-
-# pnpm
-pnpm build
-
-# yarn
-yarn build
-
-# bun
-bun run build
-```
-
-Locally preview production build:
-
-```bash
-# npm
-npm run preview
-
-# pnpm
-pnpm preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+Every push to `main` builds and deploys automatically through `.github/workflows/deploy.yml`.
