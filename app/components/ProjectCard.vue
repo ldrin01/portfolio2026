@@ -16,17 +16,17 @@ defineProps<{ title: string; category: string; year: string; color: string; blur
 </template>
 
 <style scoped>
-.card { text-align: center; }
-/* arched, double-ruled frame */
-.frame { border: 1.5px solid var(--gold); border-radius: 999px 999px 8px 8px; padding: 8px; transition: transform .5s ease; }
+.card { text-align: left; }
+.frame { transition: transform .5s cubic-bezier(.16, .84, .3, 1); }
 .card:hover .frame { transform: translateY(-6px); }
 .art {
-  aspect-ratio: 3 / 4; border-radius: 999px 999px 4px 4px; display: grid; place-items: center; overflow: hidden;
-  background: radial-gradient(circle at 50% 30%, color-mix(in srgb, var(--tone) 70%, white), var(--tone) 70%);
-  border: 1px solid color-mix(in srgb, var(--gold) 60%, transparent);
+  aspect-ratio: 4 / 3; border-radius: 10px; display: grid; place-items: center; overflow: hidden;
+  background: radial-gradient(circle at 30% 20%, color-mix(in srgb, var(--tone) 80%, white), var(--tone) 75%);
+  border: 1px solid var(--line); transition: border-color .3s, box-shadow .3s;
 }
-.art span { font: italic 400 clamp(88px, 12vw, 150px)/1 var(--serif); color: rgba(248, 241, 224, .88); }
-.cat { margin: 20px 0 4px; font-size: 12px; letter-spacing: .24em; text-transform: uppercase; color: var(--muted); }
-h3 { font-size: 32px; font-style: italic; }
-.blurb { margin: 8px auto 0; max-width: 28ch; color: var(--muted); }
+.card:hover .art { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent), 0 12px 40px -12px color-mix(in srgb, var(--accent) 50%, transparent); }
+.art span { font: 300 clamp(88px, 12vw, 150px)/1 var(--serif); color: color-mix(in srgb, var(--bg) 82%, transparent); }
+.cat { margin: 16px 0 4px; font-size: 12px; letter-spacing: .2em; text-transform: uppercase; color: var(--muted); }
+h3 { font-size: 30px; font-weight: 500; letter-spacing: -.01em; }
+.blurb { margin: 8px 0 0; max-width: 32ch; color: var(--muted); }
 </style>

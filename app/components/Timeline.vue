@@ -1,0 +1,205 @@
+<script setup lang="ts">
+import { journey } from '~/data/site'
+
+const root = ref<HTMLElement | null>(null)
+const list = ref<HTMLElement | null>(null)
+const track = ref<HTMLElement | null>(null)
+const seen = ref(false) // heading has been revealed
+const live = ref(false) // section is near the screen: the line glows and scroll is tracked
+const activeCount = ref(0)
+const revealed = ref<number[]>([])
+
+const words = journey.heading.split(' ')
+
+// Geometry is measured once (and on resize), so a scroll tick does no layout reads.
+interface Geo { top: number; height: number; items: { el: HTMLElement; center: number; dot: number; step: number }[] }
+let geo: Geo | null = null
+
+function measure() {
+  const el = list.value
+  if (!el) return
+  const sy = window.scrollY
+  const r = el.getBoundingClientRect()
+  geo = {
+    top: r.top + sy,
+    height: r.height,
+    items: [...el.querySelectorAll<HTMLElement>('.item')].map(item => {
+      const ir = item.getBoundingClientRect()
+      const dr = item.querySelector('.dot')!.getBoundingClientRect()
+      return { el: item, center: ir.top + sy + ir.height / 2, dot: dr.top + sy + dr.height / 2, step: -1 }
+    })
+  }
+}
+
+let raf = 0
+function update() {
+  raf = 0
+  if (!geo) return
+  const vh = window.innerHeight
+  const mid = window.scrollY + vh * 0.55
+  const p = Math.min(1, Math.max(0, (mid - geo.top) / geo.height))
+  track.value?.style.setProperty('--p', p.toFixed(4)) // only the line reads this: transforms, no layout
+
+  let n = 0
+  for (const it of geo.items) {
+    if (it.dot < mid) n++
+    // the role thickens near the focus line; quantised so the font only re-lays-out a few times
+    const step = Math.round(Math.max(0, 1 - Math.abs(it.center - mid) / (vh * 0.5)) * 8)
+    if (step !== it.step) { it.step = step; it.el.style.setProperty('--k', String(step / 8)) }
+  }
+  if (n !== activeCount.value) activeCount.value = n
+}
+const onScroll = () => { if (!raf) raf = requestAnimationFrame(update) }
+const onResize = () => { measure(); onScroll() }
+
+const observers: IntersectionObserver[] = []
+let ro: ResizeObserver | undefined
+let tracking = false
+const track_ = (on: boolean) => {
+  if (on === tracking) return
+  tracking = on
+  if (on) { measure(); update(); window.addEventListener('scroll', onScroll, { passive: true }) }
+  else window.removeEventListener('scroll', onScroll)
+}
+
+onMounted(() => {
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  if (reduce) {
+    seen.value = true
+    revealed.value = journey.entries.map((_, i) => i)
+  } else {
+    const heading = new IntersectionObserver(([e]) => { if (e?.isIntersecting) { seen.value = true; heading.disconnect() } }, { threshold: 0.3 })
+    if (root.value) heading.observe(root.value)
+
+    const items = new IntersectionObserver(entries => {
+      for (const e of entries) {
+        if (!e.isIntersecting) continue
+        revealed.value.push(Number((e.target as HTMLElement).dataset.i))
+        items.unobserve(e.target)
+      }
+    }, { threshold: 0.3, rootMargin: '0px 0px -8% 0px' })
+    list.value?.querySelectorAll('.item').forEach(i => items.observe(i))
+    observers.push(heading, items)
+  }
+
+  // only track scroll (and glow) while the section is near the screen
+  const near = new IntersectionObserver(([e]) => { live.value = !!e?.isIntersecting; track_(live.value) }, { rootMargin: '200px 0px' })
+  if (root.value) near.observe(root.value)
+  observers.push(near)
+
+  window.addEventListener('resize', onResize)
+  if (list.value && 'ResizeObserver' in window) { ro = new ResizeObserver(onResize); ro.observe(list.value) }
+  document.fonts?.ready.then(onResize)
+})
+onBeforeUnmount(() => {
+  observers.forEach(o => o.disconnect())
+  ro?.disconnect()
+  window.removeEventListener('scroll', onScroll)
+  window.removeEventListener('resize', onResize)
+  if (raf) cancelAnimationFrame(raf)
+})
+</script>
+
+<template>
+  <section id="journey" ref="root">
+    <div class="wrap">
+      <header class="intro">
+        <h2 :class="{ seen }" :aria-label="journey.heading">
+          <template v-for="(w, i) in words" :key="i">
+            <span class="mask" aria-hidden="true"><span class="w" :style="{ '--i': i }">{{ w }}</span></span>{{ ' ' }}
+          </template>
+        </h2>
+      </header>
+
+      <ol ref="list" class="list" :class="{ live }">
+        <li ref="track" class="track" aria-hidden="true">
+          <span class="glow" />
+          <span class="fill" />
+          <span class="rail"><span class="spark" /></span>
+        </li>
+        <li
+          v-for="(e, i) in journey.entries"
+          :key="e.org"
+          class="item"
+          :class="[i % 2 ? 'right' : 'left', { in: revealed.includes(i), on: i < activeCount }]"
+          :data-i="i"
+        >
+          <span class="dot" aria-hidden="true" />
+          <div class="card">
+            <p class="period"><span class="num">{{ String(i + 1).padStart(2, '0') }}</span> {{ e.period }}</p>
+            <h3>{{ e.role }}</h3>
+            <p class="org">{{ e.org }}</p>
+            <p class="blurb">{{ e.blurb }}</p>
+            <ul class="tags">
+              <li v-for="t in e.tags" :key="t">{{ t }}</li>
+            </ul>
+          </div>
+        </li>
+      </ol>
+    </div>
+  </section>
+</template>
+
+<style scoped>
+.intro { margin-bottom: clamp(32px, 6vw, 72px); }
+h2 { font-size: clamp(34px, 5.5vw, 72px); letter-spacing: -.02em; font-weight: 500; }
+.mask { display: inline-block; overflow-y: clip; padding-bottom: .14em; margin-bottom: -.14em; }
+.w { display: inline-block; transform: translateY(110%); }
+.seen .w { animation: rise .9s cubic-bezier(.16, .84, .3, 1) both; animation-delay: calc(var(--i) * 70ms); }
+@keyframes rise { from { transform: translateY(110%); } to { transform: none; } }
+
+.list { list-style: none; margin: 0; padding: 0; position: relative; display: grid; gap: clamp(24px, 8vh, 80px); }
+
+/* the center line */
+.track { position: absolute; left: 50%; top: 0; bottom: 0; width: 2px; margin-left: -1px; background: var(--line); }
+/* the line, glow and spark only use transform/opacity, so scrolling never repaints them */
+.fill { position: absolute; inset: 0; background: var(--accent); border-radius: 2px; transform-origin: top; transform: scaleY(var(--p, 0)); }
+.glow { position: absolute; inset: 0 -4px; background: var(--accent); filter: blur(7px); opacity: 0; transform-origin: top; transform: scaleY(var(--p, 0)); transition: opacity .8s ease; }
+.live .glow { opacity: .85; }
+.rail { position: absolute; left: 0; right: 0; top: 0; height: 100%; transform: translateY(calc(var(--p, 0) * 100%)); }
+.spark { /* bright head at the leading edge of the line */
+  position: absolute; left: 50%; top: 0; width: 10px; height: 10px; margin: -5px 0 0 -5px; border-radius: 50%;
+  background: var(--fg); opacity: 0; transition: opacity .8s ease;
+  box-shadow: 0 0 10px 3px var(--accent), 0 0 30px 8px color-mix(in srgb, var(--accent) 55%, transparent);
+}
+.live .spark { opacity: 1; }
+
+/* alternating entries */
+.item { position: relative; display: grid; grid-template-columns: 1fr 1fr; min-height: 38vh; align-items: center; --k: 0; }
+.left .card { grid-column: 1; text-align: right; padding-right: clamp(32px, 5vw, 72px); }
+.left .tags { justify-content: flex-end; }
+.right .card { grid-column: 2; padding-left: clamp(32px, 5vw, 72px); }
+.left .blurb { margin-left: auto; }
+
+/* each line blurs in on its own, one after another */
+.card > * { opacity: 0; filter: blur(12px); transform: translateY(18px); transition: opacity .9s ease, filter .9s ease, transform .9s cubic-bezier(.16, .84, .3, 1); }
+.item.in .card > * { opacity: 1; filter: none; transform: none; }
+.item.in .card > :nth-child(2) { transition-delay: .15s; }
+.item.in .card > :nth-child(3) { transition-delay: .3s; }
+.item.in .card > :nth-child(4) { transition-delay: .45s; }
+.item.in .card > :nth-child(5) { transition-delay: .6s; }
+
+.dot { position: absolute; left: 50%; top: 50%; width: 16px; height: 16px; margin: -8px 0 0 -8px; border-radius: 50%; border: 1.5px solid var(--muted); background: var(--bg); z-index: 1; transition: background .3s, border-color .3s, box-shadow .5s; }
+.item.on .dot { background: var(--accent); border-color: var(--accent); box-shadow: 0 0 12px 3px color-mix(in srgb, var(--accent) 60%, transparent); }
+
+.period { margin: 0 0 8px; font-size: 13px; letter-spacing: .2em; text-transform: uppercase; color: var(--muted); }
+.num { color: var(--accent); margin-right: 8px; }
+h3 { font-size: clamp(30px, 4vw, 54px); font-weight: calc(300 + 500 * var(--k)); letter-spacing: -.02em; }
+.org { margin: 4px 0 12px; color: var(--muted); }
+.blurb { margin: 0; max-width: 40ch; }
+.tags { list-style: none; padding: 0; margin: 16px 0 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.tags li { border: 1px solid var(--line); border-radius: 8px; padding: 2px 14px; font-size: 13px; background: var(--surface); }
+
+@media (max-width: 800px) {
+  .track { left: 8px; }
+  .item { grid-template-columns: 1fr; }
+  .left .card, .right .card { grid-column: 1; text-align: left; padding: 0 0 0 40px; }
+  .left .tags { justify-content: flex-start; }
+  .left .blurb { margin-left: 0; }
+  .dot { left: 8px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .w { transform: none; animation: none !important; }
+  .card > * { opacity: 1; filter: none; transform: none; transition: none; }
+}
+</style>

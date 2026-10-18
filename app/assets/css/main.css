@@ -1,27 +1,46 @@
 :root {
-  --bg: #f1e8d4;        /* parchment */
-  --paper: #f8f1e0;
-  --fg: #2b3a2c;        /* deep moss */
-  --muted: #6d7560;
-  --gold: #b08a3e;
-  --rose: #b4584a;      /* faded poppy */
-  --teal: #3f6b62;
+  color-scheme: dark;
+
+  /* ── 1. Palette: sampled from the Hyundai Grandeur Heritage Series restomod ── */
+  --black: #0f0f13;        /* body paint, dashboard (measured ~#1e1e23, deepened) */
+  --charcoal: #3a3b43;     /* studio backdrop (measured) */
+  --silver: #a8aaaf;       /* chrome grille, bumper, mirrors (measured) */
+  --silver-light: #e6e9ed; /* chrome highlights */
+  --red-velvet: #a32a22;   /* seat velvet; measured highlights ~#95403a, saturated slightly */
+  --burgundy: #5a1a17;     /* velvet in shadow (measured ~#3e1b18, lifted so it reads on screen) */
+  --orange: #ff5a2d;       /* LED ambient light strips on the doors */
+
+  /* ── 2. Semantic tokens: change what they point to and the whole site follows ── */
+  --bg: var(--black);
+  --surface: #1a1a20;
+  --fg: var(--silver-light);
+  --muted: var(--silver);
+  --line: color-mix(in srgb, var(--silver) 22%, transparent);
+  --accent: var(--orange);
+  --on-accent: var(--black);
+  --accent-2: var(--red-velvet);
+  --accent-3: var(--burgundy);
+  --accent-4: var(--silver);
+
+
   --gutter: clamp(16px, 4vw, 48px);
-  --serif: 'Cormorant Garamond', Georgia, serif;
-  --sans: 'Jost', system-ui, sans-serif;
+  --font: 'Funnel Display', system-ui, sans-serif;
+  --serif: var(--font);
+  --sans: var(--font);
+  --display: var(--font);
 }
 *, *::before, *::after { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
 body {
   margin: 0; color: var(--fg); font: 400 17px/1.7 var(--sans); -webkit-font-smoothing: antialiased;
-  background:
-    radial-gradient(circle at 12% 8%, rgba(176, 138, 62, .14), transparent 40%),
-    radial-gradient(circle at 90% 70%, rgba(63, 107, 98, .10), transparent 45%),
-    var(--bg);
+  background: var(--bg);
 }
 a { color: inherit; }
+::selection { background: var(--accent); color: var(--on-accent); }
 h1, h2, h3 { font-family: var(--serif); font-weight: 400; line-height: 1.05; margin: 0; }
 .wrap { max-width: 1160px; margin: 0 auto; padding: 0 var(--gutter); }
-section { padding: clamp(48px, 8vw, 96px) 0; }
-.eyebrow { font-size: 13px; letter-spacing: .28em; text-transform: uppercase; color: var(--gold); margin: 0 0 20px; font-weight: 500; }
+/* every frame fills the screen (svh = visible height, even with mobile browser bars) */
+section { min-height: 100vh; min-height: 100svh; width: 100%; display: flex; flex-direction: column; justify-content: center; padding: clamp(88px, 10vw, 120px) 0 clamp(32px, 6vw, 64px); }
+section > .wrap { width: 100%; }
+.eyebrow { font-size: 13px; letter-spacing: .2em; text-transform: uppercase; color: var(--accent); margin: 0 0 20px; font-weight: 500; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; scroll-behavior: auto !important; } }
