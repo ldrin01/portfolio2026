@@ -1,6 +1,8 @@
 <script setup lang="ts">
 const FONT = '"Funnel Display"'
-const WORD = 'DRINWORKS'
+const LINES = ['DRIN', 'WORKS'] // one line on wide screens, two stacked lines on phones
+const PHONE = '(max-width: 600px)'
+const STACK_LINE_HEIGHT = 0.8225 // leading for the stacked lines (keep in sync with .word.stack in the CSS)
 
 // Timeline: enter 1.2s, hold 0.4s, exit 1.2s.
 const DURATION = 2800
@@ -13,6 +15,7 @@ const SAMPLES = 60
 
 const word = ref<HTMLElement | null>(null)
 const loaderDone = useState('loaderDone', () => false) // tells the hero when to start
+const stack = ref(false)
 const fading = ref(false)
 const done = ref(false)
 
@@ -45,21 +48,37 @@ onMounted(async () => {
     await document.fonts.load(`300 100px ${FONT}`)
   } catch { /* the CSS failsafe still hides the loader */ }
 
-  // Size the word to span the full width at its boldest weight.
-  const probe = document.createElement('span')
-  probe.textContent = WORD
-  probe.style.cssText = `position:absolute;visibility:hidden;white-space:nowrap;font:800 100px ${FONT}`
-  document.body.appendChild(probe)
-  const w = probe.getBoundingClientRect().width
-  probe.remove()
+  // Width of some text at the boldest weight, measured at 100px.
+  const measure = (text: string) => {
+    const probe = document.createElement('span')
+    probe.textContent = text
+    probe.style.cssText = `position:absolute;visibility:hidden;white-space:nowrap;font:800 100px ${FONT}`
+    document.body.appendChild(probe)
+    const w = probe.getBoundingClientRect().width
+    probe.remove()
+    return w
+  }
   const vw = window.innerWidth
   const vh = window.innerHeight
-  const pad = Math.max(16, vw * 0.02)
-  const fs = w ? (100 * (vw - pad * 2)) / w : vw * 0.13
-  el.style.fontSize = `${fs}px`
+  const avail = vw - Math.max(16, vw * 0.02) * 2
+
+  // Fit to the full width at the boldest weight: one line (DRINWORKS), or on phones each of
+  // DRIN / WORKS on its own line, each sized so that line spans the whole width.
+  let blockH: number
+  stack.value = window.matchMedia(PHONE).matches
+  if (stack.value) {
+    const sizes = LINES.map(l => { const w = measure(l); return w ? (100 * avail) / w : vw * 0.3 })
+    el.querySelectorAll<HTMLElement>('.ln').forEach((ln, i) => { ln.style.fontSize = `${sizes[i]}px` })
+    blockH = sizes.reduce((sum, s) => sum + s * STACK_LINE_HEIGHT, 0) + Math.max(...sizes) * 0.3
+  } else {
+    const w = measure(LINES.join(''))
+    const fs = w ? (100 * avail) / w : vw * 0.13
+    el.style.fontSize = `${fs}px`
+    blockH = fs
+  }
 
   // Start just off-screen, travel to center, leave just off the top.
-  const off = vh / 2 + fs / 2 + 4
+  const off = vh / 2 + blockH / 2 + 4
   const ease = (b: readonly number[]) => `cubic-bezier(${b.join(',')})`
 
   const opts = { duration: DURATION, fill: 'forwards' as const }
@@ -90,7 +109,7 @@ onMounted(async () => {
 
 <template>
   <div v-if="!done" class="loader" :class="{ fading }" aria-hidden="true">
-    <span ref="word" class="word">{{ WORD }}</span>
+    <span ref="word" class="word" :class="{ stack }"><span v-for="l in LINES" :key="l" class="ln">{{ l }}</span></span>
   </div>
 </template>
 
@@ -105,7 +124,7 @@ onMounted(async () => {
 }
 .loader.fading { opacity: 0; }
 .word {
-  display: block; white-space: nowrap; line-height: 1;
+  display: flex; justify-content: center; white-space: nowrap; line-height: 1;
   font-family: 'Funnel Display', system-ui, sans-serif;
   font-size: 13vw;
   color: var(--fg);
@@ -113,6 +132,9 @@ onMounted(async () => {
   transform: translateY(110vh);
   will-change: transform;
 }
+/* phones: DRIN over WORKS, centered, each line fitted to the width in script */
+.word.stack { flex-direction: column; align-items: center; line-height: 0.8225; }
+.ln { display: block; white-space: nowrap; }
 @keyframes failsafe { to { opacity: 0; visibility: hidden; } }
 @media (prefers-reduced-motion: reduce) { .loader { display: none; } }
 </style>

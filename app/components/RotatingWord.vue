@@ -72,7 +72,7 @@ onBeforeUnmount(() => timers.forEach(clearTimeout))
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 /* each word is a clipping window the letters slide through */
 .w { display: inline-block; white-space: nowrap; overflow-y: clip; padding-bottom: .14em; margin-bottom: -.14em; }
-.sp { white-space: pre; }
+.sp { white-space: normal; } /* collapses at a line break, so a wrapped line never starts with a space */
 .ch { display: inline-block; }
 
 .hidden .ch { transform: translateY(110%); font-weight: 300; }

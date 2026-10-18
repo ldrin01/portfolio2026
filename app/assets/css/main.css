@@ -45,9 +45,15 @@ body {
 a { color: inherit; }
 ::selection { background: var(--accent); color: var(--on-accent); }
 h1, h2, h3 { font-family: var(--serif); font-weight: 400; line-height: 1.05; margin: 0; }
-.wrap { max-width: 1160px; margin: 0 auto; padding: 0 var(--gutter); }
+.wrap { max-width: 1160px; margin: 0 auto; padding: 0 max(var(--gutter), env(safe-area-inset-right)) 0 max(var(--gutter), env(safe-area-inset-left)); }
 /* every frame fills the screen (svh = visible height, even with mobile browser bars) */
 section { min-height: 100vh; min-height: 100svh; width: 100%; display: flex; flex-direction: column; justify-content: center; padding: clamp(88px, 10vw, 120px) 0 clamp(32px, 6vw, 64px); }
 section > .wrap { width: 100%; }
+.lag { will-change: translate; }
+/* phones: only the hero fills the screen; other frames hug their content so there are no empty gaps */
+@media (max-width: 800px) {
+  section { min-height: auto; padding: 72px 0 40px; }
+  section.hero { min-height: 100vh; min-height: 100svh; padding: 72px 0; }
+}
 .eyebrow { font-size: 13px; letter-spacing: .2em; text-transform: uppercase; color: var(--accent); margin: 0 0 20px; font-weight: 500; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; scroll-behavior: auto !important; } }

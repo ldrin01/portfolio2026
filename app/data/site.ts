@@ -9,11 +9,11 @@ export const profile = {
     'Outside of work you will find me sketching, collecting type specimens and making too much coffee.'
   ],
   skills: ['Brand identity', 'Product design', 'Motion', 'Illustration', 'Prototyping'],
+  contactHeading: ['Got a story', 'to tell?'], // placeholder: the two-line headline in the last frame
   email: 'hello@example.com',
   links: [
-    { label: 'Instagram', href: 'https://instagram.com/' },
-    { label: 'Behance', href: 'https://behance.net/' },
-    { label: 'LinkedIn', href: 'https://linkedin.com/' }
+    { label: 'LinkedIn', href: 'https://linkedin.com/' },
+    { label: 'Instagram', href: 'https://instagram.com/' }
   ]
 }
 

@@ -4,15 +4,17 @@ import { journey } from '~/data/site'
 const root = ref<HTMLElement | null>(null)
 const list = ref<HTMLElement | null>(null)
 const track = ref<HTMLElement | null>(null)
+const intro = ref<HTMLElement | null>(null)
 const seen = ref(false) // heading has been revealed
 const live = ref(false) // section is near the screen: the line glows and scroll is tracked
+const started = ref(false) // the line has reached the first point: only then does the glowing dot exist
 const activeCount = ref(0)
 const revealed = ref<number[]>([])
 
 const words = journey.heading.split(' ')
 
 // Geometry is measured once (and on resize), so a scroll tick does no layout reads.
-interface Geo { top: number; height: number; items: { el: HTMLElement; center: number; dot: number; target: number; cur: number }[] }
+interface Geo { top: number; height: number; start: number; span: number; items: { el: HTMLElement; center: number; dot: number; target: number; cur: number }[] }
 let geo: Geo | null = null
 
 function measure() {
@@ -23,12 +25,21 @@ function measure() {
   geo = {
     top: r.top + sy,
     height: r.height,
+    start: 0,
+    span: 1,
     items: [...el.querySelectorAll<HTMLElement>('.item')].map(item => {
       const ir = item.getBoundingClientRect()
       const dr = item.querySelector('.dot')!.getBoundingClientRect()
       return { el: item, center: ir.top + sy + ir.height / 2, dot: dr.top + sy + dr.height / 2, target: 0, cur: 0 }
     })
   }
+  // the line runs only from the first point to the last point, never beyond them
+  const first = geo.items[0]?.dot ?? geo.top
+  const last = geo.items[geo.items.length - 1]?.dot ?? geo.top + geo.height
+  geo.start = first
+  geo.span = Math.max(1, last - first)
+  track.value?.style.setProperty('--t', `${first - geo.top}px`)
+  track.value?.style.setProperty('--h', `${geo.span}px`)
 }
 
 let raf = 0
@@ -37,7 +48,10 @@ function update() {
   if (!geo) return
   const vh = window.innerHeight
   const mid = window.scrollY + vh * 0.55
-  const p = Math.min(1, Math.max(0, (mid - geo.top) / geo.height))
+  const raw = (mid - geo.start) / geo.span
+  const p = Math.min(1, Math.max(0, raw))
+  const has = raw > 0.002
+  if (has !== started.value) started.value = has
   track.value?.style.setProperty('--p', p.toFixed(4)) // only the line reads this: transforms, no layout
 
   let n = 0
@@ -88,8 +102,9 @@ onMounted(() => {
     seen.value = true
     revealed.value = journey.entries.map((_, i) => i)
   } else {
-    const heading = new IntersectionObserver(([e]) => { if (e?.isIntersecting) { seen.value = true; heading.disconnect() } }, { threshold: 0.3 })
-    if (root.value) heading.observe(root.value)
+    // observe the heading itself: a share of the whole (tall) section can never be visible on a short phone screen
+    const heading = new IntersectionObserver(([e]) => { if (e?.isIntersecting) { seen.value = true; heading.disconnect() } }, { threshold: 0.3, rootMargin: '0px 0px -8% 0px' })
+    if (intro.value) heading.observe(intro.value)
 
     const items = new IntersectionObserver(entries => {
       for (const e of entries) {
@@ -124,7 +139,7 @@ onBeforeUnmount(() => {
 <template>
   <section id="journey" ref="root">
     <div class="wrap">
-      <header class="intro">
+      <header ref="intro" v-lag="0" class="intro">
         <h2 :class="{ seen }" :aria-label="journey.heading">
           <template v-for="(w, i) in words" :key="i">
             <span class="mask" aria-hidden="true"><span class="w" :style="{ '--i': i }">{{ w }}</span></span>{{ ' ' }}
@@ -132,7 +147,7 @@ onBeforeUnmount(() => {
         </h2>
       </header>
 
-      <ol ref="list" class="list" :class="{ live }">
+      <ol ref="list" class="list" :class="{ live, started }">
         <li ref="track" class="track" aria-hidden="true">
           <span class="glow-wrap"><span class="glow-rail"><span class="glow" /></span></span>
           <span class="fill" />
@@ -147,11 +162,11 @@ onBeforeUnmount(() => {
         >
           <span class="dot" aria-hidden="true" />
           <div class="card">
-            <p class="period"><span class="num">{{ String(i + 1).padStart(2, '0') }}</span> {{ e.period }}</p>
-            <h3>{{ e.role }}</h3>
-            <p class="org">{{ e.org }}</p>
-            <p class="blurb">{{ e.blurb }}</p>
-            <ul class="tags">
+            <p v-lag="0" class="period"><span class="num">{{ String(i + 1).padStart(2, '0') }}</span> {{ e.period }}</p>
+            <h3 v-lag="1">{{ e.role }}</h3>
+            <p v-lag="2" class="org">{{ e.org }}</p>
+            <p v-lag="3" class="blurb">{{ e.blurb }}</p>
+            <ul v-lag="4" class="tags">
               <li v-for="t in e.tags" :key="t">{{ t }}</li>
             </ul>
           </div>
@@ -172,7 +187,7 @@ h2 { font-size: clamp(34px, 5.5vw, 72px); letter-spacing: -.02em; font-weight: 5
 .list { list-style: none; margin: 0; padding: 0; position: relative; display: grid; gap: clamp(24px, 8vh, 80px); }
 
 /* the center line */
-.track { position: absolute; left: 50%; top: 0; bottom: 0; width: 2px; margin-left: -1px; background: var(--line); }
+.track { position: absolute; left: 50%; top: var(--t, 0px); height: var(--h, 0px); width: 2px; margin-left: -1px; background: var(--line); }
 /* the line, glow and spark only use transform/opacity, so scrolling never repaints them */
 .fill { position: absolute; inset: 0; background: var(--accent); border-radius: 2px; transform-origin: top; transform: scaleY(var(--p, 0)); }
 .glow-wrap { /* glow along the line: a soft side falloff that rides up with the dot and fades out into it */
@@ -183,14 +198,15 @@ h2 { font-size: clamp(34px, 5.5vw, 72px); letter-spacing: -.02em; font-weight: 5
 .glow { position: absolute; left: 0; right: 0; bottom: 100%; height: 100%;
   background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--accent) 55%, transparent) 50%, transparent);
   -webkit-mask-image: linear-gradient(to top, transparent, #000 70px); mask-image: linear-gradient(to top, transparent, #000 70px); }
-.live .glow-wrap { opacity: 1; }
-.rail { position: absolute; left: 0; right: 0; top: 0; height: 100%; transform: translateY(calc(var(--p, 0) * 100%)); }
+.live.started .glow-wrap { opacity: 1; }
+/* zero-height rail moved by the measured track height: a tall translated box would stretch the page's scroll height */
+.rail { position: absolute; left: 0; right: 0; top: 0; height: 0; transform: translateY(calc(var(--p, 0) * var(--h, 0px))); }
 .spark { /* bright head at the leading edge of the line */
   position: absolute; left: 50%; top: 0; width: 10px; height: 10px; margin: -5px 0 0 -5px; border-radius: 50%;
   background: var(--fg); opacity: 0; transition: opacity .8s ease;
   box-shadow: 0 0 12px 4px var(--accent), 0 0 36px 14px color-mix(in srgb, var(--accent) 50%, transparent), 0 0 70px 24px color-mix(in srgb, var(--accent) 22%, transparent);
 }
-.live .spark { opacity: 1; }
+.live.started .spark { opacity: 1; }
 
 /* alternating entries */
 .item { position: relative; display: grid; grid-template-columns: 1fr 1fr; min-height: 38vh; align-items: center; --k: 0; }
@@ -219,6 +235,8 @@ h3 { font-size: clamp(30px, 4vw, 54px); font-weight: calc(300 + 500 * var(--k));
 .tags li { border: 1px solid var(--line); border-radius: 8px; padding: 2px 14px; font-size: 13px; background: var(--surface); }
 
 @media (max-width: 800px) {
+  .list { gap: 56px; }
+  .item { min-height: 0; }
   .track { left: 8px; }
   .item { grid-template-columns: 1fr; }
   .left .card, .right .card { grid-column: 1; text-align: left; padding: 0 0 0 40px; }

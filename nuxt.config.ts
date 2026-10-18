@@ -10,7 +10,7 @@ export default defineNuxtConfig({
       title: 'Your Name — Designer',
       htmlAttrs: { lang: 'en' },
       meta: [
-        { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+        { name: 'viewport', content: 'width=device-width, initial-scale=1, viewport-fit=cover' },
         { name: 'description', content: 'Portfolio of Your Name, a designer working across brand, product and motion.' }
       ],
       link: [
