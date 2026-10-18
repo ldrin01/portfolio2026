@@ -12,7 +12,7 @@ const revealed = ref<number[]>([])
 const words = journey.heading.split(' ')
 
 // Geometry is measured once (and on resize), so a scroll tick does no layout reads.
-interface Geo { top: number; height: number; items: { el: HTMLElement; center: number; dot: number; step: number }[] }
+interface Geo { top: number; height: number; items: { el: HTMLElement; center: number; dot: number; target: number; cur: number }[] }
 let geo: Geo | null = null
 
 function measure() {
@@ -26,7 +26,7 @@ function measure() {
     items: [...el.querySelectorAll<HTMLElement>('.item')].map(item => {
       const ir = item.getBoundingClientRect()
       const dr = item.querySelector('.dot')!.getBoundingClientRect()
-      return { el: item, center: ir.top + sy + ir.height / 2, dot: dr.top + sy + dr.height / 2, step: -1 }
+      return { el: item, center: ir.top + sy + ir.height / 2, dot: dr.top + sy + dr.height / 2, target: 0, cur: 0 }
     })
   }
 }
@@ -43,11 +43,31 @@ function update() {
   let n = 0
   for (const it of geo.items) {
     if (it.dot < mid) n++
-    // the role thickens near the focus line; quantised so the font only re-lays-out a few times
-    const step = Math.round(Math.max(0, 1 - Math.abs(it.center - mid) / (vh * 0.5)) * 8)
-    if (step !== it.step) { it.step = step; it.el.style.setProperty('--k', String(step / 8)) }
+    // the role thickens near the focus line; the value it eases toward (smooth() below does the easing)
+    it.target = Math.max(0, 1 - Math.abs(it.center - mid) / (vh * 0.5))
   }
   if (n !== activeCount.value) activeCount.value = n
+  if (!sraf) sraf = requestAnimationFrame(smooth)
+}
+
+// Weight follows its target with a little inertia every frame, so it glides instead of stepping.
+let sraf = 0
+function smooth() {
+  sraf = 0
+  if (!geo) return
+  let moving = false
+  for (const it of geo.items) {
+    const d = it.target - it.cur
+    if (Math.abs(d) > 0.002) {
+      it.cur += d * 0.1
+      it.el.style.setProperty('--k', it.cur.toFixed(3))
+      moving = true
+    } else if (it.cur !== it.target) {
+      it.cur = it.target
+      it.el.style.setProperty('--k', String(it.cur))
+    }
+  }
+  if (moving) sraf = requestAnimationFrame(smooth)
 }
 const onScroll = () => { if (!raf) raf = requestAnimationFrame(update) }
 const onResize = () => { measure(); onScroll() }
@@ -97,6 +117,7 @@ onBeforeUnmount(() => {
   window.removeEventListener('scroll', onScroll)
   window.removeEventListener('resize', onResize)
   if (raf) cancelAnimationFrame(raf)
+  if (sraf) cancelAnimationFrame(sraf)
 })
 </script>
 
@@ -113,7 +134,7 @@ onBeforeUnmount(() => {
 
       <ol ref="list" class="list" :class="{ live }">
         <li ref="track" class="track" aria-hidden="true">
-          <span class="glow" />
+          <span class="glow-wrap"><span class="glow-rail"><span class="glow" /></span></span>
           <span class="fill" />
           <span class="rail"><span class="spark" /></span>
         </li>
@@ -154,13 +175,20 @@ h2 { font-size: clamp(34px, 5.5vw, 72px); letter-spacing: -.02em; font-weight: 5
 .track { position: absolute; left: 50%; top: 0; bottom: 0; width: 2px; margin-left: -1px; background: var(--line); }
 /* the line, glow and spark only use transform/opacity, so scrolling never repaints them */
 .fill { position: absolute; inset: 0; background: var(--accent); border-radius: 2px; transform-origin: top; transform: scaleY(var(--p, 0)); }
-.glow { position: absolute; inset: 0 -4px; background: var(--accent); filter: blur(7px); opacity: 0; transform-origin: top; transform: scaleY(var(--p, 0)); transition: opacity .8s ease; }
-.live .glow { opacity: .85; }
+.glow-wrap { /* glow along the line: a soft side falloff that rides up with the dot and fades out into it */
+  position: absolute; inset: 0 -14px; overflow: hidden; opacity: 0; transition: opacity .8s ease;
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 48px); mask-image: linear-gradient(to bottom, transparent, #000 48px);
+}
+.glow-rail { position: absolute; left: 0; right: 0; top: 0; height: 100%; transform: translateY(calc(var(--p, 0) * 100%)); }
+.glow { position: absolute; left: 0; right: 0; bottom: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--accent) 55%, transparent) 50%, transparent);
+  -webkit-mask-image: linear-gradient(to top, transparent, #000 70px); mask-image: linear-gradient(to top, transparent, #000 70px); }
+.live .glow-wrap { opacity: 1; }
 .rail { position: absolute; left: 0; right: 0; top: 0; height: 100%; transform: translateY(calc(var(--p, 0) * 100%)); }
 .spark { /* bright head at the leading edge of the line */
   position: absolute; left: 50%; top: 0; width: 10px; height: 10px; margin: -5px 0 0 -5px; border-radius: 50%;
   background: var(--fg); opacity: 0; transition: opacity .8s ease;
-  box-shadow: 0 0 10px 3px var(--accent), 0 0 30px 8px color-mix(in srgb, var(--accent) 55%, transparent);
+  box-shadow: 0 0 12px 4px var(--accent), 0 0 36px 14px color-mix(in srgb, var(--accent) 50%, transparent), 0 0 70px 24px color-mix(in srgb, var(--accent) 22%, transparent);
 }
 .live .spark { opacity: 1; }
 

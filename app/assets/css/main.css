@@ -31,6 +31,13 @@
 }
 *, *::before, *::after { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
+/* hidden scrollbar (the page still scrolls) */
+html { scrollbar-width: none; }
+html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; }
+/* Lenis (smooth scrolling) */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-stopped { overflow: hidden; }
 body {
   margin: 0; color: var(--fg); font: 400 17px/1.7 var(--sans); -webkit-font-smoothing: antialiased;
   background: var(--bg);
