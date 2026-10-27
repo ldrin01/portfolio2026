@@ -19,6 +19,7 @@ const showHeader = false // header is hidden for now
 
   <main id="top">
     <section class="hero">
+      <HeroDepth />
       <div class="wrap hero-in">
         <h1 :class="{ ready: loaderDone }">
           <span class="line" v-lag="0"><span class="line-in">I am {{ profile.name }}</span></span>
@@ -74,7 +75,9 @@ const showHeader = false // header is hidden for now
 .logo { font-family: var(--serif); font-size: 26px; text-decoration: none; }
 nav a { margin-left: 28px; text-decoration: none; font-size: 13px; letter-spacing: .2em; text-transform: uppercase; color: var(--muted); transition: color .2s; }
 nav a:hover { color: var(--accent); }
-.hero { text-align: left; }
+.hero { position: relative; text-align: left; overflow: hidden; }
+.hero-in { position: relative; z-index: 1; }
+@media (max-width: 1024px) { .hero { justify-content: flex-start; padding-top: clamp(88px, 14vw, 128px); } } /* tablet and phone: headline up top so it clears the portrait's head */ /* text sits in front of the depth portrait */
 
 .hero h1 { font-family: var(--display); font-weight: 500; font-size: clamp(32px, 6vw, 88px); letter-spacing: -.02em; line-height: 1.15; }
 .line { display: block; overflow-y: clip; padding-bottom: .14em; margin-bottom: -.14em; }
