@@ -3,11 +3,16 @@
 // Hover and scroll slide near pixels more than far ones; the intro fades in from the nearest depth to the farthest.
 const loaderDone = useState('loaderDone', () => false)
 const canvas = useTemplateRef<HTMLCanvasElement>('cv')
+const base = useRuntimeConfig().app.baseURL // "/" locally, "/portfolio2026/" on GitHub Pages
 
 const VERT = `attribute vec2 p; varying vec2 vUv;
 void main() { vUv = p * .5 + .5; gl_Position = vec4(p, 0., 1.); }`
 
-const FRAG = `precision highp float;
+const FRAG = `#ifdef GL_FRAGMENT_PRECISION_HIGH
+precision highp float;
+#else
+precision mediump float;
+#endif
 varying vec2 vUv;
 uniform sampler2D uDepth;
 uniform vec2 uTexel;    // one depth-map pixel in uv
@@ -113,6 +118,7 @@ onMounted(async () => {
       gl.uniform2f(uTexel, 1 / img.width, 1 / img.height)
       res()
     }
+    img.onerror = () => console.error('[HeroDepth] could not load', src)
     img.src = src
   })
 
@@ -142,7 +148,7 @@ onMounted(async () => {
   }
 
   const stopWatch = watch(loaderDone, (done) => { if (done && !revealAt) revealAt = performance.now() }, { immediate: true })
-  loadTex('/me-depth.png', 0, 'uDepth').then(() => {
+  loadTex(`${base}me-depth.png`, 0, 'uDepth').then(() => {
     resize(); frame()
     if (reduced) { cancelAnimationFrame(raf); return }
     addEventListener('pointermove', onMove, { passive: true })
