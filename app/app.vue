@@ -3,10 +3,12 @@ import { profile, projects } from '~/data/site'
 
 const loaderDone = useState('loaderDone', () => false)
 const showHeader = false // header is hidden for now
+const roleIndex = ref(-1) // which rotating word is showing; the hero portrait follows it
 </script>
 
 <template>
   <Loader />
+  <ThemeToggle />
 
   <header v-if="showHeader" class="wrap nav">
     <a href="#top" class="logo">{{ profile.name }}</a>
@@ -19,11 +21,11 @@ const showHeader = false // header is hidden for now
 
   <main id="top">
     <section class="hero">
-      <HeroDepth />
+      <HeroPersonas :role="roleIndex" />
       <div class="wrap hero-in">
         <h1 :class="{ ready: loaderDone }">
           <span class="line" v-lag="0"><span class="line-in">I am {{ profile.name }}</span></span>
-          <span class="line" v-lag="1"><span class="line-in">I'm a <RotatingWord :words="profile.roles" :active="loaderDone" /></span></span>
+          <span class="line" v-lag="1"><span class="line-in">I'm a <RotatingWord :words="profile.roles" :active="loaderDone" @change="roleIndex = $event" /></span></span>
         </h1>
       </div>
     </section>
@@ -52,7 +54,11 @@ const showHeader = false // header is hidden for now
       </div>
     </section>
 
+    <Keyboard />
+
     <Timeline />
+
+    <Toolkit />
 
     <section id="contact" class="contact">
       <div class="wrap contact-in">

@@ -29,6 +29,22 @@
   --sans: var(--font);
   --display: var(--font);
 }
+/* ── 3. Light theme: same structure, warm paper instead of black paint. Set on <html data-theme> by the head script ── */
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f2efe9;
+  --surface: #ffffff;
+  --fg: #16161b;
+  --muted: #5d5f66;
+  --line: color-mix(in srgb, #16161b 16%, transparent);
+  --accent: #e8471c;        /* the LED orange, a touch deeper so small text still reads on paper */
+  --on-accent: #ffffff;
+  --accent-2: var(--red-velvet);
+  --accent-3: var(--burgundy);
+  --accent-4: #8a8c92;
+}
+/* colours ease over when the theme flips (only while switching, so nothing else animates) */
+html.theme-switching, html.theme-switching * { transition: background-color .45s ease, color .45s ease, border-color .45s ease, fill .45s ease, stroke .45s ease !important; }
 *, *::before, *::after { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
 /* hidden scrollbar (the page still scrolls) */

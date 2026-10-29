@@ -8,6 +8,7 @@ const STAGGER = 28 // ms between letters
 const IN_MS = 700
 const OUT_MS = 450
 
+const emit = defineEmits<{ change: [index: number] }>() // tells the hero portrait which word is showing
 const index = ref(0)
 const phase = ref<'hidden' | 'in' | 'idle' | 'out'>('hidden')
 const timers: ReturnType<typeof setTimeout>[] = []
@@ -26,6 +27,7 @@ const letterCount = () => word.value.replace(/ /g, '').length
 
 function playIn() {
   phase.value = 'in'
+  emit('change', index.value)
   later(IN_MS + letterCount() * STAGGER, () => {
     phase.value = 'idle'
     later(props.interval, playOut)
@@ -48,7 +50,7 @@ function start() {
 }
 
 onMounted(() => {
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { phase.value = 'idle'; return }
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { phase.value = 'idle'; emit('change', index.value); return }
   if (props.active) start()
 })
 watch(() => props.active, v => { if (v && phase.value === 'hidden') start() })
