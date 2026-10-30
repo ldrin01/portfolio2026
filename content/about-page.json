@@ -1,0 +1,613 @@
+{
+  "title": "More About Me",
+  "intro": "The longer version, told the way I'd tell it over coffee: what I do now, what came before, and where I'm heading.",
+  "lenticular": [
+    {
+      "image": "/pictures/about/lion.webp",
+      "alt": "Placeholder: a lion (your photo goes here)"
+    },
+    {
+      "image": "/pictures/about/tiger.webp",
+      "alt": "Placeholder: a tiger (your second photo goes here)"
+    }
+  ],
+  "work": {
+    "title": "What I do these days",
+    "body": [
+      "Draft: I'm a Senior UI/UX Designer and Assistant Creative Director at Praxxys Solutions, where I've been since 2022. Most days I'm somewhere between a client call, a Figma file and a developer's desk, making sure what we promised is what gets built.",
+      "Draft: I lead projects from the first requirements meeting to handover and QA, keep our design system in shape, and help the juniors on the team find their footing."
+    ],
+    "card": {
+      "photo": "/pictures/about/id-photo.gif",
+      "company": "Praxxys Solutions Inc.",
+      "name": "Eldrin Bernardino",
+      "role": "Senior UI/UX Designer",
+      "role2": "Assistant Creative Director",
+      "idNo": "PRX-2022-0815",
+      "since": "Since Aug 2022"
+    }
+  },
+  "talk": {
+    "title": "I also get to talk about it",
+    "body": [
+      "Draft: I was a guest speaker at LVCC ICT Week, back at the school where I studied. A few words here about the topic, the students, and what it felt like to stand on the other side of the room."
+    ],
+    "photos": [
+      {
+        "image": "/pictures/about/talk-1.webp",
+        "caption": "Placeholder: the talk"
+      },
+      {
+        "image": "/pictures/about/talk-2.webp",
+        "caption": "Placeholder: on stage"
+      },
+      {
+        "image": "/pictures/about/talk-3.webp",
+        "caption": "Placeholder: the panel"
+      },
+      {
+        "image": "/pictures/about/talk-4.webp",
+        "caption": "Placeholder: with the team"
+      },
+      {
+        "image": "/pictures/about/talk-5.webp",
+        "caption": "Placeholder: questions from the crowd"
+      }
+    ]
+  },
+  "more": {
+    "title": "Before design, there was making",
+    "body": [
+      "Draft: Long before I opened Figma, I was already making things. Posters, layouts, little videos, anything that let me put something on a screen or on paper."
+    ],
+    "tools": [
+      {
+        "kind": "corel",
+        "before": "It started with",
+        "name": "CorelDRAW",
+        "body": "Draft: my first real design tool. Tarpaulins, invitations, logos for whoever asked."
+      },
+      {
+        "kind": "premiere",
+        "before": "then I learned to cut in",
+        "name": "Premiere Pro",
+        "body": "Draft: where I learned timing, cuts and how a story moves."
+      }
+    ],
+    "stories": [
+      {
+        "title": "Working with my dad",
+        "body": "Draft: a few lines about the work I did alongside my dad, and what it taught me about doing a job properly."
+      },
+      {
+        "title": "Journalism",
+        "body": "Draft: writing and editing as a student journalist, and why it still shapes how I write UI copy today."
+      }
+    ],
+    "hobbies": {
+      "title": "Off the clock, I move",
+      "body": "Draft: running, biking, swimming and the gym. Every line here is a route I ran or rode.",
+      "routes": [
+        {
+          "image": "/pictures/about/routes/route-01.png",
+          "name": "Star run",
+          "kind": "run",
+          "km": 4.1,
+          "date": "2024-01-06"
+        },
+        {
+          "image": "/pictures/about/routes/route-02.png",
+          "name": "Interval laps",
+          "kind": "run",
+          "km": 13.5,
+          "date": "2025-07-04"
+        },
+        {
+          "image": "/pictures/about/routes/route-03.png",
+          "name": "Figure eight",
+          "kind": "run",
+          "km": 18.8,
+          "date": "2025-06-28"
+        },
+        {
+          "image": "/pictures/about/routes/route-04.png",
+          "name": "Hub and spokes",
+          "kind": "run",
+          "km": 6.1,
+          "date": "2024-11-08"
+        },
+        {
+          "image": "/pictures/about/routes/route-05.png",
+          "name": "Climb repeats",
+          "kind": "run",
+          "km": 12.2,
+          "date": "2025-12-13"
+        },
+        {
+          "image": "/pictures/about/routes/route-06.png",
+          "name": "Figure eight",
+          "kind": "ride",
+          "km": 87.7,
+          "date": "2024-10-12"
+        },
+        {
+          "image": "/pictures/about/routes/route-07.png",
+          "name": "Village loop",
+          "kind": "run",
+          "km": 9.5,
+          "date": "2023-08-21"
+        },
+        {
+          "image": "/pictures/about/routes/route-08.png",
+          "name": "Stem and loop",
+          "kind": "run",
+          "km": 8.1,
+          "date": "2024-10-08"
+        },
+        {
+          "image": "/pictures/about/routes/route-09.png",
+          "name": "Interval laps",
+          "kind": "run",
+          "km": 10.8,
+          "date": "2026-07-02"
+        },
+        {
+          "image": "/pictures/about/routes/route-10.png",
+          "name": "Park loop",
+          "kind": "run",
+          "km": 21,
+          "date": "2023-05-08"
+        },
+        {
+          "image": "/pictures/about/routes/route-11.png",
+          "name": "Weekend long ride",
+          "kind": "ride",
+          "km": 41.8,
+          "date": "2023-07-14"
+        },
+        {
+          "image": "/pictures/about/routes/route-12.png",
+          "name": "Seaside ride",
+          "kind": "ride",
+          "km": 26.4,
+          "date": "2024-09-09"
+        },
+        {
+          "image": "/pictures/about/routes/route-13.png",
+          "name": "Double loop",
+          "kind": "run",
+          "km": 6.8,
+          "date": "2024-10-16"
+        },
+        {
+          "image": "/pictures/about/routes/route-14.png",
+          "name": "Province ride",
+          "kind": "ride",
+          "km": 43.1,
+          "date": "2025-02-28"
+        },
+        {
+          "image": "/pictures/about/routes/route-15.png",
+          "name": "Zigzag climb",
+          "kind": "run",
+          "km": 3.5,
+          "date": "2026-02-18"
+        },
+        {
+          "image": "/pictures/about/routes/route-16.png",
+          "name": "Downtown zigzag",
+          "kind": "run",
+          "km": 13.3,
+          "date": "2026-08-19"
+        },
+        {
+          "image": "/pictures/about/routes/route-17.png",
+          "name": "Park loop",
+          "kind": "ride",
+          "km": 86.9,
+          "date": "2024-03-17"
+        },
+        {
+          "image": "/pictures/about/routes/route-18.png",
+          "name": "Hill switchbacks",
+          "kind": "run",
+          "km": 19.4,
+          "date": "2026-03-05"
+        },
+        {
+          "image": "/pictures/about/routes/route-19.png",
+          "name": "Interval laps",
+          "kind": "run",
+          "km": 14.2,
+          "date": "2026-03-09"
+        },
+        {
+          "image": "/pictures/about/routes/route-20.png",
+          "name": "Grid run",
+          "kind": "ride",
+          "km": 55.2,
+          "date": "2025-08-20"
+        },
+        {
+          "image": "/pictures/about/routes/route-21.png",
+          "name": "Stem and loop",
+          "kind": "ride",
+          "km": 35.1,
+          "date": "2024-02-09"
+        },
+        {
+          "image": "/pictures/about/routes/route-22.png",
+          "name": "Oval repeats",
+          "kind": "ride",
+          "km": 86.2,
+          "date": "2024-01-01"
+        },
+        {
+          "image": "/pictures/about/routes/route-23.png",
+          "name": "Twin parks",
+          "kind": "run",
+          "km": 9,
+          "date": "2025-02-21"
+        },
+        {
+          "image": "/pictures/about/routes/route-24.png",
+          "name": "Weekend long ride",
+          "kind": "ride",
+          "km": 19,
+          "date": "2025-08-06"
+        },
+        {
+          "image": "/pictures/about/routes/route-25.png",
+          "name": "Lollipop run",
+          "kind": "run",
+          "km": 14.8,
+          "date": "2026-01-07"
+        },
+        {
+          "image": "/pictures/about/routes/route-26.png",
+          "name": "Double loop",
+          "kind": "ride",
+          "km": 55.4,
+          "date": "2023-12-23"
+        },
+        {
+          "image": "/pictures/about/routes/route-27.png",
+          "name": "Park loop",
+          "kind": "run",
+          "km": 3.7,
+          "date": "2024-10-14"
+        },
+        {
+          "image": "/pictures/about/routes/route-28.png",
+          "name": "Hub and spokes",
+          "kind": "ride",
+          "km": 53.2,
+          "date": "2023-05-06"
+        },
+        {
+          "image": "/pictures/about/routes/route-29.png",
+          "name": "Twin parks",
+          "kind": "run",
+          "km": 8.9,
+          "date": "2023-03-17"
+        },
+        {
+          "image": "/pictures/about/routes/route-30.png",
+          "name": "Dawn loop",
+          "kind": "run",
+          "km": 4.8,
+          "date": "2024-05-03"
+        },
+        {
+          "image": "/pictures/about/routes/route-31.png",
+          "name": "Lollipop run",
+          "kind": "run",
+          "km": 10.1,
+          "date": "2024-09-28"
+        },
+        {
+          "image": "/pictures/about/routes/route-32.png",
+          "name": "Oval repeats",
+          "kind": "run",
+          "km": 7.9,
+          "date": "2025-02-18"
+        },
+        {
+          "image": "/pictures/about/routes/route-33.png",
+          "name": "Double loop",
+          "kind": "run",
+          "km": 20.7,
+          "date": "2023-10-25"
+        },
+        {
+          "image": "/pictures/about/routes/route-34.png",
+          "name": "Dawn loop",
+          "kind": "ride",
+          "km": 81.5,
+          "date": "2025-02-24"
+        },
+        {
+          "image": "/pictures/about/routes/route-35.png",
+          "name": "Stem and loop",
+          "kind": "run",
+          "km": 4,
+          "date": "2023-12-17"
+        },
+        {
+          "image": "/pictures/about/routes/route-36.png",
+          "name": "Double loop",
+          "kind": "run",
+          "km": 12.6,
+          "date": "2025-12-23"
+        },
+        {
+          "image": "/pictures/about/routes/route-37.png",
+          "name": "Weekend long ride",
+          "kind": "ride",
+          "km": 32.9,
+          "date": "2024-01-11"
+        },
+        {
+          "image": "/pictures/about/routes/route-38.png",
+          "name": "Stem and loop",
+          "kind": "run",
+          "km": 13.6,
+          "date": "2026-08-27"
+        },
+        {
+          "image": "/pictures/about/routes/route-39.png",
+          "name": "Seaside ride",
+          "kind": "ride",
+          "km": 92.9,
+          "date": "2026-09-19"
+        },
+        {
+          "image": "/pictures/about/routes/route-40.png",
+          "name": "Out and back",
+          "kind": "run",
+          "km": 6.6,
+          "date": "2026-05-27"
+        },
+        {
+          "image": "/pictures/about/routes/route-41.png",
+          "name": "Star run",
+          "kind": "run",
+          "km": 15.9,
+          "date": "2023-01-03"
+        },
+        {
+          "image": "/pictures/about/routes/route-42.png",
+          "name": "Track laps",
+          "kind": "run",
+          "km": 7,
+          "date": "2025-03-09"
+        },
+        {
+          "image": "/pictures/about/routes/route-43.png",
+          "name": "River out and back",
+          "kind": "run",
+          "km": 14.2,
+          "date": "2025-01-23"
+        },
+        {
+          "image": "/pictures/about/routes/route-44.png",
+          "name": "Hub and spokes",
+          "kind": "run",
+          "km": 5,
+          "date": "2025-07-02"
+        },
+        {
+          "image": "/pictures/about/routes/route-45.png",
+          "name": "Seaside ride",
+          "kind": "ride",
+          "km": 84.2,
+          "date": "2026-02-09"
+        },
+        {
+          "image": "/pictures/about/routes/route-46.png",
+          "name": "Downtown zigzag",
+          "kind": "run",
+          "km": 5.3,
+          "date": "2023-07-16"
+        },
+        {
+          "image": "/pictures/about/routes/route-47.png",
+          "name": "Dawn loop",
+          "kind": "run",
+          "km": 11.8,
+          "date": "2023-03-19"
+        },
+        {
+          "image": "/pictures/about/routes/route-48.png",
+          "name": "Lollipop run",
+          "kind": "run",
+          "km": 20.2,
+          "date": "2026-03-15"
+        },
+        {
+          "image": "/pictures/about/routes/route-49.png",
+          "name": "Twin parks",
+          "kind": "run",
+          "km": 4.5,
+          "date": "2024-03-05"
+        },
+        {
+          "image": "/pictures/about/routes/route-50.png",
+          "name": "Out and back",
+          "kind": "run",
+          "km": 6.1,
+          "date": "2024-08-29"
+        },
+        {
+          "image": "/pictures/about/routes/route-51.png",
+          "name": "Province ride",
+          "kind": "ride",
+          "km": 34,
+          "date": "2026-02-21"
+        },
+        {
+          "image": "/pictures/about/routes/route-52.png",
+          "name": "Climb repeats",
+          "kind": "run",
+          "km": 6.3,
+          "date": "2023-08-16"
+        },
+        {
+          "image": "/pictures/about/routes/route-53.png",
+          "name": "Figure eight",
+          "kind": "run",
+          "km": 6.7,
+          "date": "2024-05-03"
+        },
+        {
+          "image": "/pictures/about/routes/route-54.png",
+          "name": "Lake loop",
+          "kind": "run",
+          "km": 3.5,
+          "date": "2024-01-01"
+        },
+        {
+          "image": "/pictures/about/routes/route-55.png",
+          "name": "Bay road ride",
+          "kind": "ride",
+          "km": 56.6,
+          "date": "2026-04-02"
+        },
+        {
+          "image": "/pictures/about/routes/route-56.png",
+          "name": "Twin parks",
+          "kind": "run",
+          "km": 17,
+          "date": "2025-05-18"
+        },
+        {
+          "image": "/pictures/about/routes/route-57.png",
+          "name": "Dawn loop",
+          "kind": "run",
+          "km": 12.4,
+          "date": "2023-02-04"
+        },
+        {
+          "image": "/pictures/about/routes/route-58.png",
+          "name": "Star run",
+          "kind": "run",
+          "km": 8.3,
+          "date": "2025-05-21"
+        },
+        {
+          "image": "/pictures/about/routes/route-59.png",
+          "name": "Seaside ride",
+          "kind": "ride",
+          "km": 43.2,
+          "date": "2023-12-03"
+        },
+        {
+          "image": "/pictures/about/routes/route-60.png",
+          "name": "Grid run",
+          "kind": "run",
+          "km": 7.4,
+          "date": "2023-01-23"
+        }
+      ]
+    }
+  },
+  "evenMore": {
+    "title": "Okay, the kid with the family computer",
+    "body": [
+      "Draft: before any of that, there was a kid, a family computer, and far too much free time."
+    ],
+    "encarta": {
+      "title": "Encarta, open for hours",
+      "body": "Draft: clicking from one article to the next, way past bedtime."
+    },
+    "paint": {
+      "title": "MS Paint for everything else",
+      "body": "Draft: where most of my first drawings lived."
+    },
+    "gameboy": {
+      "title": "A GameBoy in the bag",
+      "body": "Draft: always charged, or at least always with spare batteries."
+    },
+    "volcano": {
+      "title": "The school project I still remember",
+      "body": "Draft: a papier-mâché Mayon Volcano, vinegar and baking soda, and a very proud kid. This is the real one."
+    },
+    "paintings": {
+      "title": "My paintings",
+      "items": [
+        {
+          "image": "/pictures/about/painting-1.webp",
+          "caption": "Placeholder painting"
+        },
+        {
+          "image": "/pictures/about/painting-2.webp",
+          "caption": "Placeholder painting"
+        },
+        {
+          "image": "/pictures/about/painting-3.webp",
+          "caption": "Placeholder painting"
+        },
+        {
+          "image": "/pictures/about/painting-4.webp",
+          "caption": "Placeholder painting"
+        },
+        {
+          "image": "/pictures/about/painting-5.webp",
+          "caption": "Placeholder painting"
+        }
+      ]
+    },
+    "sketches": {
+      "title": "From the sketchbooks",
+      "items": [
+        {
+          "image": "/pictures/about/sketch-1.webp",
+          "caption": "Placeholder sketch"
+        },
+        {
+          "image": "/pictures/about/sketch-2.webp",
+          "caption": "Placeholder sketch"
+        },
+        {
+          "image": "/pictures/about/sketch-3.webp",
+          "caption": "Placeholder sketch"
+        },
+        {
+          "image": "/pictures/about/sketch-4.webp",
+          "caption": "Placeholder sketch"
+        },
+        {
+          "image": "/pictures/about/sketch-5.webp",
+          "caption": "Placeholder sketch"
+        }
+      ]
+    }
+  },
+  "tooFar": {
+    "title": "You scrolled too far… anyway,",
+    "photo": "/pictures/about/kid.webp",
+    "alt": "Placeholder: a childhood photo",
+    "body": [
+      "Draft: this is me as a kid. Who I was, what I loved, and who I looked up to.",
+      "Draft: what I was dreaming of, back when the dreams were big and the computer was slow.",
+      "Draft: the hard parts, and the reason I never gave up."
+    ]
+  },
+  "next": {
+    "title": "Where I'm heading",
+    "plans": [
+      {
+        "title": "Music video director",
+        "body": "Draft: why this one, and what the first one would look like."
+      },
+      {
+        "title": "Short film director",
+        "body": "Draft: the kind of stories I want to tell."
+      },
+      {
+        "title": "Music producer",
+        "body": "Draft: where the music side comes from."
+      }
+    ]
+  }
+}

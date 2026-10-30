@@ -12,15 +12,15 @@
     },
     {
       "label": "Work",
-      "to": "/case-studies#work"
+      "to": "/case-studies?c=work"
     },
     {
       "label": "Craft",
-      "to": "/case-studies#craft"
+      "to": "/case-studies?c=craft"
     },
     {
       "label": "Opinions",
-      "to": "/case-studies#opinion"
+      "to": "/case-studies?c=opinion"
     }
   ]
 }

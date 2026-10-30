@@ -1,49 +1,14 @@
 {
   "eyebrow": "About",
-  "layers": [
-    {
-      "label": "The r\u00e9sum\u00e9",
-      "title": "UI/UX Designer, four years in.",
-      "lines": [
-        "Senior UI/UX Designer and Assistant Creative Director at Praxxys Solutions.",
-        "Guest speaker at LVCC ICT Week.",
-        "Systems thinker: requirements to design to dev handover and QA."
-      ]
-    },
-    {
-      "label": "A little more",
-      "title": "Before design, there was making.",
-      "lines": [
-        "CorelDRAW and Premiere Pro were my first real tools.",
-        "I worked alongside my dad.",
-        "I wrote and edited as a journalist.",
-        "Off the clock: running, biking, swimming and the gym."
-      ]
-    },
-    {
-      "label": "Even more",
-      "title": "The kid with the family computer.",
-      "lines": [
-        "Encarta open for hours, MS Paint for everything else.",
-        "A GameBoy in the bag.",
-        "School projects, paintings and sketchbooks."
-      ]
-    },
-    {
-      "label": "Oh.",
-      "title": "You scrolled too far.",
-      "lines": [
-        "TODO (in your own words): who that kid was, what inspired them, what they were dreaming of, and what was hard but never made them quit."
-      ]
-    },
-    {
-      "label": "Next",
-      "title": "What I want to make.",
-      "lines": [
-        "Music video director.",
-        "Short film director.",
-        "Music producer."
-      ]
-    }
-  ]
+  "title": "Start to",
+  "titleAccent": "ship.",
+  "heading": "I design the whole thing, from the first question to the last QA pass.",
+  "body": [
+    "I'm a UI/UX designer based in **Quezon City**, with **four years** of building websites and apps for teams in the Philippines, Australia, Germany and the US. Right now I'm a Senior UI/UX Designer and Assistant Creative Director at Praxxys Solutions.",
+    "Most of my work starts before the screens: sitting with clients, working out what the product really needs, then carrying it through design, handover and QA. I studied Information Systems, so I'm at home talking with developers, and these days AI tools are part of how I work, to move faster without cutting corners."
+  ],
+  "cta": {
+    "label": "More about me",
+    "to": "/about"
+  }
 }

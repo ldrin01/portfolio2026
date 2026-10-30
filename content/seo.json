@@ -11,6 +11,13 @@
       "description": "UI/UX designer and systems thinker in Quezon City, Philippines."
     },
     {
+      "id": "about",
+      "name": "More about me",
+      "path": "/about",
+      "title": "About — Eldrin Bernardino",
+      "description": "The longer story of Eldrin Bernardino, a UI/UX designer in Quezon City: where it started and where it's going."
+    },
+    {
       "id": "case-studies",
       "name": "Case studies",
       "path": "/case-studies",

@@ -1,14 +1,9 @@
 {
   "logo": "DRINWORKS",
-  "siteHeading": "Site",
-  "allCaseStudies": "All case studies",
   "links": [
     { "label": "Home", "to": "/" },
-    { "label": "Selected work", "to": "/#work" },
-    { "label": "About", "to": "/#about" },
-    { "label": "Toolkit", "to": "/#toolkit" },
-    { "label": "Process", "to": "/#process" },
-    { "label": "Journey", "to": "/#journey" },
-    { "label": "Contact", "to": "/contact" }
+    { "label": "More about me", "to": "/about" },
+    { "label": "Contact", "to": "/contact" },
+    { "label": "Case studies", "to": "/case-studies" }
   ]
 }
