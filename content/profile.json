@@ -1,0 +1,39 @@
+{
+  "name": "Eldrin Bernardino",
+  "roles": [
+    "UI/UX Designer",
+    "Video Editor",
+    "3D Designer",
+    "Graphic Artist",
+    "Visual Strategist",
+    "Digital Storyteller"
+  ],
+  "role": "Designer",
+  "tagline": "I design brands and products that feel considered, human and a little bit unexpected.",
+  "about": [
+    "I am a designer with a focus on brand identity, product design and motion. I like working with small teams on problems that need both craft and clear thinking.",
+    "Outside of work you will find me sketching, collecting type specimens and making too much coffee."
+  ],
+  "skills": [
+    "Brand identity",
+    "Product design",
+    "Motion",
+    "Illustration",
+    "Prototyping"
+  ],
+  "contactHeading": [
+    "Got a story",
+    "to tell?"
+  ],
+  "email": "eldrinbernardino01@gmail.com",
+  "links": [
+    {
+      "label": "LinkedIn",
+      "href": "https://linkedin.com/"
+    },
+    {
+      "label": "Instagram",
+      "href": "https://instagram.com/"
+    }
+  ]
+}

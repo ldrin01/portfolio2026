@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { journey } from '~/data/site'
+const { journey } = useSite()
 
 const root = ref<HTMLElement | null>(null)
 const list = ref<HTMLElement | null>(null)
@@ -243,6 +243,9 @@ h3 { font-size: clamp(30px, 4vw, 54px); font-weight: calc(300 + 500 * var(--k));
   .left .tags { justify-content: flex-start; }
   .left .blurb { margin-left: 0; }
   .dot { left: 8px; }
+  /* phones: a bolder title is a wider title, and in one narrow column it re-wraps mid-scroll, shifting everything below
+     (the line and dots then drift off). Keep the weight fixed and show focus with opacity, which never moves layout. */
+  h3 { font-weight: 500; opacity: calc(.45 + .55 * var(--k)); }
 }
 @media (prefers-reduced-motion: reduce) {
   .w { transform: none; animation: none !important; }

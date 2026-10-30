@@ -1,0 +1,26 @@
+{
+  "label": "Say hello",
+  "legalLink": "Privacy & Terms",
+  "exploreLabel": "Explore",
+  "writingLabel": "Writing",
+  "socialLabel": "Elsewhere",
+  "wordmark": "DRINWORKS",
+  "writing": [
+    {
+      "label": "All case studies",
+      "to": "/case-studies"
+    },
+    {
+      "label": "Work",
+      "to": "/case-studies#work"
+    },
+    {
+      "label": "Craft",
+      "to": "/case-studies#craft"
+    },
+    {
+      "label": "Opinions",
+      "to": "/case-studies#opinion"
+    }
+  ]
+}

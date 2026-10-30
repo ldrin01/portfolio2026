@@ -93,13 +93,17 @@ on(window, 'pointermove', (e) => {
 function depthStyle() {
   const cv = $('cDepth'), gl = cv.getContext('webgl', { premultipliedAlpha: true })
   const prog = glProgram(gl, QUAD_VS, PREC + `
-varying vec2 vUv; uniform sampler2D uDepth; uniform vec2 uTexel, uMouse; uniform float uReveal;
+varying vec2 vUv; uniform sampler2D uDepth; uniform vec2 uTexel, uMouse; uniform float uReveal, uLight;
 float H(vec2 p) { return texture2D(uDepth, p).r; }
 float hs(vec2 p) { vec2 o = uTexel * 2.; float s = H(p) * 4.;
   s += (H(p + vec2(o.x, 0.)) + H(p - vec2(o.x, 0.)) + H(p + vec2(0., o.y)) + H(p - vec2(0., o.y))) * 2.;
   s += H(p + o) + H(p - o) + H(p + vec2(o.x, -o.y)) + H(p + vec2(-o.x, o.y)); return s / 16.; }
 vec3 grade(float v) {
   vec3 c0 = vec3(.27, .075, .03), c1 = vec3(.62, .15, .06), c2 = vec3(.93, .30, .10), c3 = vec3(1., .50, .16), c4 = vec3(1., .86, .42);
+  v = clamp(v, 0., 1.) * 4.; vec3 c = mix(c0, c1, clamp(v, 0., 1.)); c = mix(c, c2, clamp(v - 1., 0., 1.)); c = mix(c, c3, clamp(v - 2., 0., 1.)); return mix(c, c4, clamp(v - 3., 0., 1.)); }
+// on paper the ramp flips: far parts fade to a pale peach near the paper, near parts are the deepest orange
+vec3 gradeLight(float v) {
+  vec3 c0 = vec3(.96, .87, .77), c1 = vec3(.98, .72, .50), c2 = vec3(.95, .50, .24), c3 = vec3(.82, .30, .10), c4 = vec3(.55, .15, .05);
   v = clamp(v, 0., 1.) * 4.; vec3 c = mix(c0, c1, clamp(v, 0., 1.)); c = mix(c, c2, clamp(v - 1., 0., 1.)); c = mix(c, c3, clamp(v - 2., 0., 1.)); return mix(c, c4, clamp(v - 3., 0., 1.)); }
 float noise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3. - 2. * f);
   float a = fract(sin(dot(i, vec2(127.1, 311.7))) * 43758.5453), b = fract(sin(dot(i + vec2(1., 0.), vec2(127.1, 311.7))) * 43758.5453);
@@ -109,11 +113,12 @@ void main() {
   float a = texture2D(uDepth, vUv).a, d0 = H(vUv);
   vec2 uv = vUv - vec2(uMouse.x * .07, uMouse.y * .045) * (d0 - .2);
   if (texture2D(uDepth, uv).a < .98) uv = vUv;
-  float v = (hs(uv) - .14) / .86; vec3 col = grade(v);
+  float v = (hs(uv) - .14) / .86; vec3 col = mix(grade(v), gradeLight(v), uLight);
   float n = noise(vUv * vec2(4., 6.)) * .65 + noise(vUv * vec2(11., 15.)) * .35;
   float k = .55 * (1. - clamp(v, 0., 1.)) + .45 * (1. - vUv.y) + .2 * (n - .5);
   float front = uReveal * 1.6 - .1, vis = 1. - smoothstep(front - .22, front, k);
-  col += vec3(1., .8, .45) * smoothstep(front - .22, front - .1, k) * (1. - smoothstep(front - .1, front, k)) * .5;
+  float band = smoothstep(front - .22, front - .1, k) * (1. - smoothstep(front - .1, front, k));
+  col = mix(col + vec3(1., .8, .45) * band * .5, mix(col, vec3(.62, .18, .05), band * .55), uLight); // a glowing edge on dark, an inked one on paper
   a *= vis; gl_FragColor = vec4(col * a, a);
 }`)
   quad(gl, prog); glTexture(gl, depthImg, 0)
@@ -126,6 +131,7 @@ void main() {
       fit(cv); gl.viewport(0, 0, cv.width, cv.height)
       const p = reduced ? 1 : Math.min((t - t0) / 2200, 1)
       gl.uniform1f(u('uReveal'), 1 - (1 - p) ** 2); gl.uniform2f(u('uMouse'), input.mx, input.my + input.sw * 2.2)
+      gl.uniform1f(u('uLight'), isLight() ? 1 : 0)
       gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT); gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
     },
   }

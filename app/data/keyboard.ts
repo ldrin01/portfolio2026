@@ -11,10 +11,3 @@ export const keyboardRows: Key[][] = [
   [['ShiftLeft', 2.25], ...'ZXCVBNM'.split('').map(c => [`Key${c}`] as Key), ['Comma'], ['Period'], ['Slash'], ['ShiftRight', 1.75], ['ArrowUp'], ['Numpad1'], ['Numpad2'], ['Numpad3'], ['NumpadEnter', 1, 2]],
   [['ControlLeft', 1.25], ['AltLeft', 1.25], ['MetaLeft', 1.25], ['Space', 6.25], ['MetaRight'], [''], ['ControlRight'], ['ArrowLeft'], ['ArrowDown'], ['ArrowRight'], ['Numpad0'], ['NumpadDecimal']]
 ]
-
-export const keyboardCopy = {
-  typed: 'From wireframe to working product.', // typed out behind the keyboard as the page scrolls
-  hintKeys: 'Type something',
-  hintTouch: 'Tap the keys',
-  tilt: 'Tap to tilt'
-}

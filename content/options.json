@@ -1,0 +1,48 @@
+{
+  "articleCategories": [
+    {
+      "id": "work",
+      "name": "Work",
+      "heading": "Work",
+      "blurb": "Projects, by industry."
+    },
+    {
+      "id": "craft",
+      "name": "Craft",
+      "heading": "Craft",
+      "blurb": "How I make things in Figma and beyond."
+    },
+    {
+      "id": "opinion",
+      "name": "Opinion",
+      "heading": "Opinions",
+      "blurb": "What I think, with receipts."
+    }
+  ],
+  "toolLevels": [
+    {
+      "id": "daily",
+      "name": "Daily"
+    },
+    {
+      "id": "comfortable",
+      "name": "Comfortable"
+    },
+    {
+      "id": "familiar",
+      "name": "Familiar"
+    }
+  ],
+  "toolGroups": [
+    {
+      "id": "ai",
+      "name": "AI tools",
+      "tag": "AI"
+    },
+    {
+      "id": "design",
+      "name": "Design",
+      "tag": ""
+    }
+  ]
+}

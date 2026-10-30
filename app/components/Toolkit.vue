@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { toolkit } from '~/data/tools'
+const { toolkit, options } = useSite()
+// a group's short tag after the level ("Daily · AI"); groups without a tag show nothing
+const groupTag = (id: string) => options.toolGroups.find(g => g.id === id)?.tag ?? ''
 
 // Each logo is its outline drawn LAYERS times, each copy pushed further back: an extruded wireframe.
 const LAYERS = 10
@@ -144,13 +146,35 @@ onBeforeUnmount(() => {
           </div>
           <p class="name">{{ t.name }}</p>
           <p class="use">{{ t.use }}</p>
+          <p class="lvl" :data-level="t.level">{{ optionName('toolLevels', t.level) }}<template v-if="groupTag(t.group)"> · {{ groupTag(t.group) }}</template></p>
         </li>
       </ul>
+
+      <div class="code">
+        <p v-lag="0" class="eyebrow">{{ toolkit.codeHeading }}</p>
+        <ul class="chips">
+          <li v-for="c in toolkit.code" :key="c.name" v-lag="1">
+            <span class="icons" aria-hidden="true"><svg v-for="ic in c.icons" :key="ic.path" viewBox="0 0 24 24" :style="{ '--c': ic.color }"><path :d="ic.path" /></svg></span>
+            {{ c.name }} <span class="lvl" :data-level="c.level">{{ optionName('toolLevels', c.level) }}</span>
+          </li>
+        </ul>
+      </div>
     </div>
   </section>
 </template>
 
 <style scoped>
+.lvl { margin: 6px 0 0; font-size: 12px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+.lvl[data-level="daily"] { color: var(--accent); }
+@media (max-width: 600px) { .tool .lvl { font-size: 10.5px; letter-spacing: .1em; } } /* keeps "Comfortable · AI" on one line in a narrow column */
+.code { margin-top: clamp(48px, 8vw, 96px); text-align: center; }
+.chips { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+.chips li { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line); border-radius: 8px; padding: 6px 16px 6px 12px; font-size: 15px; background: var(--surface); }
+.chips .lvl { margin: 0; }
+.icons { display: inline-flex; gap: 4px; }
+/* small brand logos: their own colour on paper; the dark world tints them with its orange */
+.icons svg { width: 16px; height: 16px; fill: var(--c); }
+[data-theme="dark"] .icons svg { fill: var(--accent); }
 .defs { position: absolute; width: 0; height: 0; overflow: hidden; }
 .intro { margin-bottom: clamp(40px, 7vw, 88px); }
 h2 { font-size: clamp(34px, 5.5vw, 72px); letter-spacing: -.02em; font-weight: 500; }

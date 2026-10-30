@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { keyboardRows, keyboardCopy } from '~/data/keyboard'
+import { keyboardRows } from '~/data/keyboard'
+
+const keyboardCopy = useSite().keyboard
 
 // A creative break: the desk keyboard as a 3D outline. It tilts with the mouse, the scroll and the
 // phone's tilt, and the visitor's own key presses push the matching keys down.
@@ -59,8 +61,11 @@ async function start() {
   scene.fog = fog
   const camera = new THREE.PerspectiveCamera(28, 1, 0.1, 200)
 
-  const line = (name: string, opacity: number, linewidth: number) =>
-    new LineMaterial({ color: color(name).getHex(), transparent: true, opacity, linewidth, worldUnits: false, fog: true })
+  const line = (name: string, opacity: number, linewidth: number) => {
+    const m = new LineMaterial({ color: color(name).getHex(), transparent: true, opacity, linewidth, worldUnits: false, fog: true })
+    m.userData.token = name // the colour token, so a theme switch can repaint it
+    return m
+  }
   // line weights: key tops and the case's outer contour are bold, sides and inner details thin
   const mats = {
     top: line('--fg', 0.95, 1.5),
@@ -443,11 +448,22 @@ async function start() {
 
   const ro = new ResizeObserver(fit)
   ro.observe(el)
+
+  // the theme flips the colour tokens: repaint the lines, the hiding bodies and the fog to match
+  const repaint = () => {
+    Object.values(mats).forEach(m => m.color.copy(color(m.userData.token)))
+    const b = color('--bg')
+    solid.color.copy(b); fog.color.copy(b); renderer.setClearColor(b, 0)
+    kick()
+  }
+  const themeWatch = new MutationObserver(repaint)
+  themeWatch.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] })
   readScroll(); readInput(); fit()
 
   return () => {
     visible.disconnect()
     ro.disconnect()
+    themeWatch.disconnect()
     live = false
     if (raf) cancelAnimationFrame(raf)
     for (const ev of ['scroll', 'pointermove', 'keydown', 'keyup', 'blur', 'deviceorientation'] as const) window.removeEventListener(ev, (({ scroll: onScroll, pointermove: onPointer, keydown: onKeyDown, keyup: onKeyUp, blur: releaseAll, deviceorientation: onTilt }) as Record<string, EventListener>)[ev]!)

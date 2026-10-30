@@ -1,0 +1,35 @@
+{
+  "siteName": "Eldrin Bernardino",
+  "defaultDescription": "Portfolio of Eldrin Bernardino, a UI/UX designer and systems thinker in Quezon City, Philippines.",
+  "shareImage": "/me.webp",
+  "pages": [
+    {
+      "id": "home",
+      "name": "Home page",
+      "path": "/",
+      "title": "Eldrin Bernardino — UI/UX Designer",
+      "description": "UI/UX designer and systems thinker in Quezon City, Philippines."
+    },
+    {
+      "id": "case-studies",
+      "name": "Case studies",
+      "path": "/case-studies",
+      "title": "Case studies — Eldrin Bernardino",
+      "description": "Work, craft and opinions from a UI/UX designer."
+    },
+    {
+      "id": "contact",
+      "name": "Contact",
+      "path": "/contact",
+      "title": "Contact — Eldrin Bernardino",
+      "description": "Get in touch with Eldrin Bernardino, a UI/UX designer in Quezon City, Metro Manila."
+    },
+    {
+      "id": "legal",
+      "name": "Privacy & Terms",
+      "path": "/legal",
+      "title": "Privacy & Terms — Eldrin Bernardino",
+      "description": "How this site treats your data and its content."
+    }
+  ]
+}

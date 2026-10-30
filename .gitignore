@@ -5,3 +5,9 @@ node_modules
 dist
 .DS_Store
 *.log
+
+# local content editor: stays on this laptop
+layers/admin/
+
+# personal notes (CV, client industries): not for the public repo
+NOTES.md

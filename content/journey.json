@@ -1,0 +1,49 @@
+{
+  "heading": "Every chapter, a new craft.",
+  "entries": [
+    {
+      "period": "2015 — 2019",
+      "role": "BS Information System",
+      "org": "La Verdad Christian College",
+      "blurb": "Studied web and iOS app development, software engineering, project management and e-commerce.",
+      "tags": [
+        "Web apps",
+        "Software engineering",
+        "Project management"
+      ]
+    },
+    {
+      "period": "2020 — 2021",
+      "role": "Graphic Designer",
+      "org": "Aether Design",
+      "blurb": "Freelance graphic design and video editing for a creative studio in Caloocan City.",
+      "tags": [
+        "Photoshop",
+        "Premiere Pro",
+        "CorelDRAW"
+      ]
+    },
+    {
+      "period": "2021 — 2022",
+      "role": "Video Editor",
+      "org": "Mess Energy",
+      "blurb": "Freelance video editing and graphics for an energy company in Singapore.",
+      "tags": [
+        "Premiere Pro",
+        "After Effects",
+        "Photoshop"
+      ]
+    },
+    {
+      "period": "2022 — Present",
+      "role": "Senior UI/UX Designer",
+      "org": "Praxxys Solutions",
+      "blurb": "Assistant Creative Director. I lead design end to end, from requirements to dev handover and QA, for clients in education, finance, hospitality, F&B and more.",
+      "tags": [
+        "Figma",
+        "Design systems",
+        "Agentic AI"
+      ]
+    }
+  ]
+}

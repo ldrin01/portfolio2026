@@ -1,0 +1,36 @@
+{
+  "eyebrow": "Selected work",
+  "heading": "Four stories from the folder.",
+  "hint": "tap the folder!",
+  "closeHint": "close",
+  "items": [
+    {
+      "title": "Design System",
+      "blurb": "One set of tokens and components that design and development share, so a change happens once.",
+      "category": "work",
+      "to": "/case-studies/design-system"
+    },
+    {
+      "title": "UX Research",
+      "blurb": "From interviews and surveys to decisions on the screen, and why research earns its time.",
+      "category": "craft",
+      "to": "/case-studies/ux-research"
+    },
+    {
+      "title": "Pinoy E-commerce",
+      "blurb": "An online shop built around how Filipinos actually buy: mobile first, cash on delivery, support over chat.",
+      "category": "work",
+      "to": "/case-studies/pinoy-e-commerce"
+    },
+    {
+      "title": "AI and Creatives",
+      "blurb": "Is AI the worst thing that happened to creatives? Notes from someone who designs with it daily.",
+      "category": "opinion",
+      "to": "/case-studies/ai-and-creatives"
+    }
+  ],
+  "more": {
+    "label": "View more case studies",
+    "to": "/case-studies"
+  }
+}

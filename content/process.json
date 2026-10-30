@@ -1,0 +1,47 @@
+{
+  "heading": "How I work.",
+  "steps": [
+    {
+      "title": "Briefing",
+      "blurb": "Goals, users, constraints and what success looks like, written down before any pixels.",
+      "outputs": [
+        "Brief doc",
+        "Success metrics",
+        "Constraints"
+      ],
+      "icon": "brief"
+    },
+    {
+      "title": "Mind mapping",
+      "blurb": "Everything the product could be on one page, then cut down to what it should be.",
+      "outputs": [
+        "Feature map",
+        "Scope cut",
+        "Priorities"
+      ],
+      "icon": "map"
+    },
+    {
+      "title": "UX research",
+      "blurb": "Talk to users, study the market, and let evidence settle the arguments.",
+      "outputs": [
+        "Interviews",
+        "Survey",
+        "Competitor scan"
+      ],
+      "icon": "research"
+    },
+    {
+      "title": "User journey",
+      "blurb": "Follow a person from first click to goal and fix every place they stall.",
+      "outputs": [
+        "Journey map",
+        "Pain points",
+        "Wireframes"
+      ],
+      "icon": "journey"
+    }
+  ],
+  "eyebrow": "Design process",
+  "sub": "Four steps, every project. The line fills in as you scroll."
+}

@@ -22,6 +22,13 @@
   --accent-3: var(--burgundy);
   --accent-4: var(--silver);
 
+  /* ── Two worlds. DARK is digital: black into an orange ramp, no shadows, ASCII instead of grain, pixels instead of blur ── */
+  --ramp-1: #ff7a3d; --ramp-2: #ff5a2d; --ramp-3: #e84a1c; --ramp-4: #c43a14; --ramp-5: #9a2c10; --ramp-6: #6e200c;
+  --bg-image: linear-gradient(180deg, #0a0605 0%, #0f0f13 45%, #2a1006 100%);
+  --shadow-card: none;
+  --gloss: none;
+  --fx-opacity: .07;
+
 
   --gutter: clamp(16px, 4vw, 48px);
   --font: 'Funnel Display', system-ui, sans-serif;
@@ -42,6 +49,13 @@
   --accent-2: var(--red-velvet);
   --accent-3: var(--burgundy);
   --accent-4: #8a8c92;
+
+  /* LIGHT is physical: real colours, soft shadows, gloss, film grain, real blur */
+  --c-red: #e63946; --c-green: #3a9d5d; --c-blue: #2f6fdb; --c-yellow: #f5b82e; --c-purple: #8a4fc7;
+  --bg-image: none;
+  --shadow-card: 0 1px 1px rgba(22, 22, 27, .08), 0 8px 18px -6px rgba(22, 22, 27, .22), 0 28px 48px -20px rgba(22, 22, 27, .28);
+  --gloss: linear-gradient(120deg, rgba(255, 255, 255, .55) 0%, rgba(255, 255, 255, 0) 38%, rgba(255, 255, 255, 0) 62%, rgba(255, 255, 255, .18) 100%);
+  --fx-opacity: .16;
 }
 /* colours ease over when the theme flips (only while switching, so nothing else animates) */
 html.theme-switching, html.theme-switching * { transition: background-color .45s ease, color .45s ease, border-color .45s ease, fill .45s ease, stroke .45s ease !important; }
@@ -56,7 +70,7 @@ html.lenis, html.lenis body { height: auto; }
 .lenis.lenis-stopped { overflow: hidden; }
 body {
   margin: 0; color: var(--fg); font: 400 17px/1.7 var(--sans); -webkit-font-smoothing: antialiased;
-  background: var(--bg);
+  background: var(--bg) var(--bg-image) fixed;
 }
 a { color: inherit; }
 ::selection { background: var(--accent); color: var(--on-accent); }
@@ -73,3 +87,19 @@ section > .wrap { width: 100%; }
 }
 .eyebrow { font-size: 13px; letter-spacing: .2em; text-transform: uppercase; color: var(--accent); margin: 0 0 20px; font-weight: 500; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; scroll-behavior: auto !important; } }
+
+/* ── Effect layer (see ThemeFX.vue): light = film grain, dark = ASCII. One overlay, two looks. ── */
+.fx { position: fixed; inset: 0; z-index: 900; pointer-events: none; opacity: var(--fx-opacity); }
+[data-theme="light"] .fx {
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+[data-theme="dark"] .fx {
+  font: 10px/12px ui-monospace, 'SF Mono', Menlo, monospace; color: var(--ramp-2); overflow: hidden;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Cg fill='%23ff5a2d' font-family='monospace' font-size='9'%3E%3Ctext x='2' y='10'%3E.%3C/text%3E%3Ctext x='26' y='10'%3E:%3C/text%3E%3Ctext x='14' y='22'%3E+%3C/text%3E%3Ctext x='38' y='22'%3E.%3C/text%3E%3Ctext x='2' y='34'%3E*%3C/text%3E%3Ctext x='26' y='34'%3E.%3C/text%3E%3Ctext x='14' y='46'%3E:%3C/text%3E%3Ctext x='38' y='46'%3E+%3C/text%3E%3C/g%3E%3C/svg%3E");
+}
+/* dark has no blur and no shadows: glass becomes flat, pictures become pixels */
+[data-theme="dark"] * { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+[data-theme="dark"] img { image-rendering: pixelated; }
+
+/* the room for the footer's glasses is the footer's own margin-top (SiteFooter.vue), so no page can override it */

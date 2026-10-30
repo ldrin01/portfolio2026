@@ -13,7 +13,7 @@ npm run dev      # http://localhost:3000
 
 ## Edit the content
 
-- Text, roles, projects and the timeline: `app/data/site.ts`
+- Text, roles, projects, timeline and toolkit: `content/` (JSON files)
 - Colors (the design tokens): `app/assets/css/main.css`
 
 ## Deploy

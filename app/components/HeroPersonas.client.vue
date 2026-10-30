@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // Hero portrait with one art style per role. It switches the moment the headline's rotating word changes,
 // so the word sets the pace. The styles themselves live in ~/lib/personas.js.
-import { profile } from '~/data/site'
+const { profile } = useSite()
 
 const props = defineProps<{ role: number }>() // index into profile.roles; -1 before the first word shows
 const root = useTemplateRef<HTMLDivElement>('root')

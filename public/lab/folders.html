@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Work folder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Funnel+Display:wght@300..800&display=swap">
+<script>
+  // ?theme=light|dark wins, then the system setting
+  document.documentElement.dataset.theme = new URLSearchParams(location.search).get('theme') || (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark')
+</script>
+<style>
+/* the site's two worlds: dark is black into an orange ramp with no shadows, light is warm paper with a green folder */
+:root {
+  --bg: #0f0f13; --fg: #e6e9ed; --muted: #a8aaaf;
+  --line: color-mix(in srgb, #a8aaaf 22%, transparent);
+  --f-back: #9a2c10; --f-front: #e84a1c; --f-ink: #0a0605; --f-shadow: rgba(0, 0, 0, 0);
+  --paper: #efe7df; --paper-ink: #0a0605;
+  --gutter: clamp(16px, 4vw, 48px);
+  --font: 'Funnel Display', system-ui, sans-serif;
+  color-scheme: dark;
+}
+:root[data-theme="light"] {
+  --bg: #f2efe9; --fg: #16161b; --muted: #5d5f66;
+  --line: color-mix(in srgb, #16161b 16%, transparent);
+  --f-back: #2f8a50; --f-front: #46b06a; --f-ink: #fff; --f-shadow: rgba(22, 22, 27, .28);
+  --paper: #fffdf8; --paper-ink: #16161b;
+  color-scheme: light;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--bg); color: var(--fg); font: 400 17px/1.6 var(--font); -webkit-font-smoothing: antialiased; transition: background-color .45s, color .45s; }
+main { overflow-x: clip; min-height: 100vh; min-height: 100svh; display: flex; flex-direction: column; justify-content: center; padding: clamp(72px, 10vw, 120px) 0; }
+.wrap { width: 100%; padding: 0 max(calc(var(--gutter) * 1.4), 11vw); } /* the folder runs close to the edges; the margin leaves room for its top, which leans toward you */
+.theme { position: fixed; z-index: 20; top: 20px; right: var(--gutter); font: inherit; font-size: 12px; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); background: none; border: 1px solid var(--line); border-radius: 999px; padding: 8px 14px; cursor: pointer; }
+.theme:hover { color: var(--fg); }
+
+/* ── the folder, lying on its side ─────────────────────────────────
+   Think of it standing up first: two covers, no spine, each with a long tab on its right edge,
+   the back's from the top to halfway, the front's from halfway to the bottom.
+   Lay it on its side (its top to the left) and that right edge becomes the top of the screen: the back's tab runs
+   along the left half, the front's along the right half. The front faces you, the back sits parallel behind it,
+   and the view is from a little above, looking at the front, so the back and its tab show above it. */
+.folder {
+  --gap: 46px; --tabh: 34px;
+  position: relative; width: 100%; aspect-ratio: 2.133; margin: 0 auto; /* a quarter shorter than it was (1.6), cut from the bottom */ perspective: 1800px; perspective-origin: 50% -30%;
+}
+/* resting view: from a little above, looking at the front (the top edge leans toward you). --rx and --ry come from the script */
+.scene { position: absolute; inset: 0; transform-style: preserve-3d; transform: translateY(var(--drop)) rotateX(var(--rx, -16deg)) rotateY(var(--ry, 0deg)); }
+/* --drop moves the folder down under a camera that stays put, so you look down on it a bit more without it getting bigger */
+.folder { --drop: 22%; }
+/* for now the whole page is a handle: drag to turn the folder and look around it */
+main { cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none; }
+main.dragging { cursor: grabbing; }
+.drag-hint { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); margin: 0; font-size: 12px; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); pointer-events: none; }
+/* each cover is one smooth outline (body and its tab, drawn by the script below), so every corner is a real curve:
+   rounded outside corners, and soft inside corners where a tab rises out of the body */
+.cover { position: absolute; left: 0; right: 0; top: calc(var(--tabh) * -1); bottom: 0; filter: drop-shadow(0 22px 26px var(--f-shadow)); }
+.shape { position: absolute; inset: 0; -webkit-mask: var(--outline) 0 0 / 100% 100% no-repeat; mask: var(--outline) 0 0 / 100% 100% no-repeat; }
+
+.back { transform: translateZ(calc(var(--gap) * -1)); }
+/* click the front: the back slips away behind it (a little smaller) and the front comes the smallest step toward you */
+.back, .front { transition: transform .9s cubic-bezier(.2, .8, .2, 1); }
+.front { cursor: pointer; transform: translateZ(0); }
+.folder.open .back { transform: translateY(calc(var(--rise) * -1)) translateZ(calc(var(--gap) * -1 - var(--away))); }
+/* the front also slides down until only about half of it is on screen (later the frame grows to hold it),
+   and the papers follow by how near the front they sit, so every gap stretches by the same percentage */
+.folder.open .front { transform: translateY(var(--push)) translateZ(var(--toward)); }
+.folder { --away: 340px; --toward: 60px; --rise: 130px; --push: calc(var(--fh, 500px) * .55); }
+.back .shape { background: var(--f-back); }
+
+/* four papers between the covers. --k is how far toward the back each sits (0 = at the front, 1 = at the back),
+   so when the folder opens they fan out along the same path the back takes, evenly spaced */
+.paper {
+  position: absolute; left: 3%; right: 3%; top: calc(var(--tabh) * -.45 - var(--peek, 0px)); bottom: 4%;
+  border-radius: 10px; padding: 10px 16px; background: color-mix(in srgb, var(--paper) calc(100% - var(--k) * 14%), var(--paper-ink));
+  color: var(--paper-ink); font-size: 12px; letter-spacing: .18em; text-transform: uppercase;
+  box-shadow: 0 10px 20px var(--f-shadow); pointer-events: none;
+  transform: translateZ(calc(var(--gap) * -1 * var(--k)));
+  transition: transform .9s cubic-bezier(.2, .8, .2, 1);
+}
+.folder.open .paper { transform: translateY(calc(var(--push) * (1 - var(--k)) - var(--rise) * var(--k))) translateZ(calc((var(--gap) + var(--away)) * -1 * var(--k))); }
+
+.front .shape {
+  display: flex; align-items: flex-end; padding: clamp(24px, 4vw, 48px);
+  background: linear-gradient(100deg, rgba(255, 255, 255, .1), transparent 35%), var(--f-front); color: var(--f-ink);
+}
+.head { position: relative; margin: 0; font-size: clamp(26px, 5vw, 56px); font-weight: 600; letter-spacing: -.02em; line-height: 1.05; max-width: 12ch; }
+</style>
+</head>
+<body>
+<button class="theme" id="theme" type="button"></button>
+<main>
+  <div class="wrap">
+    <div class="folder" id="folder">
+      <div class="scene" id="scene">
+        <div class="cover back" aria-hidden="true"><div class="shape"></div></div>
+        <div class="paper">01</div>
+        <div class="paper">02</div>
+        <div class="paper">03</div>
+        <div class="paper">04</div>
+        <div class="paper">05</div>
+        <div class="paper">06</div>
+        <div class="cover front"><div class="shape"><p class="head">Four stories from the folder.</p></div></div>
+      </div>
+    </div>
+  </div>
+</main>
+<p class="drag-hint">Drag to look around · double-click to reset</p>
+
+<script>
+const $ = (id) => document.getElementById(id)
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches
+const coarse = matchMedia('(pointer: coarse)').matches
+const scene = $('scene'), stage = document.querySelector('main')
+const REST_X = -16 // degrees: a little above, looking at the front
+
+// ── the covers' outlines: a body with a long tab along half of its top edge (the back's on the left half, the front's
+// on the right). Every corner gets a radius, rounded outward or inward, so the whole outline flows
+const outline = (w, h, th, side) => {
+  const R = 18, TAB = 12, BASE = 6, FILLET = 10, SLANT = 22 // corner radii and how far a tab's end leans
+  const m = w / 2
+  const pts = side === 'left'
+    ? [[0, h, R], [0, th, BASE], [SLANT, 0, TAB], [m - SLANT, 0, TAB], [m, th, FILLET], [w, th, R], [w, h, R]]
+    : [[0, h, R], [0, th, R], [m, th, FILLET], [m + SLANT, 0, TAB], [w - SLANT, 0, TAB], [w, th, BASE], [w, h, R]]
+  // round each vertex: stop short of it along both edges and curve through it
+  const n = pts.length, unit = (a, b) => { const dx = b[0] - a[0], dy = b[1] - a[1], l = Math.hypot(dx, dy); return [dx / l, dy / l, l] }
+  let d = ''
+  pts.forEach((p, i) => {
+    const prev = pts[(i + n - 1) % n], next = pts[(i + 1) % n]
+    const [ax, ay, al] = unit(p, prev), [bx, by, bl] = unit(p, next), r = Math.min(p[2], al / 2, bl / 2)
+    d += `${i ? 'L' : 'M'}${p[0] + ax * r},${p[1] + ay * r}Q${p[0]},${p[1]} ${p[0] + bx * r},${p[1] + by * r}`
+  })
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none"><path d="${d}Z"/></svg>`
+  return `url("data:image/svg+xml,${encodeURIComponent(svg)}")`
+}
+const shapeCovers = () => {
+  $('folder').style.setProperty('--fh', $('folder').offsetHeight + 'px')
+  for (const [sel, side] of [['.back', 'left'], ['.front', 'right']]) {
+    const el = document.querySelector(sel), th = parseFloat(getComputedStyle(el).getPropertyValue('--tabh'))
+    el.querySelector('.shape').style.setProperty('--outline', outline(el.offsetWidth, el.offsetHeight, th, side))
+  }
+}
+// ── papers: however many there are, the first sits just off the back, the last a small step behind the front,
+// and the rest are spaced evenly between. Their labels step across the width so each one shows
+const papers = [...document.querySelectorAll('.paper')]
+const K_BACK = .95, K_FRONT = .12
+papers.forEach((el, i) => {
+  const t = papers.length > 1 ? i / (papers.length - 1) : 1
+  el.style.setProperty('--k', (K_BACK - (K_BACK - K_FRONT) * t).toFixed(3))
+  el.style.setProperty('--peek', (i % 2 ? 6 : 1) + 'px')
+  el.style.paddingLeft = (6 + 70 * t) + '%'
+})
+
+new ResizeObserver(shapeCovers).observe(document.querySelector('.folder'))
+
+// ── drag: turn the folder freely (for now, to look around it). It stays where you leave it; double-click resets
+let dragX = 0, dragY = 0, gx = 0, gy = 0, held = null
+stage.addEventListener('pointerdown', (e) => { held = { x: e.clientX, y: e.clientY, rx: gx, ry: gy, front: !!e.target.closest('.front') }; stage.setPointerCapture(e.pointerId); stage.classList.add('dragging') })
+stage.addEventListener('pointermove', (e) => {
+  if (!held) return
+  gy = held.ry + (e.clientX - held.x) * .35
+  gx = Math.max(-80, Math.min(80, held.rx - (e.clientY - held.y) * .35))
+})
+const drop = (e) => {
+  // a press on the front that did not turn into a drag is a click: it opens or closes the folder
+  if (held?.front && e.type === 'pointerup' && Math.hypot(e.clientX - held.x, e.clientY - held.y) < 5) $('folder').classList.toggle('open')
+  held = null; stage.classList.remove('dragging')
+}
+stage.addEventListener('pointerup', drop); stage.addEventListener('pointercancel', drop)
+stage.addEventListener('dblclick', () => { gx = 0; gy = 0 })
+
+// ── the default: a small, subtle follow. Hover leans it toward the cursor, scrolling nudges it and springs back,
+// and on phones tilting the phone does what hover does (iOS asks on the first tap)
+const follow = { tx: 0, ty: 0, wheel: 0 }
+addEventListener('pointermove', (e) => { if (e.pointerType === 'mouse') { follow.tx = (e.clientX / innerWidth) * 2 - 1; follow.ty = (e.clientY / innerHeight) * 2 - 1 } }, { passive: true })
+const nudge = (d) => { follow.wheel = Math.max(-1, Math.min(1, follow.wheel + d)) }
+addEventListener('wheel', (e) => nudge(e.deltaY / 600), { passive: true })
+addEventListener('scroll', () => nudge(.04), { passive: true })
+{
+  let b0 = null, g0 = 0
+  const onOrient = (e) => {
+    if (e.beta == null || e.gamma == null) return
+    if (b0 == null) { b0 = e.beta; g0 = e.gamma }
+    b0 += (e.beta - b0) * .004; g0 += (e.gamma - g0) * .004 // the centre slowly follows the hand
+    follow.tx = Math.max(-1, Math.min(1, (e.gamma - g0) / 20)); follow.ty = Math.max(-1, Math.min(1, (e.beta - b0) / 20))
+  }
+  if (coarse && 'DeviceOrientationEvent' in window) {
+    if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+      const ask = () => { removeEventListener('touchend', ask); DeviceOrientationEvent.requestPermission().then((r) => { if (r === 'granted') addEventListener('deviceorientation', onOrient) }).catch(() => {}) }
+      addEventListener('touchend', ask, { passive: true })
+    } else addEventListener('deviceorientation', onOrient)
+  }
+}
+
+// one loop eases everything together
+let rx = REST_X, ry = 0, fx = 0, fy = 0, sw = 0
+;(function loop() {
+  requestAnimationFrame(loop)
+  follow.wheel *= .93; sw += (follow.wheel - sw) * .12
+  if (!reduced && !held) { fx += (follow.ty - fx) * .05; fy += (follow.tx - fy) * .05 }
+  const toX = REST_X + gx - fx * 3 + sw * 6, toY = gy + fy * 5 // follow: about 3 to 6 degrees, never more
+  rx += (toX - rx) * (held ? .35 : .12); ry += (toY - ry) * (held ? .35 : .12)
+  scene.style.setProperty('--rx', `${rx}deg`); scene.style.setProperty('--ry', `${ry}deg`)
+})()
+
+// theme switch, for checking both worlds
+const theme = $('theme'), label = () => { theme.textContent = document.documentElement.dataset.theme === 'light' ? 'Dark' : 'Light' }
+theme.addEventListener('click', () => { const r = document.documentElement; r.dataset.theme = r.dataset.theme === 'light' ? 'dark' : 'light'; label() })
+label()
+</script>
+</body>
+</html>
