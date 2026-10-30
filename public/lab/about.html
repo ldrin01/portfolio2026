@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>About: lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Funnel+Display:wght@300..800&display=swap">
+<style>
+  /* Lab (the one about experiment page): a very large title on the left that stays put, and the text on the right
+     sliding in line by line from the right as you scroll. Words near the pointer thicken (the font is variable). */
+  :root { --bg: #f2efe9; --fg: #16161b; --muted: #5d5f66; --line: color-mix(in srgb, #16161b 16%, transparent); --accent: #e8471c; }
+  [data-theme="dark"] { --bg: #0a0605; --fg: #e7e3df; --muted: #a3a1a6; --line: color-mix(in srgb, #a3a1a6 22%, transparent); --accent: #ff5a2d; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--fg); font-family: 'Funnel Display', system-ui, sans-serif; overflow-x: clip; }
+  .ui { position: fixed; top: 16px; right: 16px; z-index: 5; display: flex; gap: 8px; }
+  .ui button { font: inherit; font-size: 13px; padding: 8px 14px; color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: 999px; cursor: pointer; }
+  .spacer { height: 70vh; display: grid; place-items: center; color: var(--muted); font-size: 14px; letter-spacing: .2em; text-transform: uppercase; }
+
+  .about { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: clamp(32px, 6vw, 96px); align-items: start; max-width: 1400px; margin: 0 auto; padding: 12vh max(16px, 5vw); }
+  /* the title: huge, on the left, staying on screen while the text runs past */
+  .title { position: sticky; top: 14vh; margin: 0; font-size: clamp(56px, 9vw, 160px); font-weight: 600; letter-spacing: -.045em; line-height: .88; }
+  .title .ln { display: block; overflow: hidden; padding-bottom: .06em; }
+  .title .ln > span { display: block; transform: translateX(calc(var(--t, 1) * 30%)); opacity: calc(1 - var(--t, 1)); }
+  .title em { font-style: normal; color: var(--accent); }
+
+  .body { padding-top: 22vh; padding-bottom: 6vh; }
+  .body p { margin: 0 0 1.2em; font-size: clamp(20px, 2.1vw, 32px); line-height: 1.35; letter-spacing: -.01em; }
+  .body p.lead { font-size: clamp(24px, 2.8vw, 42px); line-height: 1.2; font-weight: 500; }
+  /* each line slides in from the right edge of the screen and settles; --x is 1 off to the right, 0 in place */
+  .row { display: block; white-space: nowrap; transform: translateX(calc(var(--x, 1) * 55vw)); opacity: calc(1 - var(--x, 1) * .85); will-change: transform; }
+  .wd { display: inline-block; font-weight: calc(400 + var(--h, 0) * 350); color: color-mix(in srgb, var(--accent) calc(var(--h, 0) * 100%), currentColor); transition: font-weight .25s, color .25s; }
+  .key { color: var(--accent); }
+  .wd .key { font-weight: inherit; }
+  .more { display: inline-block; margin-top: 12px; font-size: 13px; letter-spacing: .2em; text-transform: uppercase; color: var(--fg); text-decoration: none; padding: 10px 0; border-bottom: 1px solid var(--line); }
+
+  @media (max-width: 760px) {
+    .about { grid-template-columns: 1fr; padding-top: 8vh; }
+    .title { position: relative; top: 0; font-size: 18vw; }
+    .body { padding-top: 0; padding-bottom: 10vh; }
+  }
+  @media (prefers-reduced-motion: reduce) { .row, .title .ln > span { transform: none !important; opacity: 1 !important; } }
+</style>
+</head>
+<body>
+  <div class="ui"><button type="button" id="theme">Dark</button></div>
+
+  <div class="spacer">↓ the folder would be above here ↓</div>
+
+  <section class="about" id="about">
+    <h2 class="title" id="title"><span class="ln"><span>Hi, I'm</span></span><span class="ln"><span><em>Eldrin.</em></span></span></h2>
+    <div class="body" id="body">
+      <p class="lead">I design the whole thing, from the first question to the last QA pass.</p>
+      <p>I'm a UI/UX designer based in <span class="key">Quezon City</span>, with <span class="key">four years</span> of building websites and apps for teams in the Philippines, Australia, Germany and the US.</p>
+      <p>Most of my work starts before the screens: sitting with clients, working out what the product really needs, then carrying it through design, handover and QA.</p>
+      <a class="more" href="#">More about me →</a>
+    </div>
+  </section>
+
+  <div class="spacer">↓ keyboard section next ↓</div>
+
+<script>
+const body = document.getElementById('body'), title = document.getElementById('title')
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches
+const source = [...body.querySelectorAll('p')].map(p => p.innerHTML)
+
+// split every paragraph into words, then group the words into the lines the browser wrapped them onto
+let rows = [], words = []
+function split() {
+  body.querySelectorAll('p').forEach((p, i) => {
+    p.innerHTML = source[i]
+    // words, with punctuation kept on the word it follows (so "City," stays one piece)
+    const toks = []
+    let gap = false
+    for (const n of [...p.childNodes]) {
+      for (const part of n.textContent.split(/(\s+)/)) {
+        if (!part) continue
+        if (!part.trim()) { gap = true; continue }
+        const html = n.nodeType === 1 ? `<span class="key">${part}</span>` : part
+        if (!gap && toks.length) toks[toks.length - 1] += html; else toks.push(html)
+        gap = false
+      }
+    }
+    p.innerHTML = toks.map(h => `<span class="wd">${h}</span>`).join(' ')
+    const lines = []
+    let top = null
+    for (const w of p.querySelectorAll('.wd')) {
+      if (w.offsetTop !== top) { lines.push([]); top = w.offsetTop }
+      lines.at(-1).push(w.outerHTML)
+    }
+    p.innerHTML = lines.map(l => `<span class="row">${l.join(' ')}</span>`).join('')
+  })
+  rows = [...body.querySelectorAll('.row')]
+  words = [...body.querySelectorAll('.wd')]
+  frame()
+}
+
+const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v))
+const easeOut = t => 1 - (1 - t) ** 3
+let mx = -1, my = -1
+function frame() {
+  const vh = innerHeight
+  // a line starts sliding when it comes up past the bottom of the screen and is in place by 60% of the way up
+  for (const r of rows) {
+    const y = r.getBoundingClientRect().top
+    const t = reduced ? 0 : 1 - easeOut(clamp((vh * 1.02 - y) / (vh * .42)))
+    r.style.setProperty('--x', t.toFixed(4))
+  }
+  // the title slides in once, from the right, as the section arrives
+  const tt = title.getBoundingClientRect().top
+  title.querySelectorAll('.ln > span').forEach((s, i) => s.style.setProperty('--t', reduced ? 0 : (1 - easeOut(clamp((vh * .95 - tt) / (vh * .35) - i * .18))).toFixed(4)))
+  // words near the pointer thicken and warm up
+  for (const w of words) {
+    if (mx < 0) { w.style.setProperty('--h', 0); continue }
+    const b = w.getBoundingClientRect(), d = Math.hypot(b.left + b.width / 2 - mx, b.top + b.height / 2 - my)
+    w.style.setProperty('--h', clamp(1 - d / 120).toFixed(3))
+  }
+}
+
+let raf = 0
+const kick = () => { if (!raf) raf = requestAnimationFrame(() => { raf = 0; frame() }) }
+addEventListener('scroll', kick, { passive: true })
+addEventListener('pointermove', e => { if (e.pointerType === 'mouse') { mx = e.clientX; my = e.clientY; kick() } }, { passive: true })
+document.addEventListener('pointerleave', () => { mx = my = -1; kick() })
+let rw = innerWidth
+addEventListener('resize', () => { if (innerWidth !== rw) { rw = innerWidth; split() } else kick() })
+document.fonts.ready.then(split)
+split()
+
+document.getElementById('theme').onclick = e => {
+  const root = document.documentElement, dark = root.dataset.theme === 'light'
+  root.dataset.theme = dark ? 'dark' : 'light'
+  e.target.textContent = dark ? 'Light' : 'Dark'
+}
+</script>
+</body>
+</html>

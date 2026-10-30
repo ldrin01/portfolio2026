@@ -26,8 +26,6 @@ export default defineContentConfig({
       schema: z.object({
         eyebrow: z.string(),
         heading: z.string(),
-        hint: z.string(), // on the closed folder
-        closeHint: z.string(), // on the open folder
         // category: an articleCategories id; blurb: shown on the paper while the case study's write-up is still a stub
         items: z.array(z.object({ title: z.string(), blurb: z.string(), category: z.string(), to: z.string() })),
         more: z.object({ label: z.string(), to: z.string() }) // the last paper in the folder, at the back behind the stories
@@ -74,14 +72,15 @@ export default defineContentConfig({
         order: z.number(),
         draft: z.boolean().default(true), // true until the real write-up replaces the stub
         seoTitle: z.string().default(''), // empty: "<title> — <site name>"
-        seoDescription: z.string().default('') // empty: the summary
+        seoDescription: z.string().default(''), // empty: the summary
+        cover: z.string().default('') // a picture path, e.g. /covers/<slug>.webp; empty = no cover
       })
     }),
     // Header (logo and menu), footer, and the text of the fixed pages
     header: defineCollection({
       type: 'data',
       source: 'header.json',
-      schema: z.object({ logo: z.string(), siteHeading: z.string(), allCaseStudies: z.string(), links: z.array(z.object({ label: z.string(), to: z.string() })) })
+      schema: z.object({ logo: z.string(), links: z.array(z.object({ label: z.string(), to: z.string() })) })
     }),
     footer: defineCollection({
       type: 'data',
@@ -152,7 +151,40 @@ export default defineContentConfig({
       source: 'about.json',
       schema: z.object({
         eyebrow: z.string(),
-        layers: z.array(z.object({ label: z.string(), title: z.string(), lines: z.array(z.string()) }))
+        title: z.string(), // the big words on the left
+        titleAccent: z.string(), // its last line, in orange
+        heading: z.string(),
+        body: z.array(z.string()), // **words** between double asterisks show in orange
+        cta: z.object({ label: z.string(), to: z.string() })
+      })
+    }),
+    // The "More About Me" page: stages of the story, in order
+    aboutPage: defineCollection({
+      type: 'data',
+      source: 'about-page.json',
+      schema: z.object({
+        title: z.string(),
+        intro: z.string(),
+        lenticular: z.array(z.object({ image: z.string(), alt: z.string() })), // two or more pictures the lenticular card flips through
+        work: z.object({
+          title: z.string(), body: z.array(z.string()),
+          card: z.object({ photo: z.string(), company: z.string(), name: z.string(), role: z.string(), role2: z.string(), idNo: z.string(), since: z.string() })
+        }),
+        talk: z.object({ title: z.string(), body: z.array(z.string()), photos: z.array(z.object({ image: z.string(), caption: z.string() })) }),
+        more: z.object({
+          title: z.string(), body: z.array(z.string()),
+          tools: z.array(z.object({ kind: z.string(), before: z.string(), name: z.string(), body: z.string() })), // kind: corel | premiere (which 3D logo sits in the line)
+          stories: z.array(z.object({ title: z.string(), body: z.string() })),
+          hobbies: z.object({ title: z.string(), body: z.string(), routes: z.array(z.object({ image: z.string(), name: z.string(), kind: z.string(), km: z.number(), date: z.string() })) }) // routes: transparent PNGs of the line; kind: run | ride
+        }),
+        evenMore: z.object({
+          title: z.string(), body: z.array(z.string()),
+          encarta: z.object({ title: z.string(), body: z.string() }), paint: z.object({ title: z.string(), body: z.string() }), gameboy: z.object({ title: z.string(), body: z.string() }), volcano: z.object({ title: z.string(), body: z.string() }),
+          paintings: z.object({ title: z.string(), items: z.array(z.object({ image: z.string(), caption: z.string() })) }),
+          sketches: z.object({ title: z.string(), items: z.array(z.object({ image: z.string(), caption: z.string() })) })
+        }),
+        tooFar: z.object({ title: z.string(), photo: z.string(), alt: z.string(), body: z.array(z.string()) }),
+        next: z.object({ title: z.string(), plans: z.array(z.object({ title: z.string(), body: z.string() })) })
       })
     }),
     keyboard: defineCollection({
@@ -160,8 +192,6 @@ export default defineContentConfig({
       source: 'keyboard.json',
       schema: z.object({
         typed: z.string(),
-        hintKeys: z.string(),
-        hintTouch: z.string(),
         tilt: z.string()
       })
     })

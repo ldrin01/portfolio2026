@@ -1,0 +1,20 @@
+Placeholder images from Wikimedia Commons (replace with your own):
+lion: Loewe frontal.JPG — Martin Falbisoner, CC BY-SA 3.0, https://commons.wikimedia.org/wiki/File:Loewe_frontal.JPG
+tiger: Bengal tiger (Panthera tigris tigris) female 3 crop.jpg — Charles J. Sharp, CC BY-SA 4.0, https://commons.wikimedia.org/wiki/File:Bengal_tiger_(Panthera_tigris_tigris)_female_3_crop.jpg
+kid: Portrait of Boy in Striped Dress (26080717452).jpg — SMU Central University Libraries, No restrictions, https://commons.wikimedia.org/wiki/File:Portrait_of_Boy_in_Striped_Dress_(26080717452).jpg
+id-photo: Muybridge race horse animated.gif — Eadweard Muybridge, Public domain, https://commons.wikimedia.org/wiki/File:Muybridge_race_horse_animated.gif
+talk-1: Snjezana Kordic keynote presentation Japan.jpg — Mozel W., CC BY-SA 4.0, https://commons.wikimedia.org/wiki/File:Snjezana_Kordic_keynote_presentation_Japan.jpg
+talk-2: Group of speakers on main stage - Wikimania 2026 - Paris by @JJxFile 0073 14.jpg — Jorge Jaramillo, CC BY-SA 4.0, https://commons.wikimedia.org/wiki/File:Group_of_speakers_on_main_stage_-_Wikimania_2026_-_Paris_by_@JJxFile_0073_14.jpg
+talk-3: Panel discussion on stage - Wikimania 2026 - Paris by @JJxFile 0017 08.jpg — Jorge Jaramillo, CC BY-SA 4.0, https://commons.wikimedia.org/wiki/File:Panel_discussion_on_stage_-_Wikimania_2026_-_Paris_by_@JJxFile_0017_08.jpg
+talk-4: Side view of team on stage - Wikimania 2026 - Paris by @JJxFile 0073 18.jpg — Jorge Jaramillo, CC BY-SA 4.0, https://commons.wikimedia.org/wiki/File:Side_view_of_team_on_stage_-_Wikimania_2026_-_Paris_by_@JJxFile_0073_18.jpg
+talk-5: Panelists answering questions during a Wikimania 2026 session. - Wikimania 2026 - Paris by @JJxFile 0017 09.jpg — Jorge Jaramillo, CC BY-SA 4.0, https://commons.wikimedia.org/wiki/File:Panelists_answering_questions_during_a_Wikimania_2026_session._-_Wikimania_2026_-_Paris_by_@JJxFile_0017_09.jpg
+painting-1: VanGogh-starry night ballance1.jpg — Vincent van Gogh, Public domain, https://commons.wikimedia.org/wiki/File:VanGogh-starry_night_ballance1.jpg
+painting-2: Vincent van Gogh - Irises (1889).jpg — Vincent van Gogh, Public domain, https://commons.wikimedia.org/wiki/File:Vincent_van_Gogh_-_Irises_(1889).jpg
+painting-3: Vincent van Gogh - Sunflowers - VGM F458.jpg — Vincent van Gogh, Public domain, https://commons.wikimedia.org/wiki/File:Vincent_van_Gogh_-_Sunflowers_-_VGM_F458.jpg
+painting-4: Vincent van Gogh - The yellow house ('The street').jpg — Vincent van Gogh, Public domain, https://commons.wikimedia.org/wiki/File:Vincent_van_Gogh_-_The_yellow_house_(%27The_street%27).jpg
+painting-5: Sunset at Montmajour 1888 Van Gogh.jpg — Vincent van Gogh, Public domain, https://commons.wikimedia.org/wiki/File:Sunset_at_Montmajour_1888_Van_Gogh.jpg
+sketch-1: Leonardo da vinci, Studies for a Nativity.jpg — Leonardo da Vinci, Public domain, https://commons.wikimedia.org/wiki/File:Leonardo_da_vinci,_Studies_for_a_Nativity.jpg
+sketch-2: Leonardo da vinci, Study of an apostle's head and architectural study.jpg — Leonardo da Vinci, Public domain, https://commons.wikimedia.org/wiki/File:Leonardo_da_vinci,_Study_of_an_apostle%27s_head_and_architectural_study.jpg
+sketch-3: Leonardo da Vinci - RCIN 912285, Studies of horses and horses' heads c.1490.jpg — Leonardo da Vinci, Public domain, https://commons.wikimedia.org/wiki/File:Leonardo_da_Vinci_-_RCIN_912285,_Studies_of_horses_and_horses%27_heads_c.1490.jpg
+sketch-4: Notebooks-of-Leonardo-da-Vinci Plate-XLVI Sketches-for-The-Last-Supper.jpg — Leonardo da Vinci, Public domain, https://commons.wikimedia.org/wiki/File:Notebooks-of-Leonardo-da-Vinci_Plate-XLVI_Sketches-for-The-Last-Supper.jpg
+sketch-5: Leonardo da vinci, Study for the Last Supper & geometry study.jpg — Leonardo da Vinci, Public domain, https://commons.wikimedia.org/wiki/File:Leonardo_da_vinci,_Study_for_the_Last_Supper_%26_geometry_study.jpg
