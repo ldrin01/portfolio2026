@@ -456,13 +456,9 @@ function asciiStyle() {
       last = t
       fit(cv)
       if (builtFor !== cv.clientWidth + 'x' + cv.clientHeight + document.documentElement.dataset.theme) build()
-      const e = reduced ? 99 : (t - t0) / 1000, k = cv.width / cv.clientWidth, rect = cv.getBoundingClientRect()
+      const e = reduced ? 99 : (t - t0) / 1000, k = cv.width / cv.clientWidth
       cx.setTransform(k, 0, 0, k, 0, 0); cx.clearRect(0, 0, cv.clientWidth, cv.clientHeight)
       cx.font = `${fs}px ${FONT}`; cx.textAlign = 'center'; cx.textBaseline = 'middle'
-      // the lens: the cursor on desktop, the tilt on phones
-      const lx = input.tilting ? (.5 + input.mx * .4) * rect.width : input.cx - rect.left
-      const ly = input.tilting ? (.45 - input.my * .35) * rect.height : input.cy - rect.top
-      const R = 46
       // view angle in cells: hover/tilt turns it sideways and up/down, scrolling tips it up/down
       project(input.mx * 16, -input.my * 10 + input.sw * 14)
       for (const c of cells) if (t > c.next) { c.ch = pick(c.lv); c.next = t + 300 + Math.random() * 2800 } // swaps for another glyph of the same tone
@@ -471,9 +467,9 @@ function asciiStyle() {
         if (i < 0) continue
         const c = cells[i], left = c.settle - e
         if (left > .35) continue
-        const x = (j % COLS + .5) * cw, y = ((j / COLS | 0) + .5) * chh, near = Math.hypot(x - lx, y - ly) < R * (.6 + Math.random() * .4)
-        cx.fillStyle = left > 0 ? (isLight() ? '#e8471c' : '#ffd27a') : near ? (isLight() ? '#16161b' : '#ffe2a8') : c.col
-        cx.fillText(left > 0 || near ? pick(Math.random() * LEVELS | 0) : c.ch, x, y)
+        const x = (j % COLS + .5) * cw, y = ((j / COLS | 0) + .5) * chh
+        cx.fillStyle = left > 0 ? (isLight() ? '#e8471c' : '#ffd27a') : c.col
+        cx.fillText(left > 0 ? pick(Math.random() * LEVELS | 0) : c.ch, x, y)
       }
     },
   }

@@ -9,9 +9,10 @@ const root = ref<HTMLElement>()
 const scene = ref<HTMLElement>()
 
 // each story's paper shows the start of its write-up on the right; while the write-up is still a stub (headings and a
-// TODO line), the folder's own short description, else the article's summary
+// TODO line), the folder's own short description, else the article's summary. Its cover is the photo tucked behind it
 const { data: studies } = await useAsyncData('folder-studies', () =>
-  queryCollection('caseStudies').where('path', 'IN', folder.items.map(it => it.to)).select('path', 'summary', 'body').all())
+  queryCollection('caseStudies').where('path', 'IN', folder.items.map(it => it.to)).select('path', 'title', 'summary', 'body', 'cover').all())
+const asset = useAssetUrl()
 const textOf = (n: unknown): string => typeof n === 'string' ? n
   : Array.isArray(n) ? typeof n[0] === 'string' && n[1] && typeof n[1] === 'object' && !Array.isArray(n[1]) // minimark: [tag, props, ...children]
     ? n.slice(2).map(textOf).join('') + (n[0] === 'li' ? ' ' : '') : n.map(textOf).join('')
@@ -27,11 +28,12 @@ const snippet = (it: (typeof folder.items)[number]) => {
   const doc = studies.value?.find(d => d.path === it.to)
   return excerpt(doc?.body) || it.blurb || doc?.summary || ''
 }
+const photo = (it: (typeof folder.items)[number]) => asset(studies.value?.find(d => d.path === it.to)?.cover) || ''
 
 // in reading order, which is also the tab order: the stories, then the way to all of them
 const papers = computed(() => [
-  ...folder.items.map((it, i) => ({ to: it.to, num: String(i + 1).padStart(2, '0'), kind: optionName('articleCategories', it.category), title: it.title, snippet: snippet(it), more: false })),
-  { to: folder.more.to, num: '', kind: '', title: folder.more.label, snippet: '', more: true }
+  ...folder.items.map(it => ({ to: it.to, kind: optionName('articleCategories', it.category), title: studies.value?.find(d => d.path === it.to)?.title || it.title, snippet: snippet(it), photo: photo(it), more: false })),
+  { to: folder.more.to, kind: '', title: folder.more.label, snippet: '', photo: '', more: true }
 ])
 // how far toward the back each paper sits (0 = the front, 1 = the back): the first a small step behind the front, the
 // last just off the back, the rest evenly between, so any number of papers spaces itself
@@ -53,6 +55,45 @@ const outline = (w: number, h: number, th: number, side: 'left' | 'right') => {
     d += `${i ? 'L' : 'M'}${p[0]! + ax * r},${p[1]! + ay * r}Q${p[0]},${p[1]} ${p[0]! + bx * r},${p[1]! + by * r}`
   })
   return `url("data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none"><path d="${d}Z"/></svg>`)}")`
+}
+
+// hovering lifts a paper a little, tilted a different way each time, so its title clears the paper in front; dragging
+// moves it a little with resistance and it springs home, like the windows in the UI/UX portrait
+const lift = (e: PointerEvent) => {
+  const el = e.currentTarget as HTMLElement
+  el.style.setProperty('--lift', `${-(44 + Math.random() * 28).toFixed(0)}px`)
+  el.style.setProperty('--tilt', `${((Math.random() < .5 ? -1 : 1) * (.8 + Math.random() * 1.8)).toFixed(2)}deg`)
+}
+const pulls = new Map<HTMLElement, { x: number, y: number, drag: { x: number, y: number } | null, moved: boolean }>()
+const pullOf = (el: HTMLElement) => pulls.get(el) ?? (pulls.set(el, { x: 0, y: 0, drag: null, moved: false }), pulls.get(el)!)
+const MAX_PULL = 80
+const pull = (v: number) => Math.sign(v) * MAX_PULL * (1 - Math.exp(-Math.abs(v) / MAX_PULL)) // resists more the further it goes
+const paint = (el: HTMLElement, s: { x: number, y: number }) => { el.style.setProperty('--dx', `${s.x.toFixed(1)}px`); el.style.setProperty('--dy', `${s.y.toFixed(1)}px`) }
+const down = (e: PointerEvent) => {
+  const el = e.currentTarget as HTMLElement
+  if (!open.value || e.button !== 0) return
+  const s = pullOf(el)
+  s.moved = false; s.drag = { x: e.clientX, y: e.clientY }
+  el.setPointerCapture(e.pointerId); el.classList.add('drag')
+}
+const move = (e: PointerEvent) => {
+  const el = e.currentTarget as HTMLElement, s = pullOf(el)
+  if (!s.drag) return
+  const dx = e.clientX - s.drag.x, dy = e.clientY - s.drag.y
+  if (Math.hypot(dx, dy) > 5) s.moved = true
+  s.x = pull(dx); s.y = pull(dy); paint(el, s)
+}
+const up = (e: PointerEvent) => {
+  const el = e.currentTarget as HTMLElement, s = pullOf(el)
+  if (!s.drag) return
+  s.drag = null; el.classList.remove('drag')
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) { s.x = s.y = 0; paint(el, s) }
+}
+// a drag is not a click: caught before the link's own handler sees it, so it never navigates
+const click = (e: MouseEvent) => {
+  const s = pullOf(e.currentTarget as HTMLElement)
+  if (!s.moved) return
+  e.preventDefault(); e.stopPropagation(); s.moved = false
 }
 
 onMounted(() => {
@@ -94,6 +135,9 @@ onMounted(() => {
     fx += (f.ty - fx) * .05; fy += (f.tx - fy) * .05
     rx += (REST_X - fx * 3 + sw * 6 - rx) * .12; ry += (fy * 5 - ry) * .12 // about 3 to 6 degrees, never more
     scene.value?.style.setProperty('--rx', `${rx}deg`); scene.value?.style.setProperty('--ry', `${ry}deg`)
+    for (const [p, s] of pulls) if (!s.drag && (s.x || s.y)) { // a released paper eases home
+      s.x = Math.abs(s.x) < .1 ? 0 : s.x * .86; s.y = Math.abs(s.y) < .1 ? 0 : s.y * .86; paint(p, s)
+    }
   }
   if (!reduced) loop()
 
@@ -114,17 +158,19 @@ onMounted(() => {
             <div class="cover back" aria-hidden="true"><div class="shape" /></div>
             <NuxtLink
               v-for="(p, i) in papers" :key="p.to" :to="p.to" class="paper" :class="{ more: p.more }"
-              :style="{ '--k': depth(i) }" :tabindex="open ? undefined : -1" :aria-hidden="open ? undefined : 'true'"
+              :style="{ '--k': depth(i) }" draggable="false" :tabindex="open ? undefined : -1" :aria-hidden="open ? undefined : 'true'"
+              @pointerenter="lift" @pointerdown="down" @pointermove="move" @pointerup="up" @pointercancel="up" @click.capture="click"
             >
               <span class="label">
-                <span v-if="!p.more" class="num">{{ p.num }} · {{ p.kind }}</span>
+                <span v-if="!p.more" class="num">{{ p.kind }}</span>
                 <span class="title">{{ p.title }}<span v-if="p.more" class="arrow" aria-hidden="true"> →</span></span>
               </span>
               <span v-if="p.snippet" class="snippet">{{ p.snippet }}</span>
+              <!-- a photo print lying on the paper, low enough that the paper in front hides it; hovering the paper slides it up into view -->
+              <span v-if="p.photo" class="photo" aria-hidden="true"><img :src="p.photo" alt="" loading="lazy" width="1600" height="900"></span>
             </NuxtLink>
             <button type="button" class="cover front" :aria-expanded="open" @click="open = !open">
               <span class="shape">
-                <span class="hint" aria-hidden="true">{{ open ? folder.closeHint : folder.hint }}</span>
                 <span class="head">{{ folder.heading }}</span>
               </span>
             </button>
@@ -172,7 +218,6 @@ onMounted(() => {
   background: linear-gradient(100deg, rgba(255, 255, 255, .1), transparent 35%), var(--f-front);
 }
 .head { font-size: clamp(26px, 5vw, 56px); font-weight: 600; letter-spacing: -.02em; line-height: 1.05; max-width: 12ch; }
-.hint { position: absolute; top: calc(var(--tabh) + 22px); right: clamp(20px, 6vw, 80px); font-size: 14px; font-style: italic; opacity: .9; }
 .front:focus-visible { outline: none; }
 .front:focus-visible .head { text-decoration: underline; text-underline-offset: 6px; }
 
@@ -186,28 +231,48 @@ onMounted(() => {
   box-shadow: 0 10px 20px var(--f-shadow);
   transform: translateZ(calc(var(--gap) * -1 * var(--k)));
   transition: transform .9s cubic-bezier(.2, .8, .2, 1);
+  translate: var(--dx, 0) var(--dy, 0); touch-action: pan-y; /* the drag offset; no transition, the script eases it */
 }
 .open .paper { pointer-events: auto; transform: translateY(calc(var(--push) * (1 - var(--k)) - var(--rise) * var(--k))) translateZ(calc((var(--gap) + var(--away)) * -1 * var(--k))); }
+.open .paper:is(:hover, :focus-visible) { transition-duration: .45s; transform: translateY(calc(var(--push) * (1 - var(--k)) - var(--rise) * var(--k) + var(--lift, -52px))) translateZ(calc((var(--gap) + var(--away)) * -1 * var(--k))) rotate(var(--tilt, 1.2deg)); }
+.open .paper { cursor: grab; }
+.open .paper.drag { cursor: grabbing; transition-duration: .3s; }
 .label { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 28px; min-width: 0; }
 .num { font-size: 12px; letter-spacing: .2em; text-transform: uppercase; opacity: .6; }
-.title { font-size: clamp(18px, 2.2vw, 28px); font-weight: 500; letter-spacing: -.01em; line-height: 1.1; transition: color .2s; }
+.title { font-size: clamp(22px, 3.2vw, 42px); font-weight: 500; letter-spacing: -.01em; line-height: 1.1; transition: color .2s; }
 .paper:hover .title, .paper:focus-visible .title { color: var(--accent); }
 .paper:focus-visible { outline: 2px solid var(--accent); outline-offset: -4px; }
-.more .title { font-weight: 600; }
+/* the way to all case studies: small, against the right edge */
+.more { justify-content: flex-end; }
+.more .title { font-size: clamp(13px, 1.2vw, 16px); font-weight: 600; letter-spacing: .02em; }
 /* the start of the write-up, on the right of the strip that shows */
 .snippet {
   flex: 0 1 38%; max-width: 46ch; font-size: 14px; line-height: 1.4; opacity: .62;
   display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden;
 }
 
+/* the photo lies a hair in front of its own paper, halfway down, where the next paper forward covers it; hovering lifts it up
+   over the paper's top strip and past its top edge */
+.paper { transform-style: preserve-3d; }
+.photo {
+  position: absolute; top: calc(var(--fh, 500px) * .5); left: 40%; width: clamp(180px, 23vw, 340px); padding: 6px 6px 18px; border-radius: 3px;
+  background: #fbfaf6; box-shadow: 0 6px 16px rgba(22, 22, 27, .22); pointer-events: none;
+  transform: translateZ(3px) rotate(2deg); transition: transform .6s cubic-bezier(.2, .8, .2, 1);
+}
+.photo img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 10; object-fit: cover; border-radius: 1px; }
+.open .paper:is(:hover, :focus-visible) .photo { transform: translateZ(3px) translateY(calc(var(--fh, 500px) * -.5 - 28%)) rotate(-4deg); }
+[data-theme="dark"] .photo { background: #efe7df; box-shadow: none; }
+
 @media (max-width: 700px) {
   .work .wrap { padding: 0 var(--gutter); }
   .folder { --gap: 30px; --tabh: 26px; --away: 220px; --rise: 90px; aspect-ratio: 1.3; }
   .paper { padding: 10px 14px; gap: 12px; }
   .label { gap: 0 12px; }
-  .title { font-size: 16px; }
+  .title { font-size: 20px; }
+  .more .title { font-size: 13px; }
   .num { font-size: 10px; }
   .snippet { flex-basis: 44%; font-size: 11px; line-height: 1.35; }
+  .photo { width: 150px; padding: 4px 4px 12px; left: 30%; }
 }
-@media (prefers-reduced-motion: reduce) { .folder, .cover, .paper { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .folder, .cover, .paper, .photo { transition: none; } }
 </style>

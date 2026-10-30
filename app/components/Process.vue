@@ -6,7 +6,8 @@ const { process } = useSite()
 const root = ref<HTMLElement | null>(null)
 const list = ref<HTMLElement | null>(null)
 const progress = ref(0) // 0..1 along the line
-const reached = computed(() => Math.min(process.steps.length, Math.floor(progress.value * process.steps.length + 0.15)))
+const reached = ref(0) // how many nodes the filled line has reached
+const span = ref({ start: 0, len: 0 }) // the line runs from the first node's centre to the last's, in px along the list
 
 let raf = 0
 const update = () => {
@@ -14,30 +15,42 @@ const update = () => {
   const el = list.value
   if (!el) return
   const r = el.getBoundingClientRect(), vh = window.innerHeight
-  // starts when the list's top reaches 80% of the screen, done when its bottom passes 55%
-  progress.value = Math.min(1, Math.max(0, (vh * 0.8 - r.top) / (r.height + vh * 0.25)))
+  const down = matchMedia('(max-width: 860px)').matches // phones: the line runs top to bottom
+  const centres = [...el.querySelectorAll<HTMLElement>('.node')].map(n => {
+    const b = n.getBoundingClientRect()
+    return down ? b.top + b.height / 2 - r.top : b.left + b.width / 2 - r.left
+  })
+  const start = centres[0] ?? 0, len = (centres.at(-1) ?? 0) - start
+  span.value = { start, len }
+  progress.value = down
+    // the tip of the line follows a point 60% down the screen, so it is always drawing where you are reading
+    ? Math.min(1, Math.max(0, (vh * 0.6 - r.top - start) / Math.max(1, len)))
+    // starts when the list's top reaches 80% of the screen, done when its bottom passes 55%
+    : Math.min(1, Math.max(0, (vh * 0.8 - r.top) / (r.height + vh * 0.25)))
+  const tip = progress.value * len
+  reached.value = progress.value > 0 ? centres.filter(c => c - start <= tip + 1).length : 0
 }
 const onScroll = () => { if (!raf) raf = requestAnimationFrame(update) }
 let near: IntersectionObserver | null = null
 onMounted(() => {
-  if (matchMedia('(prefers-reduced-motion: reduce)').matches) { progress.value = 1; return }
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) { update(); progress.value = 1; reached.value = process.steps.length; return }
+  window.addEventListener('resize', onScroll)
   near = new IntersectionObserver(([e]) => {
     if (e?.isIntersecting) { window.addEventListener('scroll', onScroll, { passive: true }); update() }
     else window.removeEventListener('scroll', onScroll)
   }, { rootMargin: '200px 0px' })
   if (root.value) near.observe(root.value)
 })
-onBeforeUnmount(() => { near?.disconnect(); window.removeEventListener('scroll', onScroll); cancelAnimationFrame(raf) })
+onBeforeUnmount(() => { near?.disconnect(); window.removeEventListener('scroll', onScroll); window.removeEventListener('resize', onScroll); cancelAnimationFrame(raf) })
 </script>
 
 <template>
   <section id="process" ref="root">
     <div class="wrap">
-      <p v-lag="0" class="eyebrow">{{ process.eyebrow }}</p>
       <h2 v-lag="1">{{ process.heading }}</h2>
       <p v-lag="2" class="sub">{{ process.sub }}</p>
 
-      <ol ref="list" class="steps" :style="{ '--p': progress, '--n': process.steps.length }">
+      <ol ref="list" class="steps" :style="{ '--p': progress, '--n': process.steps.length, '--a': `${span.start}px`, '--len': `${span.len}px` }">
         <li class="line" aria-hidden="true"><span class="fill" /></li>
         <li v-for="(s, i) in process.steps" :key="s.title" class="step" :class="{ on: i < reached }">
           <span class="node" aria-hidden="true">
@@ -48,7 +61,6 @@ onBeforeUnmount(() => { near?.disconnect(); window.removeEventListener('scroll',
               <template v-else><circle cx="5" cy="18" r="2" /><circle cx="19" cy="6" r="2" /><path d="M7 18c6 0 3-12 10-12" stroke-dasharray="2 2.4" /></template>
             </svg>
           </span>
-          <span class="num">{{ String(i + 1).padStart(2, '0') }}</span>
           <h3>{{ s.title }}</h3>
           <p class="blurb">{{ s.blurb }}</p>
           <ul class="outs">
@@ -66,7 +78,7 @@ h2 { font-size: clamp(34px, 5.5vw, 72px); letter-spacing: -.02em; font-weight: 5
 
 .steps { --node: 56px; list-style: none; margin: 0; padding: 0; position: relative; display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: clamp(20px, 3vw, 40px); }
 /* the line runs through the middle of the nodes, from the first to the last */
-.line { position: absolute; top: calc(var(--node) / 2 - 1px); left: calc(var(--node) / 2); right: calc((100% - (var(--n) - 1) * clamp(20px, 3vw, 40px)) / var(--n) - var(--node) / 2); height: 2px; background: var(--line); }
+.line { position: absolute; top: calc(var(--node) / 2 - 1px); left: var(--a); width: var(--len); height: 2px; background: var(--line); }
 .fill { position: absolute; inset: 0; background: var(--accent); transform-origin: left; transform: scaleX(var(--p)); }
 
 .step { position: relative; }
@@ -79,9 +91,7 @@ h2 { font-size: clamp(34px, 5.5vw, 72px); letter-spacing: -.02em; font-weight: 5
 .on .node { color: var(--on-accent); background: var(--accent); border-color: var(--accent); transform: scale(1.06); box-shadow: 0 10px 28px -10px color-mix(in srgb, var(--accent) 70%, transparent); }
 [data-theme="dark"] .on .node { box-shadow: none; }
 
-.num { display: block; margin: 22px 0 6px; font-size: 13px; letter-spacing: .2em; color: var(--muted); transition: color .4s; }
-.on .num { color: var(--accent); }
-h3 { font-size: clamp(22px, 2.2vw, 30px); font-weight: 500; letter-spacing: -.01em; margin-bottom: 8px; }
+h3 { margin-top: 22px; font-size: clamp(22px, 2.2vw, 30px); font-weight: 500; letter-spacing: -.01em; margin-bottom: 8px; }
 .blurb { margin: 0; color: var(--muted); font-size: 16px; line-height: 1.55; }
 .outs { list-style: none; margin: 16px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
 .outs li { font-size: 12px; letter-spacing: .04em; padding: 3px 10px; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); background: var(--surface); transition: border-color .4s, color .4s; }
@@ -93,14 +103,14 @@ h3 { font-size: clamp(22px, 2.2vw, 30px); font-weight: 500; letter-spacing: -.01
 /* tablets and phones: one column, the line runs down the left through the nodes */
 @media (max-width: 860px) {
   .steps { --node: 48px; grid-template-columns: 1fr; gap: 40px; }
-  .line { top: calc(var(--node) / 2); bottom: calc(var(--node) / 2); left: calc(var(--node) / 2 - 1px); right: auto; width: 2px; height: auto; }
+  .line { top: var(--a); left: calc(var(--node) / 2 - 1px); width: 2px; height: var(--len); } /* ends at the last node, not the last step's text */
   .fill { transform-origin: top; transform: scaleY(var(--p)); }
   .step { display: grid; grid-template-columns: var(--node) 1fr; column-gap: 20px; }
   .node { grid-row: 1 / span 4; }
   .step > :not(.node) { grid-column: 2; }
-  .num { margin-top: 4px; }
+  h3 { margin-top: 10px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .node, .num, .outs li, .step > :not(.node) { transition: none; }
+  .node, .outs li, .step > :not(.node) { transition: none; }
 }
 </style>

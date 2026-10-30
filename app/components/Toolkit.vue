@@ -119,7 +119,6 @@ onBeforeUnmount(() => {
 
     <div class="wrap">
       <header ref="intro" class="intro">
-        <p v-lag="0" class="eyebrow">Toolkit</p>
         <h2 v-lag="1" :class="{ seen }" :aria-label="toolkit.heading">
           <template v-for="(w, i) in words" :key="i">
             <span class="mask" aria-hidden="true"><span class="w" :style="{ '--i': i }">{{ w }}</span></span>{{ ' ' }}

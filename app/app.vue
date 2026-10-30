@@ -6,12 +6,15 @@ useSiteSeo() // default title, description and share card; pages override them
 const route = useRoute()
 const admin = computed(() => route.path.startsWith('/admin'))
 if (admin.value) useState('loaderDone', () => true).value = true
+// the loader only plays when the visit starts on the home page; any other page (or a reload of one) opens straight away
+const intro = route.path === '/'
+if (!intro) useState('loaderDone', () => true).value = true
 </script>
 
 <template>
   <NuxtPage v-if="admin" />
   <template v-else>
-    <Loader />
+    <Loader v-if="intro" />
     <ThemeFX />
     <SiteMenu />
     <SiteSearch />

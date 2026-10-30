@@ -162,7 +162,7 @@ onBeforeUnmount(() => {
         >
           <span class="dot" aria-hidden="true" />
           <div class="card">
-            <p v-lag="0" class="period"><span class="num">{{ String(i + 1).padStart(2, '0') }}</span> {{ e.period }}</p>
+            <p v-lag="0" class="period">{{ e.period }}</p>
             <h3 v-lag="1">{{ e.role }}</h3>
             <p v-lag="2" class="org">{{ e.org }}</p>
             <p v-lag="3" class="blurb">{{ e.blurb }}</p>
@@ -177,7 +177,7 @@ onBeforeUnmount(() => {
 </template>
 
 <style scoped>
-.intro { margin-bottom: clamp(32px, 6vw, 72px); }
+.intro { margin-bottom: clamp(32px, 6vw, 72px); text-align: center; }
 h2 { font-size: clamp(34px, 5.5vw, 72px); letter-spacing: -.02em; font-weight: 500; }
 .mask { display: inline-block; overflow-y: clip; padding-bottom: .14em; margin-bottom: -.14em; }
 .w { display: inline-block; transform: translateY(110%); }
@@ -207,6 +207,8 @@ h2 { font-size: clamp(34px, 5.5vw, 72px); letter-spacing: -.02em; font-weight: 5
   box-shadow: 0 0 12px 4px var(--accent), 0 0 36px 14px color-mix(in srgb, var(--accent) 50%, transparent), 0 0 70px 24px color-mix(in srgb, var(--accent) 22%, transparent);
 }
 .live.started .spark { opacity: 1; }
+/* light: the glowing head and the lit points are hot orange, nearly white at the centre */
+[data-theme="light"] .spark { background: #fff4ec; box-shadow: 0 0 10px 3px #ff8a4c, 0 0 32px 12px color-mix(in srgb, #ff6a2b 60%, transparent), 0 0 64px 22px color-mix(in srgb, #ff6a2b 25%, transparent); }
 
 /* alternating entries */
 .item { position: relative; display: grid; grid-template-columns: 1fr 1fr; min-height: 38vh; align-items: center; --k: 0; }
@@ -225,9 +227,9 @@ h2 { font-size: clamp(34px, 5.5vw, 72px); letter-spacing: -.02em; font-weight: 5
 
 .dot { position: absolute; left: 50%; top: 50%; width: 16px; height: 16px; margin: -8px 0 0 -8px; border-radius: 50%; border: 1.5px solid var(--muted); background: var(--bg); z-index: 1; transition: background .3s, border-color .3s, box-shadow .5s; }
 .item.on .dot { background: var(--accent); border-color: var(--accent); box-shadow: 0 0 12px 3px color-mix(in srgb, var(--accent) 60%, transparent); }
+[data-theme="light"] .item.on .dot { background: radial-gradient(circle, #fffaf5 0 30%, #ffb27f 62%, #ff7a3d); border-color: #ff7a3d; box-shadow: 0 0 14px 4px color-mix(in srgb, #ff7a3d 65%, transparent); }
 
 .period { margin: 0 0 8px; font-size: 13px; letter-spacing: .2em; text-transform: uppercase; color: var(--muted); }
-.num { color: var(--accent); margin-right: 8px; }
 h3 { font-size: clamp(30px, 4vw, 54px); font-weight: calc(300 + 500 * var(--k)); letter-spacing: -.02em; }
 .org { margin: 4px 0 12px; color: var(--muted); }
 .blurb { margin: 0; max-width: 40ch; }

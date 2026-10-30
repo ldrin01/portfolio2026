@@ -1,9 +1,9 @@
 <script setup lang="ts">
-// Pictures inside articles. Their paths start with "/" (/uploads/x.webp), so add the site's base URL,
+// Pictures inside articles. Their paths start with "/" (/uploads/x.webp); useAssetUrl adds the site's base URL,
 // which is /portfolio2026/ on GitHub Pages.
 const props = defineProps<{ src?: string; alt?: string; width?: string | number; height?: string | number }>()
-const base = useRuntimeConfig().app.baseURL.replace(/\/$/, '')
-const url = computed(() => (props.src?.startsWith('/') && !props.src.startsWith(`${base}/`) ? base + props.src : props.src))
+const asset = useAssetUrl()
+const url = computed(() => asset(props.src))
 </script>
 
 <template>

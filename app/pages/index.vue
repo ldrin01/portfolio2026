@@ -25,9 +25,9 @@ const roleIndex = ref(-1) // which rotating word is showing; the hero portrait f
       </div>
     </section>
 
-    <FolderStack />
+    <AboutIntro />
 
-    <LenticularCard />
+    <FolderStack />
 
     <Keyboard />
 

@@ -8,11 +8,12 @@ const { data: studies } = await useAsyncData('menu-studies', () => queryCollecti
 const sections = useSiteSections()
 const loaderDone = useState('loaderDone', () => false)
 const route = useRoute()
+const asset = useAssetUrl()
 
-interface Hit { id: string; title: string; text: string; kind: string; to: string }
+interface Hit { id: string; title: string; text: string; kind: string; to: string; cover: string }
 const docs = (): Hit[] => [
-  ...(studies.value ?? []).map(c => ({ id: c.path, title: c.title, text: c.summary, kind: optionName('articleCategories', c.shelf), to: c.path })),
-  ...sections.map(s => ({ id: s.to, title: s.label, text: '', kind: 'Page', to: s.to }))
+  ...(studies.value ?? []).map(c => ({ id: c.path, title: c.title, text: c.summary, kind: optionName('articleCategories', c.shelf), to: c.path, cover: c.cover })),
+  ...sections.map(s => ({ id: s.to, title: s.label, text: '', kind: 'Page', to: s.to, cover: '' }))
 ]
 
 const open = ref(false)
@@ -29,7 +30,7 @@ const results = computed<Hit[]>(() => {
   const q = query.value.trim()
   if (!q) return []
   if (!index) {
-    index = new MiniSearch<Hit>({ fields: ['title', 'text', 'kind'], storeFields: ['title', 'text', 'kind', 'to'], searchOptions: { prefix: true, fuzzy: 0.2, boost: { title: 3 } } })
+    index = new MiniSearch<Hit>({ fields: ['title', 'text', 'kind'], storeFields: ['title', 'text', 'kind', 'to', 'cover'], searchOptions: { prefix: true, fuzzy: 0.2, boost: { title: 3 } } })
     index.addAll(docs())
   }
   return index.search(q).slice(0, 6) as unknown as Hit[]
@@ -109,9 +110,10 @@ onBeforeUnmount(() => {
     <ul v-if="typing" id="search-results" ref="list" class="results" role="listbox" data-lenis-prevent>
       <li
         v-for="(r, i) in results" :id="`sr-${i}`" :key="r.id" role="option" :aria-selected="i === active"
-        class="hit" :class="{ on: i === active }" :data-kind="r.kind.toLowerCase()" :style="{ '--i': i }"
+        class="hit" :class="{ on: i === active, 'has-cover': r.cover }" :data-kind="r.kind.toLowerCase()" :style="{ '--i': i }"
         @mouseenter="active = i" @mousedown.prevent="go(r)"
       >
+        <img v-if="r.cover" class="thumb" :src="asset(r.cover)" alt="" width="160" height="90" loading="lazy">
         <span class="kind">{{ r.kind }}</span>
         <span class="title">{{ r.title }}</span>
         <span v-if="r.text" class="text">{{ r.text }}</span>
@@ -170,6 +172,8 @@ svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; 
 .kind { font-size: 11px; letter-spacing: .18em; text-transform: uppercase; }
 .title { display: block; font-size: 19px; font-weight: 500; line-height: 1.2; }
 .text { display: block; margin-top: 4px; font-size: 14px; line-height: 1.45; color: var(--muted); }
+.results .hit.has-cover { padding-right: 116px; }
+.thumb { position: absolute; z-index: 1; top: 50%; right: 16px; translate: 0 -50%; width: 84px; height: auto; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 8px; border: 1px solid var(--line); }
 .none { padding: 16px 20px; color: var(--muted); background: var(--surface); border-radius: 14px; }
 
 /* LIGHT: paper cards with real colour tags, a soft shadow and a glossy edge */

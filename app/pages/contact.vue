@@ -9,6 +9,7 @@ usePageSeo('contact')
       <p class="eyebrow">{{ contact.eyebrow }}</p>
       <h1>{{ contact.heading }}</h1>
       <p class="lead">{{ contact.lead }}</p>
+      <QuezonMap />
       <a class="mail" :href="`mailto:${profile.email}`">{{ profile.email }}</a>
       <p class="note">{{ contact.note }}</p>
     </div>

@@ -20,10 +20,6 @@ const sections = useSiteSections()
             <ul><li v-for="l in sections" :key="l.to"><NuxtLink :to="l.to">{{ l.label }}</NuxtLink></li></ul>
           </div>
           <div>
-            <p class="label">{{ footer.writingLabel }}</p>
-            <ul><li v-for="l in footer.writing" :key="l.to"><NuxtLink :to="l.to">{{ l.label }}</NuxtLink></li></ul>
-          </div>
-          <div>
             <p class="label">{{ footer.socialLabel }}</p>
             <ul><li v-for="l in profile.links" :key="l.label"><a :href="l.href" target="_blank" rel="noopener">{{ l.label }}</a></li></ul>
           </div>
@@ -57,7 +53,7 @@ const sections = useSiteSections()
 .mail { display: inline-block; font-size: clamp(18px, 2vw, 28px); line-height: 1.25; text-decoration: none; white-space: nowrap; border-bottom: 1px solid var(--line); padding-bottom: 4px; transition: color .2s, border-color .2s; }
 .mail:hover { color: var(--accent); border-color: var(--accent); }
 
-.cols { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+.cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
 ul { list-style: none; margin: 0; padding: 0; }
 li a { display: inline-flex; align-items: center; min-height: 34px; font-size: 15px; text-decoration: none; transition: color .2s; }
 li a:hover { color: var(--accent); }
@@ -68,10 +64,5 @@ a.copy:hover { color: var(--accent); }
 
 @media (max-width: 860px) {
   .top { grid-template-columns: 1fr; }
-}
-@media (max-width: 520px) {
-  .cols { grid-template-columns: 1fr 1fr; }
-  .cols > :last-child { grid-column: 1 / -1; }
-  .cols > :last-child ul { display: flex; gap: 20px; }
 }
 </style>

@@ -487,8 +487,6 @@ async function start() {
       <div ref="stage" class="stage" />
       <p v-lag="1" class="hint">
         <button v-if="needsTiltPermission && !tiltOn" type="button" class="tilt" @click="requestTilt">{{ keyboardCopy.tilt }}</button>
-        <span class="keys-hint">{{ keyboardCopy.hintKeys }}</span>
-        <span class="touch-hint">{{ keyboardCopy.hintTouch }}</span>
       </p>
     </div>
   </section>
@@ -514,8 +512,6 @@ async function start() {
 .stage { position: relative; width: 100%; flex: 1 1 auto; min-height: 0; cursor: pointer; touch-action: pan-y; } /* takes all the height between the eyebrow and the hint */
 .stage :deep(canvas) { display: block; width: 100%; height: 100%; }
 .hint { margin: 0; display: flex; gap: 16px; align-items: center; justify-content: center; font-size: 12px; letter-spacing: .2em; text-transform: uppercase; color: var(--muted); }
-.touch-hint { display: none; }
-@media (hover: none) { .keys-hint { display: none; } .touch-hint { display: inline; } }
 .tilt { font: inherit; letter-spacing: inherit; text-transform: inherit; color: var(--fg); background: var(--surface); border: 1px solid var(--line); border-radius: 8px; min-height: 44px; padding: 0 16px; cursor: pointer; }
 @media (max-width: 800px) {
   .desk { height: 180vh; height: 180svh; padding: 0; } /* shorter on phones, so it never feels like the scroll is stuck */
