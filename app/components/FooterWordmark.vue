@@ -146,7 +146,7 @@ onBeforeUnmount(() => {
 .wordmark {
   /* the box clips the sunken part (so it can't stretch the page), with headroom on top so rising letters are never cut:
      the padding adds room above, the negative margin keeps the word where it was */
-  margin: calc(clamp(8px, 2vw, 24px) - 6vw) 0 0; padding-top: 6vw; height: calc(10.6vw + 6vw); overflow: hidden; text-align: center; white-space: nowrap; user-select: none;
+  margin: calc(clamp(32px, 7vw, 112px) - 6vw) 0 0; /* the gap above clears the copyright even when letters rise their highest (~.37em) */ padding-top: 6vw; height: calc(10.6vw + 6vw); overflow: hidden; text-align: center; white-space: nowrap; user-select: none;
   font-family: var(--display); font-size: 15.6vw; line-height: .78; /* sized so the word at full weight still fits the width */ letter-spacing: -.04em;
   cursor: default; -webkit-tap-highlight-color: transparent;
 }
