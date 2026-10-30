@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Glasses Depth</title>
+<style>
+  :root { --bg: #f2efe9; --fg: #16161b; --muted: #5d5f66; --line: rgba(22, 22, 27, .16); --accent: #e8471c; }
+  :root[data-theme="dark"] { --bg: #0f0f13; --fg: #e6e9ed; --muted: #a8aaaf; --line: rgba(168, 170, 175, .22); --accent: #ff5a2d; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; background: var(--bg); color: var(--fg); font: 14px/1.4 system-ui, sans-serif; }
+  main { min-height: 100svh; display: grid; place-items: center; padding: 72px 16px 56px; }
+  canvas { display: block; width: min(92vw, 900px); aspect-ratio: var(--ar); }
+  .ui { position: fixed; left: 16px; top: 16px; display: flex; flex-wrap: wrap; gap: 8px; }
+  .ui button { font: inherit; padding: 8px 14px; color: var(--fg); background: none; border: 1px solid var(--line); border-radius: 999px; cursor: pointer; }
+  .ui button[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); }
+  .note { position: fixed; left: 16px; bottom: 16px; max-width: 560px; margin: 0; color: var(--muted); font-size: 12px; }
+</style>
+</head>
+<body>
+<div class="ui">
+  <button id="mode" aria-pressed="false">Depth</button>
+  <button id="theme" aria-pressed="false">Dark</button>
+  <button id="replay">Replay reveal</button>
+</div>
+<main><canvas id="cv"></canvas></main>
+<p class="note">Cut out of IMG_5946, with a depth map (frame near, temple tips far). Same idea as the hero portrait: move the pointer (or tilt / let it sway on touch) and every pixel shifts by its depth.</p>
+
+<script>
+const isLight = () => document.documentElement.dataset.theme === 'light'
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches
+const load = (src) => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = src })
+
+Promise.all([load('glasses-cutout.png'), load('glasses-depth.png')]).then(([photo, depth]) => {
+  const cv = document.getElementById('cv')
+  cv.style.setProperty('--ar', `${photo.width} / ${photo.height}`)
+  const gl = cv.getContext('webgl', { premultipliedAlpha: true })
+
+  const sh = (t, s) => { const o = gl.createShader(t); gl.shaderSource(o, s); gl.compileShader(o); if (!gl.getShaderParameter(o, gl.COMPILE_STATUS)) console.error(gl.getShaderInfoLog(o)); return o }
+  const prog = gl.createProgram()
+  gl.attachShader(prog, sh(gl.VERTEX_SHADER, 'attribute vec2 p; varying vec2 vUv; void main() { vUv = p * .5 + .5; gl_Position = vec4(p, 0., 1.); }'))
+  gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, `
+#ifdef GL_FRAGMENT_PRECISION_HIGH
+precision highp float;
+#else
+precision mediump float;
+#endif
+varying vec2 vUv;
+uniform sampler2D uDepth, uPhoto; uniform vec2 uTexel, uMouse; uniform float uReveal, uLight, uPhotoMode;
+float H(vec2 p) { return texture2D(uDepth, p).r; }
+float hs(vec2 p) { vec2 o = uTexel * 1.5; float s = H(p) * 4.;
+  s += (H(p + vec2(o.x, 0.)) + H(p - vec2(o.x, 0.)) + H(p + vec2(0., o.y)) + H(p - vec2(0., o.y))) * 2.;
+  s += H(p + o) + H(p - o) + H(p + vec2(o.x, -o.y)) + H(p + vec2(-o.x, o.y)); return s / 16.; }
+// the hero's palettes: dark = burnt orange (far) to yellow (near); paper = pale peach (far) to deep orange (near)
+vec3 grade(float v) {
+  vec3 c0 = vec3(.27, .075, .03), c1 = vec3(.62, .15, .06), c2 = vec3(.93, .30, .10), c3 = vec3(1., .50, .16), c4 = vec3(1., .86, .42);
+  v = clamp(v, 0., 1.) * 4.; vec3 c = mix(c0, c1, clamp(v, 0., 1.)); c = mix(c, c2, clamp(v - 1., 0., 1.)); c = mix(c, c3, clamp(v - 2., 0., 1.)); return mix(c, c4, clamp(v - 3., 0., 1.)); }
+vec3 gradeLight(float v) {
+  vec3 c0 = vec3(.96, .87, .77), c1 = vec3(.98, .72, .50), c2 = vec3(.95, .50, .24), c3 = vec3(.82, .30, .10), c4 = vec3(.55, .15, .05);
+  v = clamp(v, 0., 1.) * 4.; vec3 c = mix(c0, c1, clamp(v, 0., 1.)); c = mix(c, c2, clamp(v - 1., 0., 1.)); c = mix(c, c3, clamp(v - 2., 0., 1.)); return mix(c, c4, clamp(v - 3., 0., 1.)); }
+float noise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3. - 2. * f);
+  float a = fract(sin(dot(i, vec2(127.1, 311.7))) * 43758.5453), b = fract(sin(dot(i + vec2(1., 0.), vec2(127.1, 311.7))) * 43758.5453);
+  float c = fract(sin(dot(i + vec2(0., 1.), vec2(127.1, 311.7))) * 43758.5453), d = fract(sin(dot(i + vec2(1., 1.), vec2(127.1, 311.7))) * 43758.5453);
+  return mix(mix(a, b, f.x), mix(c, d, f.x), f.y); }
+const float LAYERS = 28.;
+const float PIVOT = .55; // depth that stays put: nearer slides with the view, farther against it
+void main() {
+  // The portrait is one solid shape, so it can shift its own pixels. The glasses are thin lines with air between,
+  // so here each screen pixel searches the depth layers, nearest first, for the part of the frame that lands on it.
+  vec2 shift = vec2(uMouse.x * .06, uMouse.y * .04);
+  vec2 uv = vUv; float a = 0.;
+  for (float i = 0.; i < LAYERS; i++) {
+    float L = 1. - i / (LAYERS - 1.);
+    vec2 q = vUv - shift * (L - PIVOT);
+    if (q.x < 0. || q.y < 0. || q.x > 1. || q.y > 1.) continue;
+    vec4 d = texture2D(uDepth, q);
+    if (d.a > .35 && abs(d.r / max(d.a, .001) * 1. - (40. + 215. * L) / 255.) < 1.3 / LAYERS + .02) { uv = q; a = d.a; break; }
+  }
+  if (a <= 0.) { gl_FragColor = vec4(0.); return; }
+  float dep = clamp((H(uv) / max(texture2D(uDepth, uv).a, .001) * 255. - 40.) / 215., 0., 1.);
+  float v = (hs(uv) / max(a, .001) - .16) / .84;
+  vec3 col = mix(grade(v), gradeLight(v), uLight);
+  vec4 ph = texture2D(uPhoto, uv);
+  col = mix(col, ph.rgb / max(ph.a, .001), uPhotoMode);
+  // reveal: a front sweeps from the far tips to the frame, with a glowing (dark) or inked (paper) edge
+  float n = noise(vUv * vec2(4., 6.)) * .65 + noise(vUv * vec2(11., 15.)) * .35;
+  float k = .7 * (1. - dep) + .2 * (n - .5) + .15;
+  float front = uReveal * 1.4 - .1, vis = 1. - smoothstep(front - .22, front, k);
+  float band = smoothstep(front - .22, front - .1, k) * (1. - smoothstep(front - .1, front, k));
+  col = mix(col + vec3(1., .8, .45) * band * .5, mix(col, vec3(.62, .18, .05), band * .55), uLight);
+  a *= vis; gl_FragColor = vec4(col * a, a);
+}`))
+  gl.linkProgram(prog)
+  if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) console.error(gl.getProgramInfoLog(prog))
+  gl.useProgram(prog)
+
+  gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer())
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW)
+  const loc = gl.getAttribLocation(prog, 'p'); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0)
+  const tex = (img, unit) => {
+    const t = gl.createTexture(); gl.activeTexture(gl.TEXTURE0 + unit); gl.bindTexture(gl.TEXTURE_2D, t)
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true)
+    gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true)
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img)
+    for (const [k, v] of [[gl.TEXTURE_MIN_FILTER, gl.LINEAR], [gl.TEXTURE_MAG_FILTER, gl.LINEAR], [gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE], [gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE]]) gl.texParameteri(gl.TEXTURE_2D, k, v)
+  }
+  tex(depth, 0); tex(photo, 1)
+  const u = (n) => gl.getUniformLocation(prog, n)
+  gl.uniform1i(u('uDepth'), 0); gl.uniform1i(u('uPhoto'), 1)
+  gl.uniform2f(u('uTexel'), 1 / photo.width, 1 / photo.height)
+
+  // input: pointer on desktop, a slow sway on touch
+  const input = { tx: 0, ty: 0, mx: 0, my: 0, mouse: false }
+  addEventListener('pointermove', (e) => {
+    if (e.pointerType !== 'mouse') return
+    input.mouse = true
+    input.tx = (e.clientX / innerWidth) * 2 - 1; input.ty = -((e.clientY / innerHeight) * 2 - 1)
+  }, { passive: true })
+
+  let photoMode = true, t0 = performance.now()
+  const btn = (id) => document.getElementById(id)
+  btn('mode').textContent = 'Photo'
+  btn('mode').onclick = (e) => { photoMode = !photoMode; e.target.textContent = photoMode ? 'Photo' : 'Depth'; e.target.setAttribute('aria-pressed', !photoMode) }
+  btn('theme').onclick = (e) => { document.documentElement.dataset.theme = isLight() ? 'dark' : 'light'; e.target.setAttribute('aria-pressed', !isLight()) }
+  btn('replay').onclick = () => { t0 = performance.now() }
+
+  const fit = () => {
+    const dpr = Math.min(devicePixelRatio || 1, 2), w = Math.round(cv.clientWidth * dpr), h = Math.round(cv.clientHeight * dpr)
+    if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h }
+  }
+  const frame = (t) => {
+    if (!input.mouse && !reduced) { input.tx = Math.sin(t / 2200) * .7; input.ty = Math.sin(t / 2900) * .4 }
+    input.mx += (input.tx - input.mx) * .08; input.my += (input.ty - input.my) * .08
+    fit(); gl.viewport(0, 0, cv.width, cv.height)
+    const p = reduced ? 1 : Math.min((t - t0) / 2200, 1)
+    gl.uniform1f(u('uReveal'), 1 - (1 - p) ** 2)
+    gl.uniform2f(u('uMouse'), input.mx, input.my)
+    gl.uniform1f(u('uLight'), isLight() ? 1 : 0)
+    gl.uniform1f(u('uPhotoMode'), photoMode ? 1 : 0)
+    gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT); gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
+    requestAnimationFrame(frame)
+  }
+  requestAnimationFrame(frame)
+})
+</script>
+</body>
+</html>

@@ -1,0 +1,1 @@
+import{B as e,W as t,h as n}from"./CydqZmm8.js";import{r}from"#entry";var i={};function a(r,i){return e(),n(`thead`,null,[t(r.$slots,`default`)])}var o=Object.assign(r(i,[[`render`,a]]),{__name:`ProseThead`});export{o as default};
