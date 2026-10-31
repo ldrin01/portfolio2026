@@ -8,8 +8,10 @@ onMounted(() => {
     if (!e?.isIntersecting) return
     near.disconnect()
     const { mountGlasses } = await import('~/lib/glasses.js')
+    // the first render compiles the shaders (~130 ms): do it while the footer is still a screen or two away, when idle
+    await new Promise<void>(res => ('requestIdleCallback' in window ? requestIdleCallback(() => res(), { timeout: 1500 }) : setTimeout(res, 200)))
     if (root.value) dispose = await mountGlasses(root.value)
-  }, { rootMargin: '400px 0px' })
+  }, { rootMargin: '1500px 0px' })
   if (root.value) near.observe(root.value)
   dispose = () => near.disconnect()
 })
