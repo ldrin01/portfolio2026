@@ -1,9 +1,18 @@
 // The browser tab: the favicon follows the site's theme, and a hidden tab calls you back.
 export default defineNuxtPlugin(() => {
   const base = useRuntimeConfig().app.baseURL
-  const icon = document.querySelector<HTMLLinkElement>('link[rel="icon"][type="image/svg+xml"]')
   const root = document.documentElement
-  const paint = () => { if (icon) icon.href = `${base}favicon${root.dataset.theme === 'light' ? '-light' : ''}.svg` }
+  // Chrome ignores a changed href on an existing icon link, so swap in a fresh element each time
+  const paint = () => {
+    const light = root.dataset.theme === 'light'
+    document.querySelectorAll('link[rel="icon"]').forEach(l => l.remove())
+    const link = document.createElement('link')
+    link.rel = 'icon'
+    link.type = 'image/svg+xml'
+    link.setAttribute('sizes', 'any')
+    link.href = `${base}favicon${light ? '-light' : ''}.svg?v=${light ? 'l' : 'd'}`
+    document.head.appendChild(link)
+  }
   paint()
   new MutationObserver(paint).observe(root, { attributes: true, attributeFilter: ['data-theme'] })
 
