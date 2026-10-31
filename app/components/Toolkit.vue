@@ -37,10 +37,11 @@ function frame() {
   const vh = window.innerHeight
   const tx = pointer?.x ?? vw / 2
   const ty = pointer?.y ?? vh * 0.5
+  const sy = window.scrollY // read once: reading it after a style write inside the loop forces a layout per tile
   let moving = false
   for (const t of tiles) {
     const dx = clamp((tx - t.x) / (vw * 0.5))
-    const dy = clamp((ty - (t.y - window.scrollY)) / (vh * 0.6))
+    const dy = clamp((ty - (t.y - sy)) / (vh * 0.6))
     const ry = dx * 28
     const rx = -dy * 24
     // ease toward the target with a little inertia, like the timeline's weight
