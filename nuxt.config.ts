@@ -1,5 +1,7 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 // NUXT_APP_BASE_URL is set in CI to "/<repo-name>/" for project pages on GitHub Pages.
+const base = process.env.NUXT_APP_BASE_URL || '/'
+
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
@@ -13,6 +15,11 @@ export default defineNuxtConfig({
       htmlAttrs: { lang: 'en' },
       meta: [
         { name: 'viewport', content: 'width=device-width, initial-scale=1, viewport-fit=cover' }
+      ],
+      link: [
+        { rel: 'icon', href: `${base}favicon.svg`, type: 'image/svg+xml' },
+        { rel: 'icon', href: `${base}favicon.ico`, sizes: '48x48' },
+        { rel: 'apple-touch-icon', href: `${base}apple-touch-icon.png` }
       ],
       // without JS the loader would never leave, so hide it
       noscript: [{ innerHTML: '<style>.loader{display:none!important}</style>' }],
