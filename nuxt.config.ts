@@ -17,7 +17,11 @@ export default defineNuxtConfig({
         { name: 'viewport', content: 'width=device-width, initial-scale=1, viewport-fit=cover' }
       ],
       link: [
-        // the tab icon follows the theme, so app/plugins/tab.client.ts owns it (a head entry here would be put back)
+        // modern browsers take the SVG (its colour follows the browser's light/dark mode); the rest fall back to the PNG / ICO
+        { rel: 'icon', href: `${base}favicon.svg`, type: 'image/svg+xml', sizes: 'any' },
+        { rel: 'icon', href: `${base}favicon-32.png`, type: 'image/png', sizes: '32x32' },
+        { rel: 'icon', href: `${base}favicon-192.png`, type: 'image/png', sizes: '192x192' },
+        { rel: 'icon', href: `${base}favicon.ico`, sizes: '48x48' },
         { rel: 'apple-touch-icon', href: `${base}apple-touch-icon.png` }
       ],
       // without JS the loader would never leave, so hide it
