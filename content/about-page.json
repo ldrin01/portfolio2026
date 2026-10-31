@@ -2677,7 +2677,3409 @@
           ]
         },
         {
-          "image": "/pictures/about/routes/route-282.png",
+          "image": "/pictures/about/routes/route-287.png",
+          "kind": "ride",
+          "km": 8.06,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "14.8 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "32m 44s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "36 m"
+            },
+            {
+              "label": "Cal",
+              "value": "362 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "71 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-288.png",
+          "kind": "ride",
+          "km": 3.47,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "11.0 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "19m 1s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "7m"
+            },
+            {
+              "label": "Cal",
+              "value": "170 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "56 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-289.png",
+          "kind": "ride",
+          "km": 15.03,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "12.3 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "1h 13m"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "46 m"
+            },
+            {
+              "label": "Cal",
+              "value": "693 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "31 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-290.png",
+          "kind": "ride",
+          "km": 10.82,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "19.1 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "33m 58s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "32 m"
+            },
+            {
+              "label": "Cal",
+              "value": "416 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "67 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-291.png",
+          "kind": "ride",
+          "km": 25.63,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "13.6 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "1h 52m"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "155 m"
+            },
+            {
+              "label": "Cal",
+              "value": "1,005 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "64 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-292.png",
+          "kind": "ride",
+          "km": 5.08,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "13.9 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "21m 53s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "20 m"
+            },
+            {
+              "label": "Cal",
+              "value": "189 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "94 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-293.png",
+          "kind": "ride",
+          "km": 2.77,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "12.1 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "13m 42s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "8 m"
+            },
+            {
+              "label": "Cal",
+              "value": "94 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "94 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-294.png",
+          "kind": "ride",
+          "km": 2.41,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "12.8 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "11m 19s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "11 m"
+            },
+            {
+              "label": "Cal",
+              "value": "82 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "100 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-295.png",
+          "kind": "ride",
+          "km": 25.47,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "16.4 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "1h 32m"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "143 m"
+            },
+            {
+              "label": "Cal",
+              "value": "926 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "133 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-296.png",
+          "kind": "ride",
+          "km": 22.13,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "21.2 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "1h 2m"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "52 m"
+            },
+            {
+              "label": "Cal",
+              "value": "790 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "162 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-297.png",
+          "kind": "ride",
+          "km": 2.6,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "11.5 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "13m 35s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "12 m"
+            },
+            {
+              "label": "Cal",
+              "value": "88 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "51 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-298.png",
+          "kind": "ride",
+          "km": 7.96,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "14.1 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "33m 51s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "25 m"
+            },
+            {
+              "label": "Cal",
+              "value": "301 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "63 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-299.png",
+          "kind": "ride",
+          "km": 6.84,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "16.2 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "25m 23s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "25 m"
+            },
+            {
+              "label": "Cal",
+              "value": "257 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "46 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-300.png",
+          "kind": "ride",
+          "km": 6.57,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "15.9 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "24m 47s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "55 m"
+            },
+            {
+              "label": "Cal",
+              "value": "227 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "87 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-301.png",
+          "kind": "ride",
+          "km": 6.76,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "17.5 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "23m 11s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "24 m"
+            },
+            {
+              "label": "Cal",
+              "value": "237 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "57 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-302.png",
+          "kind": "ride",
+          "km": 6.73,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "15.8 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "25m 32s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "54 m"
+            },
+            {
+              "label": "Cal",
+              "value": "236 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "63 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-303.png",
+          "kind": "ride",
+          "km": 6.9,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "15.6 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "26m 35s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "24 m"
+            },
+            {
+              "label": "Cal",
+              "value": "206 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "52 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-304.png",
+          "kind": "ride",
+          "km": 6.52,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "15.0 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "26m 6s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "52 m"
+            },
+            {
+              "label": "Cal",
+              "value": "205 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "85 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-305.png",
+          "kind": "ride",
+          "km": 6.73,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "16.9 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "23m 51s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "24 m"
+            },
+            {
+              "label": "Cal",
+              "value": "217 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "51 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-306.png",
+          "kind": "ride",
+          "km": 6.7,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "16.2 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "24m 53s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "55 m"
+            },
+            {
+              "label": "Cal",
+              "value": "215 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "88 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-307.png",
+          "kind": "ride",
+          "km": 6.76,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "16.5 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "24m 40s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "24 m"
+            },
+            {
+              "label": "Cal",
+              "value": "226 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "51 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-308.png",
+          "kind": "ride",
+          "km": 6.63,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "15.3 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "26m 0s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "56 m"
+            },
+            {
+              "label": "Cal",
+              "value": "231 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "82 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-309.png",
+          "kind": "ride",
+          "km": 6.68,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "18.5 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "21m 38s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "24 m"
+            },
+            {
+              "label": "Cal",
+              "value": "243 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "85 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-310.png",
+          "kind": "ride",
+          "km": 6.62,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "16.0 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "24m 49s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "54 m"
+            },
+            {
+              "label": "Cal",
+              "value": "220 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "88 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-311.png",
+          "kind": "ride",
+          "km": 6.71,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "19.1 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "21m 3s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "24 m"
+            },
+            {
+              "label": "Cal",
+              "value": "228 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "90 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-312.png",
+          "kind": "ride",
+          "km": 6.6,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "17.9 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "22m 4s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "54 m"
+            },
+            {
+              "label": "Cal",
+              "value": "219 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "103 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-313.png",
+          "kind": "ride",
+          "km": 6.77,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "19.6 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "20m 45s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "24 m"
+            },
+            {
+              "label": "Cal",
+              "value": "230 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "60 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-314.png",
+          "kind": "ride",
+          "km": 6.61,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "16.1 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "24m 44s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "53 m"
+            },
+            {
+              "label": "Cal",
+              "value": "195 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "84 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-315.png",
+          "kind": "ride",
+          "km": 6.78,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "18.2 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "22m 22s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "24 m"
+            },
+            {
+              "label": "Cal",
+              "value": "231 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "57 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-316.png",
+          "kind": "ride",
+          "km": 6.73,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "16.3 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "24m 45s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "54 m"
+            },
+            {
+              "label": "Cal",
+              "value": "115 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "71 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-317.png",
+          "kind": "ride",
+          "km": 6.9,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "18.1 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "22m 57s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "38 m"
+            },
+            {
+              "label": "Cal",
+              "value": "239 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "71 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-318.png",
+          "kind": "ride",
+          "km": 6.54,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "16.1 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "24m 22s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "53 m"
+            },
+            {
+              "label": "Cal",
+              "value": "212 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "92 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-319.png",
+          "kind": "ride",
+          "km": 5.72,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "13.4 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "25m 38s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "33 m"
+            },
+            {
+              "label": "Cal",
+              "value": "188 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "65 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-320.png",
+          "kind": "ride",
+          "km": 6.67,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "18.7 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "21m 28s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "24 m"
+            },
+            {
+              "label": "Cal",
+              "value": "390 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "83 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-321.png",
+          "kind": "ride",
+          "km": 6.69,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "16.6 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "24m 11s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "55 m"
+            },
+            {
+              "label": "Cal",
+              "value": "451 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "92 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-322.png",
+          "kind": "ride",
+          "km": 6.61,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "17.0 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "23m 24s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "25 m"
+            },
+            {
+              "label": "Cal",
+              "value": "168 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "46 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-323.png",
+          "kind": "ride",
+          "km": 6.58,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "16.4 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "24m 3s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "54 m"
+            },
+            {
+              "label": "Cal",
+              "value": "211 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "94 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-324.png",
+          "kind": "ride",
+          "km": 28.33,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "15.2 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "1h 51m"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "191 m"
+            },
+            {
+              "label": "Cal",
+              "value": "1,209 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "64 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-325.png",
+          "kind": "ride",
+          "km": 6.61,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "19.8 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "20m 4s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "24 m"
+            },
+            {
+              "label": "Cal",
+              "value": "56 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "89 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-326.png",
+          "kind": "ride",
+          "km": 6.78,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "17.1 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "23m 52s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "55 m"
+            },
+            {
+              "label": "Cal",
+              "value": "236 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "73 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-327.png",
+          "kind": "ride",
+          "km": 6.82,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "17.9 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "22m 55s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "24 m"
+            },
+            {
+              "label": "Cal",
+              "value": "207 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "61 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-328.png",
+          "kind": "ride",
+          "km": 6.6,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "16.7 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "23m 41s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "54 m"
+            },
+            {
+              "label": "Cal",
+              "value": "224 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "94 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-329.png",
+          "kind": "ride",
+          "km": 6.81,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "18.0 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "22m 44s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "24 m"
+            },
+            {
+              "label": "Cal",
+              "value": "254 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "56 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-330.png",
+          "kind": "ride",
+          "km": 6.81,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "16.6 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "24m 37s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "57 m"
+            },
+            {
+              "label": "Cal",
+              "value": "248 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "69 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-331.png",
+          "kind": "ride",
+          "km": 6.91,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "17.1 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "24m 13s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "26 m"
+            },
+            {
+              "label": "Cal",
+              "value": "209 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "59 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-332.png",
+          "kind": "ride",
+          "km": 6.64,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "15.7 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "25m 26s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "55 m"
+            },
+            {
+              "label": "Cal",
+              "value": "250 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "87 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-333.png",
+          "kind": "ride",
+          "km": 3,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "12.2 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "14m 48s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "11 m"
+            },
+            {
+              "label": "Cal",
+              "value": "112 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "59 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-334.png",
+          "kind": "ride",
+          "km": 8.04,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "15.9 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "30m 23s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "39 m"
+            },
+            {
+              "label": "Cal",
+              "value": "283 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "53 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-335.png",
+          "kind": "ride",
+          "km": 6.61,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "17.1 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "23m 10s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "58 m"
+            },
+            {
+              "label": "Cal",
+              "value": "225 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "103 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-336.png",
+          "kind": "ride",
+          "km": 8.03,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "17.5 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "27m 34s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "48 m"
+            },
+            {
+              "label": "Cal",
+              "value": "277 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "69 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-337.png",
+          "kind": "ride",
+          "km": 6.61,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "19.4 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "20m 26s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "55 m"
+            },
+            {
+              "label": "Cal",
+              "value": "231 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "110 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-338.png",
+          "kind": "ride",
+          "km": 50.08,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "16.4 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "3h 3m"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "131 m"
+            },
+            {
+              "label": "Cal",
+              "value": "1,879 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "60 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-339.png",
+          "kind": "ride",
+          "km": 6.1,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "19.2 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "19m 7s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "25 m"
+            },
+            {
+              "label": "Cal",
+              "value": "382 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "57 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-340.png",
+          "kind": "ride",
+          "km": 1.15,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "15.6 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "4m 27s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "0 m"
+            },
+            {
+              "label": "Cal",
+              "value": "19 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "49 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-341.png",
+          "kind": "ride",
+          "km": 6.63,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "17.2 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "23m 9s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "55 m"
+            },
+            {
+              "label": "Cal",
+              "value": "122 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "94 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-342.png",
+          "kind": "ride",
+          "km": 4.55,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "14.7 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "18m 32s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "17 m"
+            },
+            {
+              "label": "Cal",
+              "value": "297 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "67 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-343.png",
+          "kind": "ride",
+          "km": 8.03,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "15.7 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "30m 38s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "39 m"
+            },
+            {
+              "label": "Cal",
+              "value": "218 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "55 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-344.png",
+          "kind": "ride",
+          "km": 6.62,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "17.5 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "22m 39s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "54 m"
+            },
+            {
+              "label": "Cal",
+              "value": "254 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "97 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-345.png",
+          "kind": "ride",
+          "km": 7.8,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "17.7 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "26m 29s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "40 m"
+            },
+            {
+              "label": "Cal",
+              "value": "278 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "78 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-346.png",
+          "kind": "ride",
+          "km": 6.63,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "15.5 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "25m 36s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "54 m"
+            },
+            {
+              "label": "Cal",
+              "value": "204 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "88 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-347.png",
+          "kind": "ride",
+          "km": 4.98,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "15.9 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "18m 49s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "30 m"
+            },
+            {
+              "label": "Cal",
+              "value": "187 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "87 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-348.png",
+          "kind": "ride",
+          "km": 10.2,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "16.6 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "36m 54s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "34 m"
+            },
+            {
+              "label": "Cal",
+              "value": "361 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "83 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-349.png",
+          "kind": "ride",
+          "km": 9.64,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "14.5 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "39m 50s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "48 m"
+            },
+            {
+              "label": "Cal",
+              "value": "375 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "68 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-350.png",
+          "kind": "ride",
+          "km": 6.76,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "19.0 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "21m 23s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "54 m"
+            },
+            {
+              "label": "Cal",
+              "value": "186 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "88 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-351.png",
+          "kind": "ride",
+          "km": 8.05,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "18.0 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "26m 49s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "43 m"
+            },
+            {
+              "label": "Cal",
+              "value": "292 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "60 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-352.png",
+          "kind": "ride",
+          "km": 6.7,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "18.7 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "21m 34s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "52 m"
+            },
+            {
+              "label": "Cal",
+              "value": "278 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "102 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-353.png",
+          "kind": "ride",
+          "km": 8.02,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "19.2 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "25m 8s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "39 m"
+            },
+            {
+              "label": "Cal",
+              "value": "163 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "64 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-354.png",
+          "kind": "ride",
+          "km": 6.82,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "18.7 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "21m 54s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "60 m"
+            },
+            {
+              "label": "Cal",
+              "value": "204 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "98 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-355.png",
+          "kind": "ride",
+          "km": 8.03,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "15.7 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "30m 48s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "39 m"
+            },
+            {
+              "label": "Cal",
+              "value": "262 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "49 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-356.png",
+          "kind": "ride",
+          "km": 6.62,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "17.8 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "22m 17s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "55 m"
+            },
+            {
+              "label": "Cal",
+              "value": "193 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "100 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-357.png",
+          "kind": "ride",
+          "km": 5.25,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "12.7 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "24m 48s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "31 m"
+            },
+            {
+              "label": "Cal",
+              "value": "232 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "50 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-358.png",
+          "kind": "ride",
+          "km": 5.03,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "15.4 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "19m 40s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "21 m"
+            },
+            {
+              "label": "Cal",
+              "value": "189 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "66 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-359.png",
+          "kind": "ride",
+          "km": 11.28,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "19.2 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "35m 19s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "61 m"
+            },
+            {
+              "label": "Cal",
+              "value": "447 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "69 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-360.png",
+          "kind": "ride",
+          "km": 17.58,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "14.0 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "1h 15m"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "95 m"
+            },
+            {
+              "label": "Cal",
+              "value": "817 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "51 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-361.png",
+          "kind": "ride",
+          "km": 10.1,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "18.9 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "32m 2s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "75 m"
+            },
+            {
+              "label": "Cal",
+              "value": "401 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "86 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-362.png",
+          "kind": "ride",
+          "km": 6.86,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "20.7 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "19m 56s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "33 m"
+            },
+            {
+              "label": "Cal",
+              "value": "161 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "91 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-363.png",
+          "kind": "ride",
+          "km": 6.54,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "18.8 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "20m 50s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "66 m"
+            },
+            {
+              "label": "Cal",
+              "value": "224 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "108 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-364.png",
+          "kind": "ride",
+          "km": 8.02,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "18.1 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "26m 38s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "39 m"
+            },
+            {
+              "label": "Cal",
+              "value": "301 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "58 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-365.png",
+          "kind": "ride",
+          "km": 6.62,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "18.1 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "22m 0s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "55 m"
+            },
+            {
+              "label": "Cal",
+              "value": "248 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "98 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-366.png",
+          "kind": "ride",
+          "km": 7.84,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "18.0 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "26m 11s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "40 m"
+            },
+            {
+              "label": "Cal",
+              "value": "209 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "81 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-367.png",
+          "kind": "ride",
+          "km": 6.46,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "16.9 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "22m 58s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "63 m"
+            },
+            {
+              "label": "Cal",
+              "value": "228 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "98 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-368.png",
+          "kind": "ride",
+          "km": 8.31,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "16.1 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "30m 57s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "44m"
+            },
+            {
+              "label": "Cal",
+              "value": "301 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "48 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-369.png",
+          "kind": "ride",
+          "km": 6.45,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "14.7 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "26m 16s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "53 m"
+            },
+            {
+              "label": "Cal",
+              "value": "274 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "79 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-370.png",
+          "kind": "ride",
+          "km": 5.02,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "15.7 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "19m 10s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "25 m"
+            },
+            {
+              "label": "Cal",
+              "value": "227 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "79 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-371.png",
+          "kind": "ride",
+          "km": 9.15,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "16.5 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "33m 19s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "32 m"
+            },
+            {
+              "label": "Cal",
+              "value": "394 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "63 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-372.png",
+          "kind": "ride",
+          "km": 6.7,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "17.7 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "22m 43s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "54 m"
+            },
+            {
+              "label": "Cal",
+              "value": "263 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "89 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-373.png",
+          "kind": "ride",
+          "km": 7.87,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "16.4 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "28m 52s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "36 m"
+            },
+            {
+              "label": "Cal",
+              "value": "331 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "76 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-374.png",
+          "kind": "ride",
+          "km": 6.72,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "17.2 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "23m 25s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "55 m"
+            },
+            {
+              "label": "Cal",
+              "value": "262 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "97 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-375.png",
+          "kind": "ride",
+          "km": 8.1,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "15.9 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "30m 38s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "38 m"
+            },
+            {
+              "label": "Cal",
+              "value": "379 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "59 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-376.png",
+          "kind": "ride",
+          "km": 6.45,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "14.4 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "27m 0s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "52 m"
+            },
+            {
+              "label": "Cal",
+              "value": "226 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "78 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-377.png",
+          "kind": "ride",
+          "km": 8.15,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "16.9 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "28m 59s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "38 m"
+            },
+            {
+              "label": "Cal",
+              "value": "352 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "62 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-378.png",
+          "kind": "ride",
+          "km": 6.7,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "16.9 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "23m 52s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "52 m"
+            },
+            {
+              "label": "Cal",
+              "value": "268 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "79 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-379.png",
+          "kind": "ride",
+          "km": 8.5,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "14.0 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "36m 35s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "36 m"
+            },
+            {
+              "label": "Cal",
+              "value": "438 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "51 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-380.png",
+          "kind": "ride",
+          "km": 6.72,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "17.0 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "23m 45s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "53 m"
+            },
+            {
+              "label": "Cal",
+              "value": "287 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "78 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-381.png",
+          "kind": "ride",
+          "km": 4.93,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "13.0 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "22m 43s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "20 m"
+            },
+            {
+              "label": "Cal",
+              "value": "227 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "50 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-382.png",
+          "kind": "ride",
+          "km": 8.35,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "14.3 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "35m 1s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "41 m"
+            },
+            {
+              "label": "Cal",
+              "value": "397 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "50 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-383.png",
+          "kind": "ride",
+          "km": 6.71,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "16.1 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "25m 5s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "52 m"
+            },
+            {
+              "label": "Cal",
+              "value": "306 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "73 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-384.png",
+          "kind": "ride",
+          "km": 7.79,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "46.9 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "9m 59s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "26 m"
+            },
+            {
+              "label": "Cal",
+              "value": "54 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "81 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-385.png",
+          "kind": "ride",
+          "km": 6.54,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "15.9 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "24m 40s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "53 m"
+            },
+            {
+              "label": "Cal",
+              "value": "276 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "86 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-386.png",
+          "kind": "ride",
+          "km": 10.62,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "13.3 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "48m 2s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "54 m"
+            },
+            {
+              "label": "Cal",
+              "value": "543 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "64 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-387.png",
+          "kind": "ride",
+          "km": 10.62,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "13.3 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "48m 2s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "54 m"
+            },
+            {
+              "label": "Cal",
+              "value": "543 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "64 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-388.png",
+          "kind": "ride",
+          "km": 5.48,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "12.8 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "25m 49s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "13 m"
+            },
+            {
+              "label": "Cal",
+              "value": "252 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "64 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-389.png",
+          "kind": "ride",
+          "km": 5.21,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "13.9 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "22m 27s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "24 m"
+            },
+            {
+              "label": "Cal",
+              "value": "181 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "49 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-390.png",
+          "kind": "ride",
+          "km": 19.37,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "16.2 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "1h 11m"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "34m"
+            },
+            {
+              "label": "Cal",
+              "value": "778 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "81 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-391.png",
+          "kind": "ride",
+          "km": 16.58,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "16.6 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "1h 0m"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "23 m"
+            },
+            {
+              "label": "Cal",
+              "value": "597 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "77 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-392.png",
+          "kind": "ride",
+          "km": 54.02,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "16.8 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "3h 12m"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "269 m"
+            },
+            {
+              "label": "Cal",
+              "value": "2,452 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "84 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-393.png",
+          "kind": "ride",
+          "km": 52.95,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "15.9 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "3h 20m"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "260 m"
+            },
+            {
+              "label": "Cal",
+              "value": "2,480 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "77 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-394.png",
+          "kind": "ride",
+          "km": 2.34,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "12.9 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "10m 54s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "17 m"
+            },
+            {
+              "label": "Cal",
+              "value": "52 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "69 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-395.png",
+          "kind": "ride",
+          "km": 4,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "11.5 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "20m 48s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "26 m"
+            },
+            {
+              "label": "Cal",
+              "value": "118 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "85 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-396.png",
+          "kind": "ride",
+          "km": 7.76,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "16.2 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "28m 48s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "64 m"
+            },
+            {
+              "label": "Cal",
+              "value": "319 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "92 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-397.png",
+          "kind": "ride",
+          "km": 6.63,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "14.8 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "26m 52s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "25 m"
+            },
+            {
+              "label": "Cal",
+              "value": "132 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "74 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-398.png",
+          "kind": "ride",
+          "km": 18.46,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "13.4 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "1h 22m"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "44т"
+            },
+            {
+              "label": "Cal",
+              "value": "768 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "64 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-399.png",
+          "kind": "ride",
+          "km": 6.63,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "12.7 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "31m 25s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "2m"
+            },
+            {
+              "label": "Cal",
+              "value": "126 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "60 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-400.png",
+          "kind": "ride",
+          "km": 5.1,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "12.2 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "25m 12s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "13 m"
+            },
+            {
+              "label": "Cal",
+              "value": "224 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "53 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-401.png",
+          "kind": "ride",
+          "km": 8.38,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "11.4 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "44m 2s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "78 m"
+            },
+            {
+              "label": "Cal",
+              "value": "213 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "72 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-402.png",
+          "kind": "ride",
+          "km": 0.09,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "8.3 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "42s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "0 m"
+            },
+            {
+              "label": "Cal",
+              "value": "3 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "71 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-403.png",
+          "kind": "ride",
+          "km": 2.32,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "16.7 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "8m 19s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "7m"
+            },
+            {
+              "label": "Cal",
+              "value": "86 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "86 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-404.png",
+          "kind": "ride",
+          "km": 5.82,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "10.3 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "34m 2s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "9 m"
+            },
+            {
+              "label": "Cal",
+              "value": "124 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "54 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-405.png",
+          "kind": "ride",
+          "km": 1.14,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "14.1 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "4m 52s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "5m"
+            },
+            {
+              "label": "Cal",
+              "value": "21 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "63 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-406.png",
+          "kind": "ride",
+          "km": 2.33,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "12.6 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "11m 9s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "10 m"
+            },
+            {
+              "label": "Cal",
+              "value": "40 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "54 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-407.png",
+          "kind": "ride",
+          "km": 2.57,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "16.3 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "9m 28s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "19 m"
+            },
+            {
+              "label": "Cal",
+              "value": "50 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "79 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-408.png",
+          "kind": "ride",
+          "km": 2.35,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "14.2 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "9m 58s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "13 m"
+            },
+            {
+              "label": "Cal",
+              "value": "54 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "81 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-409.png",
+          "kind": "ride",
+          "km": 11.34,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "11.6 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "58m 26s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "137 m"
+            },
+            {
+              "label": "Cal",
+              "value": "322 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "82 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-410.png",
+          "kind": "ride",
+          "km": 12.22,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "11.2 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "1h 5m"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "156 m"
+            },
+            {
+              "label": "Cal",
+              "value": "351 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "80 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-411.png",
+          "kind": "ride",
+          "km": 2.28,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "11.8 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "11m 39s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "8 m"
+            },
+            {
+              "label": "Cal",
+              "value": "55 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "71 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-412.png",
+          "kind": "ride",
+          "km": 12.79,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "12.9 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "59m 43s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "170 m"
+            },
+            {
+              "label": "Cal",
+              "value": "346 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "87 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-413.png",
           "kind": "ride",
           "km": 5.77,
           "stats": [
@@ -2704,34 +6106,7 @@
           ]
         },
         {
-          "image": "/pictures/about/routes/route-283.png",
-          "kind": "ride",
-          "km": 5.33,
-          "stats": [
-            {
-              "label": "Speed",
-              "value": "11.6 km/h"
-            },
-            {
-              "label": "Time",
-              "value": "27m 33s"
-            },
-            {
-              "label": "Elev Gain",
-              "value": "30 m"
-            },
-            {
-              "label": "Cal",
-              "value": "123 Cal"
-            },
-            {
-              "label": "Avg Power",
-              "value": "103 W"
-            }
-          ]
-        },
-        {
-          "image": "/pictures/about/routes/route-284.png",
+          "image": "/pictures/about/routes/route-414.png",
           "kind": "ride",
           "km": 28.37,
           "stats": [
@@ -2758,7 +6133,34 @@
           ]
         },
         {
-          "image": "/pictures/about/routes/route-285.png",
+          "image": "/pictures/about/routes/route-415.png",
+          "kind": "ride",
+          "km": 2.81,
+          "stats": [
+            {
+              "label": "Speed",
+              "value": "8.8 km/h"
+            },
+            {
+              "label": "Time",
+              "value": "19m 16s"
+            },
+            {
+              "label": "Elev Gain",
+              "value": "6 m"
+            },
+            {
+              "label": "Cal",
+              "value": "72 Cal"
+            },
+            {
+              "label": "Avg Power",
+              "value": "46 W"
+            }
+          ]
+        },
+        {
+          "image": "/pictures/about/routes/route-416.png",
           "kind": "ride",
           "km": 4.68,
           "stats": [
@@ -2785,29 +6187,29 @@
           ]
         },
         {
-          "image": "/pictures/about/routes/route-286.png",
+          "image": "/pictures/about/routes/route-417.png",
           "kind": "ride",
-          "km": 2.81,
+          "km": 5.33,
           "stats": [
             {
               "label": "Speed",
-              "value": "8.8 km/h"
+              "value": "11.6 km/h"
             },
             {
               "label": "Time",
-              "value": "19m 16s"
+              "value": "27m 33s"
             },
             {
               "label": "Elev Gain",
-              "value": "6 m"
+              "value": "30 m"
             },
             {
               "label": "Cal",
-              "value": "72 Cal"
+              "value": "123 Cal"
             },
             {
               "label": "Avg Power",
-              "value": "46 W"
+              "value": "103 W"
             }
           ]
         }
