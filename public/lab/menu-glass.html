@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Menu glass, first frame</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Funnel+Display:wght@300..800&display=swap">
+<style>
+:root { --bg: #0f0f13; --fg: #e6e9ed; --accent: #ff5a2d; --gutter: clamp(16px, 4vw, 48px); --font: 'Funnel Display', system-ui, sans-serif; color-scheme: dark; }
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font); overflow: hidden; -webkit-font-smoothing: antialiased; }
+canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+/* the real header icons stay crisp above the glass */
+.menu-btn { position: fixed; z-index: 10; top: max(20px, env(safe-area-inset-top)); left: max(calc(var(--gutter) - 8px), env(safe-area-inset-left)); width: 48px; height: 44px; display: grid; place-items: center; padding: 0; cursor: pointer; color: var(--fg); background: none; border: 0; transition: color .3s; }
+.menu-btn:hover { color: var(--accent); }
+.menu-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+.bars { position: relative; width: 30px; height: 12px; }
+.bars i { position: absolute; left: 0; height: 2.5px; border-radius: 3px; background: currentColor; transition: transform .45s cubic-bezier(.3, 1.4, .5, 1), width .35s cubic-bezier(.3, 1.4, .5, 1); }
+.bars i:nth-child(1) { top: 0; width: 30px; } .bars i:nth-child(2) { bottom: 0; width: 18px; }
+.menu-btn:hover .bars i:nth-child(2) { width: 30px; }
+.open .bars i:nth-child(1) { transform: translateY(4.75px) rotate(45deg); }
+.open .bars i:nth-child(2) { transform: translateY(-4.75px) rotate(-45deg); width: 30px; }
+.logo { position: fixed; z-index: 10; top: max(20px, env(safe-area-inset-top)); left: calc(max(calc(var(--gutter) - 8px), env(safe-area-inset-left)) + 56px); height: 44px; display: flex; align-items: center; font-weight: 800; font-size: 18px; letter-spacing: -.01em; color: var(--fg); text-decoration: none; transition: color .3s; }
+/* lab controls */
+.pick { position: fixed; z-index: 10; bottom: max(18px, env(safe-area-inset-bottom)); left: 50%; translate: -50% 0; display: flex; gap: 4px; padding: 4px; border-radius: 999px; background: rgba(255, 255, 255, .08); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, .12); }
+.pick button { font: 500 13px var(--font); color: var(--fg); background: none; border: 0; padding: 8px 14px; border-radius: 999px; cursor: pointer; }
+.pick button[aria-pressed="true"] { background: var(--accent); color: #0f0f13; }
+.pick button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.note { position: fixed; z-index: 10; bottom: calc(max(18px, env(safe-area-inset-bottom)) + 52px); left: 50%; translate: -50% 0; font-size: 12px; color: #a8aaaf; text-align: center; white-space: nowrap; }
+@media (max-width: 600px) { .note { display: none; } }
+</style>
+</head>
+<body>
+<canvas id="gl" aria-hidden="true"></canvas>
+<button class="menu-btn" id="btn" type="button" aria-label="Open menu" aria-expanded="false"><span class="bars" aria-hidden="true"><i></i><i></i></span></button>
+<span class="logo">DRINWORKS</span>
+<div class="note">Homepage first frame, Video Editor persona. Esc closes. Links are painted into the glass, so they are not clickable here.</div>
+<div class="pick" role="group" aria-label="Effect">
+  <button type="button" data-m="0" aria-pressed="true">Dragged</button>
+  <button type="button" data-m="1" aria-pressed="false">Prism</button>
+  <button type="button" data-m="2" aria-pressed="false">Both</button>
+</div>
+
+<script>
+// The hero's first frame (background, the depth-graded portrait, the headline) becomes texture A. The menu (an accent sheet, then the page-coloured sheet with the links)
+// becomes texture B. One shader moves left to right and bends, drags and splits colour on the way. At rest it is perfectly flat: every bend term is scaled by a band that is 0 at both ends.
+const VS = `attribute vec2 a; varying vec2 vUv; void main() { vUv = a * .5 + .5; gl_Position = vec4(a, 0., 1.); }`
+const FS = `precision highp float;
+varying vec2 vUv; uniform sampler2D uA, uB; uniform float uP, uT, uMode; uniform vec2 uRes; uniform vec3 uAcc;
+float asp() { return uRes.x / uRes.y; }
+float hash(vec2 p) { p = fract(p * vec2(123.34, 456.21)); p += dot(p, p + 45.32); return fract(p.x * p.y); }
+float vn(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3. - 2. * f);
+  return mix(mix(hash(i), hash(i + vec2(1., 0.)), f.x), mix(hash(i + vec2(0., 1.)), hash(i + vec2(1., 1.)), f.x), f.y); }
+float fbm(vec2 p) { float v = 0., a = .5; for (int i = 0; i < 4; i++) { v += a * vn(p); p *= 2.02; a *= .5; } return v; }
+vec3 A(vec2 u) { return texture2D(uA, clamp(u, 0., 1.)).rgb; }
+vec3 B(vec2 u) { return texture2D(uB, clamp(u, 0., 1.)).rgb; }
+// the accent sheet leads by a hair, the page-coloured sheet follows; ma and ms are their masks
+vec3 comp(vec2 u, float ma, float ms) { return mix(mix(A(u), uAcc, ma), B(u), ms); }
+void main() {
+  vec2 q = vUv * vec2(asp(), 1.);
+  float sS, sA, w;
+  if (uMode == 1.) { float n = fbm(q * 2. + uT * .12); float base = uP * 1.85 - (vUv.x * .6 + n * .5 + .2); sS = base; sA = base + .15; w = .35; }
+  else { float base = uP * 1.9 - (vUv.x * .8 + (vUv.y - .5) * .25 + .35); sS = base; sA = base + .18; w = .5; }
+  float ms = smoothstep(0., w, sS), ma = smoothstep(0., w, sA);
+  float band = max(ms * (1. - ms), ma * (1. - ma)) * 4.;
+  vec3 col;
+  if (uMode == 0.) { // dragged: the edge is smeared backwards along the swipe, with streaks
+    float streak = vn(vec2(vUv.y * 70., 1.)) - .5;
+    vec3 acc = vec3(0.);
+    for (int k = 0; k < 8; k++) {
+      float t = float(k) / 7.;
+      float ox = -t * .15 * band + streak * .06 * band * (1. - t);
+      vec3 c;
+      c.r = comp(vUv + vec2(ox * 1.3, 0.), ma, ms).r; c.g = comp(vUv + vec2(ox, 0.), ma, ms).g; c.b = comp(vUv + vec2(ox * .7, 0.), ma, ms).b;
+      acc += c;
+    }
+    col = acc / 8.;
+  } else { // prism: seven colour samples across the edge give a rainbow fringe
+    vec2 d = vec2(fbm(q * 3. + uT * .2), fbm(q * 3. + 7. - uT * .2)) - .5;
+    vec3 acc = vec3(0.), ws = vec3(0.);
+    float streak = vn(vec2(vUv.y * 70., 1.)) - .5;
+    for (int k = 0; k < 7; k++) {
+      float t = float(k) / 6.;
+      vec3 wv = .5 + .5 * cos(6.28318 * (t + vec3(0., .33, .67)));
+      vec2 o = (vec2(1., .2) * (t - .5) * .16 + d * .05) * band;
+      if (uMode == 2.) o += vec2(-t * .1 + streak * .04 * (1. - t), 0.) * band; // both: the fringe is also dragged
+      acc += wv * comp(vUv + o, ma, ms); ws += wv;
+    }
+    col = acc / ws;
+  }
+  gl_FragColor = vec4(col, 1.);
+}`
+const DUR = [1.1, 1.6, 1.3] // seconds per mode
+const ease = (t) => (t < .5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2)
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches
+
+const cv = document.getElementById('gl'), btn = document.getElementById('btn')
+const gl = cv.getContext('webgl', { antialias: false })
+const sh = (t, s) => { const o = gl.createShader(t); gl.shaderSource(o, s); gl.compileShader(o); if (!gl.getShaderParameter(o, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(o)); return o }
+const prog = gl.createProgram(); gl.attachShader(prog, sh(gl.VERTEX_SHADER, VS)); gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, FS)); gl.linkProgram(prog)
+if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(prog))
+gl.useProgram(prog)
+gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer()); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW)
+const loc = gl.getAttribLocation(prog, 'a'); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0)
+const U = (n) => gl.getUniformLocation(prog, n)
+const uA = U('uA'), uB = U('uB'), uP = U('uP'), uT = U('uT'), uMode = U('uMode'), uRes = U('uRes'), uAcc = U('uAcc')
+const texs = [gl.createTexture(), gl.createTexture()]
+const upload = (i, c) => {
+  gl.activeTexture(gl.TEXTURE0 + i); gl.bindTexture(gl.TEXTURE_2D, texs[i]); gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true)
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, c)
+  for (const [k, v] of [[gl.TEXTURE_MIN_FILTER, gl.LINEAR], [gl.TEXTURE_MAG_FILTER, gl.LINEAR], [gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE], [gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE]]) gl.texParameteri(gl.TEXTURE_2D, k, v)
+}
+
+// ── the portrait: the site's depth palette applied to the depth map (a still of the Video Editor persona, fully revealed) ──
+const STOPS = [[.27, .075, .03], [.62, .15, .06], [.93, .30, .10], [1, .50, .16], [1, .86, .42]]
+const grade = (v) => { v = Math.max(0, Math.min(1, v)) * 4; const i = Math.min(3, v | 0), f = v - i; return STOPS[i].map((c, j) => c + (STOPS[i + 1][j] - c) * f) }
+let portrait = null
+function loadPortrait() {
+  return new Promise((res, rej) => {
+    const im = new Image(); im.onload = () => {
+      const w = im.naturalWidth, h = im.naturalHeight
+      const c = document.createElement('canvas'); c.width = w; c.height = h
+      const x = c.getContext('2d', { willReadFrequently: true }); x.drawImage(im, 0, 0)
+      const d = x.getImageData(0, 0, w, h), p = d.data
+      for (let i = 0; i < p.length; i += 4) {
+        const dep = Math.max(0, Math.min(1, (p[i] - 40) / 215)), g = grade((dep - .14) / .86)
+        p[i] = g[0] * 255; p[i + 1] = g[1] * 255; p[i + 2] = g[2] * 255 // alpha stays as the cut-out
+      }
+      x.putImageData(d, 0, 0); portrait = c; res()
+    }
+    im.onerror = () => rej(new Error('could not load me-depth.png')); im.src = 'me-depth.png'
+  })
+}
+
+const LINKS = ['Home', 'More about me', 'Contact', 'Case studies']
+let W = 0, H = 0, progress = 0, target = 0, raf = 0, last = 0, time = 0, mode = 0
+function build() {
+  const dpr = Math.min(devicePixelRatio || 1, 2); W = innerWidth; H = innerHeight
+  cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); gl.viewport(0, 0, cv.width, cv.height)
+  const mk = () => { const c = document.createElement('canvas'); c.width = cv.width; c.height = cv.height; const x = c.getContext('2d'); x.scale(cv.width / W, cv.height / H); return [c, x] }
+  const backdrop = (x) => { const g = x.createLinearGradient(0, 0, 0, H); g.addColorStop(0, '#0a0605'); g.addColorStop(.45, '#0f0f13'); g.addColorStop(1, '#2a1006'); x.fillStyle = g; x.fillRect(0, 0, W, H) }
+
+  // A: the hero's first frame
+  const [cA, a] = mk(); backdrop(a)
+  const s = W <= 600 ? .78 : W <= 1024 ? .9 : 1
+  const ph = H * s, pw = ph * 970 / 1400, px = W * .66667 - pw * .583, py = H * 1.1 - ph // as the site: head on the right third, bottom -10%
+  if (portrait) a.drawImage(portrait, px, py, pw, ph)
+  const fs = W <= 600 ? W * .082 : Math.min(Math.max(32, W * .06), 88), lh = fs * 1.15
+  const left = (W - Math.min(W, 1160)) / 2 + Math.max(16, Math.min(48, W * .04))
+  const y0 = W <= 1024 ? Math.max(88, Math.min(128, W * .14)) + lh : H / 2 // tablet and phone: headline up top
+  a.textBaseline = 'alphabetic'; a.fillStyle = '#e6e9ed'; a.font = `500 ${fs}px "Funnel Display", system-ui, sans-serif`
+  a.letterSpacing = `${-.02 * fs}px`
+  a.fillText('I am Eldrin Bernardino', left, y0 - lh * .2)
+  const pre = "I'm a "; const y1 = y0 - lh * .2 + lh
+  a.fillText(pre, left, y1)
+  const preW = a.measureText(pre).width // measured in the headline weight, before the rotating word's heavier one
+  a.fillStyle = '#ff5a2d'; a.font = `600 ${fs}px "Funnel Display", system-ui, sans-serif`
+  a.fillText('Video Editor', left + preW, y1)
+  upload(0, cA)
+
+  // B: the menu sheet, links on the left in line with the logo, centred top to bottom
+  const [cB, b] = mk(); backdrop(b)
+  const lfs = Math.min(Math.max(40, Math.min(W * .08, H * .11)), 112), ll = lfs * 1.04 + lfs * .12
+  const lx = Math.max(W <= 600 ? 12 : Math.max(16, Math.min(48, W * .04)) - 8, 0) + 56
+  b.fillStyle = '#e6e9ed'; b.font = `700 ${lfs}px "Funnel Display", system-ui, sans-serif`; b.textBaseline = 'middle'; b.letterSpacing = `${-.035 * lfs}px`
+  LINKS.forEach((t, i) => b.fillText(t, lx, H / 2 + (i - (LINKS.length - 1) / 2) * ll))
+  b.fillStyle = '#ff5a2d'; b.beginPath(); b.arc(lx + b.measureText(LINKS[0]).width + lfs * .25, H / 2 - (LINKS.length - 1) / 2 * ll + lfs * .06, lfs * .07, 0, 6.283); b.fill() // the "you are here" dot
+  upload(1, cB)
+
+  gl.uniform1i(uA, 0); gl.uniform1i(uB, 1); gl.uniform2f(uRes, cv.width, cv.height); gl.uniform3f(uAcc, 1, .353, .176)
+  render()
+}
+function render() { gl.uniform1f(uP, ease(progress)); gl.uniform1f(uT, time); gl.uniform1f(uMode, mode); gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4) }
+function tick(now) {
+  const dt = Math.min((now - last) / 1000, .05); last = now; time += dt
+  progress += (target ? 1 : -1) * dt / DUR[mode]; progress = Math.min(Math.max(progress, 0), 1)
+  render(); raf = progress !== target ? requestAnimationFrame(tick) : 0
+}
+function setOpen(v) {
+  target = v ? 1 : 0; btn.classList.toggle('open', v); btn.setAttribute('aria-expanded', v); btn.setAttribute('aria-label', v ? 'Close menu' : 'Open menu')
+  if (reduced) { progress = target; render(); return }
+  if (!raf) { last = performance.now(); raf = requestAnimationFrame(tick) }
+}
+btn.onclick = () => setOpen(!target)
+addEventListener('keydown', (e) => { if (e.key === 'Escape') setOpen(false) })
+document.querySelectorAll('.pick button').forEach((b) => b.onclick = () => {
+  mode = +b.dataset.m; document.querySelectorAll('.pick button').forEach((o) => o.setAttribute('aria-pressed', o === b)); render()
+})
+let rt = 0; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(build, 120) })
+
+Promise.all([loadPortrait(), document.fonts.load('500 40px "Funnel Display"'), document.fonts.load('600 40px "Funnel Display"'), document.fonts.load('700 40px "Funnel Display"')])
+  .catch((e) => console.error(e)).then(build)
+</script>
+</body>
+</html>
