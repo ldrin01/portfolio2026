@@ -84,7 +84,7 @@ const narrowed = computed(() => Object.keys(ranges.value).length > 0)
 
 <style scoped>
 .panel { position: absolute; left: 0; top: calc(100% + 10px); z-index: 30; display: grid; gap: 14px; width: min(380px, 92vw); max-height: min(72vh, 620px); overflow: auto; padding: 16px; text-align: left; color: var(--fg); background: var(--surface); border: 1px solid var(--line); border-radius: 18px; box-shadow: 0 24px 60px rgb(0 0 0 / .28); overscroll-behavior: contain; }
-.top { display: flex; justify-content: space-between; align-items: center; }
+.top { display: flex; justify-content: space-between; align-items: center; position: sticky; top: -16px; z-index: 1; margin: -16px -16px 0; padding: 16px 16px 8px; background: var(--surface); } /* stays put while the sheet scrolls, so the close button is always there */
 .x { width: 28px; height: 28px; border: 0; border-radius: 50%; background: none; color: var(--muted); font: inherit; cursor: pointer; }
 .x:hover { color: var(--fg); background: var(--line); }
 .chips { display: flex; flex-wrap: wrap; gap: 6px; }

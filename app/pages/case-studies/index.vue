@@ -24,10 +24,10 @@ const blurb = computed(() => shelves.value.find(s => s.id === active.value)?.blu
 
 // the accent pill slides under whichever filter is active
 const chips = ref<HTMLElement[]>([])
-const pill = ref({ x: 0, w: 0, on: false })
+const pill = ref({ x: 0, y: 0, w: 0, h: 0, on: false })
 const placePill = () => {
   const el = chips.value[filters.value.findIndex(f => f.id === active.value)]
-  if (el) pill.value = { x: el.offsetLeft, w: el.offsetWidth, on: true }
+  if (el) pill.value = { x: el.offsetLeft, y: el.offsetTop, w: el.offsetWidth, h: el.offsetHeight, on: true }
 }
 watch(active, () => nextTick(placePill))
 onMounted(() => { placePill(); document.fonts?.ready.then(placePill); window.addEventListener('resize', placePill) })
@@ -82,7 +82,7 @@ onBeforeUnmount(() => cancelAnimationFrame(badge.raf))
       <h1>{{ caseStudiesPage.heading }}</h1>
 
       <div class="filters" role="group" aria-label="Filter by category">
-        <span class="pill" :class="{ on: pill.on }" :style="{ translate: `${pill.x}px 0`, width: `${pill.w}px` }" aria-hidden="true" />
+        <span class="pill" :class="{ on: pill.on }" :style="{ translate: `${pill.x}px ${pill.y}px`, width: `${pill.w}px`, height: `${pill.h}px` }" aria-hidden="true" />
         <button
           v-for="f in filters" :key="f.id" ref="chips" type="button" class="chip"
           :class="{ active: active === f.id }" :aria-pressed="active === f.id" @click="pick(f.id)"
@@ -118,13 +118,15 @@ onBeforeUnmount(() => cancelAnimationFrame(badge.raf))
 h1 { font-size: clamp(44px, 8vw, 104px); letter-spacing: -.02em; margin-bottom: 28px; }
 
 /* filters: text chips with counts; one accent pill slides between them */
-.filters { position: relative; display: inline-flex; flex-wrap: wrap; gap: 4px; padding: 4px; border: 1px solid var(--line); border-radius: 999px; }
-.pill { position: absolute; top: 4px; left: 0; bottom: 4px; border-radius: 999px; background: var(--accent); opacity: 0; transition: translate .5s cubic-bezier(.3, 1.3, .5, 1), width .5s cubic-bezier(.3, 1.3, .5, 1), opacity .2s; }
+.filters { position: relative; display: inline-flex; gap: 4px; max-width: 100%; padding: 4px; border: 1px solid var(--line); border-radius: 999px; overflow-x: auto; scrollbar-width: none; }
+.filters::-webkit-scrollbar { display: none; }
+.pill { position: absolute; top: 0; left: 0; border-radius: 999px; background: var(--accent); opacity: 0; transition: translate .5s cubic-bezier(.3, 1.3, .5, 1), width .5s cubic-bezier(.3, 1.3, .5, 1), opacity .2s; }
 .pill.on { opacity: 1; }
 .chip {
   position: relative; z-index: 1; padding: 9px 18px; border: 0; border-radius: 999px; background: none; cursor: pointer;
-  font: 500 15px/1 var(--font); color: var(--muted); transition: color .25s;
+  flex: none; white-space: nowrap; font: 500 15px/1 var(--font); color: var(--muted); transition: color .25s;
 }
+@media (max-width: 480px) { .chip { padding: 9px 12px; font-size: 14px; } }
 .chip:hover { color: var(--fg); }
 .chip.active { color: var(--on-accent); }
 .chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
