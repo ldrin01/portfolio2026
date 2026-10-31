@@ -20,9 +20,12 @@ export default defineNuxtPlugin(() => {
   // (Browsers run timers in a hidden tab at most once a second, and slower after a few minutes, so keep it gentle.)
   const frames = ['Psst…', 'Psst, still…', 'Psst, still here 👀', 'Psst, still here 👀']
   const still = matchMedia('(prefers-reduced-motion: reduce)').matches
+  const router = useRouter()
+  const inAdmin = () => router.currentRoute.value.path.startsWith('/admin') // the editor's tab stays plain and informative
   let title = '', timer = 0, i = 0
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) {
+      if (inAdmin()) return
       title = document.title
       i = 0
       document.title = still ? frames[2]! : frames[0]!
