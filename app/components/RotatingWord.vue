@@ -72,8 +72,8 @@ onBeforeUnmount(() => timers.forEach(clearTimeout))
 <style scoped>
 .rotator { color: var(--accent); font-weight: 600; }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
-/* each word is a clipping window the letters slide through */
-.w { display: inline-block; white-space: nowrap; overflow-y: clip; padding-bottom: .14em; margin-bottom: -.14em; }
+/* each word is a clipping window the letters slide through; clip-path (not overflow) so iOS keeps the text baseline aligned with the words beside it */
+.w { display: inline-block; white-space: nowrap; clip-path: inset(0 -1em); padding-bottom: .14em; margin-bottom: -.14em; }
 .sp { white-space: normal; } /* collapses at a line break, so a wrapped line never starts with a space */
 .ch { display: inline-block; }
 

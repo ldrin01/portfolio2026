@@ -9,13 +9,19 @@ const root = ref<HTMLElement>()
 const canvas = ref<HTMLCanvasElement>()
 const tilt = reactive({ x: 0, y: 0 })
 const gl = ref(true)
+const needsTilt = ref(false) // iOS only lets a page read the tilt after a tap
+const tiltOn = ref(false)
+const tiltLabel = useSite().keyboard.tilt
+let askTilt: () => void = () => {}
+let cleanup: (() => void) | null = null
+onBeforeUnmount(() => cleanup?.())
 
 const VERT = `attribute vec2 p; varying vec2 v; void main(){ v = p * .5 + .5; gl_Position = vec4(p, 0., 1.); }`
 const FRAG = `precision highp float;
 varying vec2 v;
 uniform sampler2D t0, t1, t2;
 uniform vec2 s0, s1, s2;      // cover-fit scale of each picture
-uniform float uView, uCount, uPitch, uTime;
+uniform float uView, uCount, uPitch;
 vec3 pic(float i, vec2 uv) {
   if (i < .5) return texture2D(t0, (uv - .5) * s0 + .5).rgb;
   if (i < 1.5) return texture2D(t1, (uv - .5) * s1 + .5).rgb;
@@ -35,21 +41,25 @@ vec3 lens(float s, vec2 uv) {
 void main() {
   vec2 uv = vec2(v.x, 1. - v.y);
   float ridge = fract(uv.x * uPitch);
-  // each ridge bends the view a little across its width, so the switch sweeps over the card in fine stripes
-  float s = uView + (ridge - .5) * .22;
-  float spread = .08 + .12 * sin(fract(uView) * 3.1416);   // the rainbow split, widest mid-switch
+  float x = ridge * 2. - 1.;                  // -1 … 1 across one cylindrical ridge
+  // a round lens bends light more towards its edges, so the view changes faster there: the switch sweeps over the card in fine stripes
+  float s = uView + (x + .35 * x * x * x) * .1;
+  float mid = sin(fract(uView) * 3.1416);
+  float spread = (.06 + .12 * mid) * (.6 + .4 * abs(x));   // the rainbow split: widest mid-switch and at a ridge's edge
   vec3 col = vec3(lens(s - spread, uv).r, lens(s, uv).g, lens(s + spread, uv).b);
-  // the ridges: a soft dark line between each, a faint highlight on top
-  col *= .86 + .14 * smoothstep(.0, .25, ridge) * smoothstep(1., .75, ridge);
-  col += .05 * smoothstep(.45, .5, ridge) * smoothstep(.55, .5, ridge);
-  // a moving glint across the plastic
+  // the ridges: dark where the lens curls away, a bright line where it faces the light (the light slides with the view)
+  col *= 1. - .16 * pow(abs(x), 4.);
+  float lit = (uView / max(uCount - 1., 1.)) * 1.6 - .8;
+  col += .07 * exp(-pow((x - lit) * 3.2, 2.));
+  // a moving glint across the plastic, tied to the view so it settles when the card does
   float glint = exp(-pow((uv.x + uv.y * .3 - .2 - uView * .45) * 5., 2.));
-  col += glint * .12 * vec3(.9 + .1 * sin(uv.y * 30. + uTime), 1., 1.1);
+  col += glint * .12 * vec3(.9 + .1 * sin(uv.y * 30.), 1., 1.1);
   gl_FragColor = vec4(col, 1.);
 }`
 
 onMounted(async () => {
   const c = canvas.value!, el = root.value!
+  const coarse = matchMedia('(pointer: coarse)').matches
   const g = c.getContext('webgl', { antialias: true, premultipliedAlpha: false })
   if (!g) { gl.value = false; return }
   const sh = (type: number, src: string) => { const s = g.createShader(type)!; g.shaderSource(s, src); g.compileShader(s); return s }
@@ -75,14 +85,14 @@ onMounted(async () => {
   g.uniform1f(u('uCount'), imgs.length)
 
   const fit = () => {
-    const r = c.getBoundingClientRect(), dpr = Math.min(2, devicePixelRatio)
+    const r = c.getBoundingClientRect(), dpr = Math.min(coarse ? 1.5 : 2, devicePixelRatio)
     c.width = Math.round(r.width * dpr); c.height = Math.round(r.height * dpr); g.viewport(0, 0, c.width, c.height)
     const ca = r.width / r.height
     imgs.forEach((img, k) => { const ia = img.width / img.height; g.uniform2f(u(`s${k}`), ca > ia ? 1 : ca / ia, ca > ia ? ia / ca : 1) })
     for (let k = imgs.length; k < 3; k++) g.uniform2f(u(`s${k}`), 1, 1)
     g.uniform1f(u('uPitch'), Math.max(60, r.width / 5)) // a ridge about every 5px
   }
-  const ro = new ResizeObserver(fit); ro.observe(c)
+  const ro = new ResizeObserver(() => { fit(); wake() }); ro.observe(c)
 
   // where the viewer "is": pointer across the card (and a little beyond), a dragged finger, or the phone's tilt
   const want = { x: 0, y: 0 }
@@ -91,43 +101,61 @@ onMounted(async () => {
     want.x = Math.max(-1, Math.min(1, ((x - r.left) / r.width - .5) * 2.2))
     want.y = Math.max(-1, Math.min(1, ((y - r.top) / r.height - .5) * 2.2))
   }
-  const onMove = (e: PointerEvent) => fromPoint(e.clientX, e.clientY)
-  const onOrient = (e: DeviceOrientationEvent) => { if (e.gamma != null && e.beta != null) { want.x = Math.max(-1, Math.min(1, e.gamma / 30)); want.y = Math.max(-1, Math.min(1, (e.beta - 45) / 30)) } }
-  addEventListener('pointermove', onMove, { passive: true })
-  addEventListener('deviceorientation', onOrient)
-
   let raf = 0, vis = false, view = 0
-  const draw = (t: number) => {
-    raf = requestAnimationFrame(draw)
+  const wake = () => { if (vis && !raf) raf = requestAnimationFrame(draw) }
+  const onMove = (e: PointerEvent) => { fromPoint(e.clientX, e.clientY); wake() }
+  const onOrient = (e: DeviceOrientationEvent) => { if (e.gamma != null && e.beta != null) { want.x = Math.max(-1, Math.min(1, e.gamma / 30)); want.y = Math.max(-1, Math.min(1, (e.beta - 45) / 30)); wake() } }
+  addEventListener('pointermove', onMove, { passive: true })
+  const DOE = window.DeviceOrientationEvent as unknown as { requestPermission?: () => Promise<string> } | undefined
+  if (coarse && DOE?.requestPermission) needsTilt.value = true
+  else if (coarse) { addEventListener('deviceorientation', onOrient); tiltOn.value = true }
+  askTilt = async () => {
+    try { if ((await DOE!.requestPermission!()) === 'granted') { addEventListener('deviceorientation', onOrient); tiltOn.value = true } } catch { /* stays on touch-drag */ }
+  }
+
+  // draws only while the card is still moving; a pointer or tilt change wakes it again
+  const draw = () => {
+    raf = 0
     tilt.x += (want.y - tilt.x) * .08; tilt.y += (want.x - tilt.y) * .08
     view = (tilt.y + 1) / 2 * (imgs.length - 1)
-    g.uniform1f(u('uView'), view); g.uniform1f(u('uTime'), t / 1000)
+    g.uniform1f(u('uView'), view)
     g.drawArrays(g.TRIANGLE_STRIP, 0, 4)
+    if (vis && (Math.abs(want.x - tilt.y) > .0008 || Math.abs(want.y - tilt.x) > .0008)) raf = requestAnimationFrame(draw)
   }
-  const io = new IntersectionObserver(([e]) => { vis = !!e?.isIntersecting; cancelAnimationFrame(raf); if (vis) raf = requestAnimationFrame(draw) })
+  const io = new IntersectionObserver(([e]) => { vis = !!e?.isIntersecting; if (!vis) { cancelAnimationFrame(raf); raf = 0 } else wake() })
   io.observe(el)
-  fit(); draw(0)
-  onBeforeUnmount(() => { ro.disconnect(); io.disconnect(); cancelAnimationFrame(raf); removeEventListener('pointermove', onMove); removeEventListener('deviceorientation', onOrient) })
+  fit(); draw()
+  cleanup = () => { ro.disconnect(); io.disconnect(); cancelAnimationFrame(raf); removeEventListener('pointermove', onMove); removeEventListener('deviceorientation', onOrient) }
 })
 </script>
 
 <template>
   <div ref="root" class="lenti">
-    <div class="card" :style="{ '--rx': `${tilt.x * -14}deg`, '--ry': `${tilt.y * 26}deg` }" role="img" :aria-label="images.map(i => i.alt).join(' / ')">
-      <canvas v-show="gl" ref="canvas" />
-      <img v-if="!gl" :src="asset(images[0]?.image)" alt="">
+    <div class="card" :style="{ '--rx': `${tilt.x * -14}deg`, '--ry': `${tilt.y * 26}deg`, '--sheen': `${50 - tilt.y * 50}%` }" role="img" :aria-label="images.map(i => i.alt).join(' / ')">
+      <!-- the thickness of the plastic sheet: plates behind the face -->
+      <i v-for="n in 8" :key="n" class="plate" aria-hidden="true" :style="{ transform: `translateZ(${-n}px)` }" />
+      <div class="face">
+        <canvas v-show="gl" ref="canvas" />
+        <img v-if="!gl" :src="asset(images[0]?.image)" alt="">
+        <span class="gloss" aria-hidden="true" />
+      </div>
     </div>
+    <button v-if="needsTilt && !tiltOn" type="button" class="enable" @click="askTilt">{{ tiltLabel }}</button>
   </div>
 </template>
 
 <style scoped>
 .lenti { display: flex; flex-direction: column; align-items: center; gap: 18px; padding: clamp(40px, 6vw, 80px) var(--gutter); perspective: 1200px; }
 .card {
-  width: min(100%, 560px, 62svh); aspect-ratio: 4 / 5; border-radius: 22px; overflow: hidden; background: #111;
-  box-shadow: 0 40px 80px -30px rgba(0, 0, 0, .55);
+  position: relative; width: min(100%, 560px, 62svh); aspect-ratio: 4 / 5; border-radius: 22px; transform-style: preserve-3d;
   transform: rotateX(var(--rx)) rotateY(var(--ry)); will-change: transform;
 }
+.plate { position: absolute; inset: 0; border-radius: 22px; background: color-mix(in srgb, var(--fg) 30%, #1a1a1e); }
+.plate:nth-child(8) { box-shadow: 0 40px 80px -30px rgba(0, 0, 0, .55); }
+.face { position: absolute; inset: 0; border-radius: 22px; overflow: hidden; background: #111; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .22), inset 0 2px 5px rgba(255, 255, 255, .3), inset 0 -4px 8px rgba(0, 0, 0, .35); }
+.gloss { position: absolute; inset: 0; border-radius: inherit; pointer-events: none; mix-blend-mode: soft-light; background: linear-gradient(110deg, transparent 25%, rgba(255, 255, 255, .7) 45%, transparent 62%); background-size: 280% 100%; background-position: var(--sheen) 0; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .22), inset 0 2px 5px rgba(255, 255, 255, .3), inset 0 -4px 8px rgba(0, 0, 0, .35); }
+.enable { font: inherit; color: var(--fg); background: var(--surface); border: 1px solid var(--line); border-radius: 8px; min-height: 44px; padding: 0 16px; cursor: pointer; }
 canvas, img { display: block; width: 100%; height: 100%; object-fit: cover; }
-[data-theme="dark"] .card { box-shadow: none; }
+[data-theme="dark"] .plate:nth-child(8) { box-shadow: none; }
 @media (prefers-reduced-motion: reduce) { .card { transform: none; } }
 </style>

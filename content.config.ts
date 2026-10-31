@@ -175,7 +175,7 @@ export default defineContentConfig({
           title: z.string(), body: z.array(z.string()),
           tools: z.array(z.object({ kind: z.string(), before: z.string(), name: z.string(), body: z.string() })), // kind: corel | premiere (which 3D logo sits in the line)
           stories: z.array(z.object({ title: z.string(), body: z.string() })),
-          hobbies: z.object({ title: z.string(), body: z.string(), routes: z.array(z.object({ image: z.string(), name: z.string(), kind: z.string(), km: z.number(), date: z.string() })) }) // routes: transparent PNGs of the line; kind: run | ride
+          hobbies: z.object({ title: z.string(), body: z.string(), routes: z.array(z.object({ image: z.string(), kind: z.string(), name: z.string().optional(), km: z.number().optional(), date: z.string().optional(), stats: z.array(z.object({ label: z.string(), value: z.string() })).optional() })) }) // routes: transparent PNGs of the line; kind: run | ride
         }),
         evenMore: z.object({
           title: z.string(), body: z.array(z.string()),
