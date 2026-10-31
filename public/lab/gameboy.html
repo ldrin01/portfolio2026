@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Gameboy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Funnel+Display:wght@300..800&display=swap">
+<script>
+  // ?theme=light|dark wins, then the system setting
+  document.documentElement.dataset.theme = new URLSearchParams(location.search).get('theme') || (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark')
+</script>
+<style>
+:root {
+  --bg: #0f0f13; --fg: #e6e9ed; --muted: #a8aaaf;
+  --line: color-mix(in srgb, #a8aaaf 22%, transparent);
+  --gutter: clamp(16px, 4vw, 48px);
+  --font: 'Funnel Display', system-ui, sans-serif;
+  color-scheme: dark;
+}
+:root[data-theme="light"] {
+  --bg: #f2efe9; --fg: #16161b; --muted: #5d5f66;
+  --line: color-mix(in srgb, #16161b 16%, transparent);
+  color-scheme: light;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--bg); color: var(--fg); font: 400 17px/1.6 var(--font); -webkit-font-smoothing: antialiased; transition: background-color .45s, color .45s; }
+main { overflow-x: clip; min-height: 100vh; min-height: 100svh; display: flex; align-items: center; justify-content: center; padding: clamp(72px, 10vw, 120px) var(--gutter); }
+.theme { position: fixed; z-index: 20; top: 20px; right: var(--gutter); font: inherit; font-size: 12px; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); background: none; border: 1px solid var(--line); border-radius: 999px; padding: 8px 14px; cursor: pointer; }
+.theme:hover { color: var(--fg); }
+
+/* the stage: the gameboy goes here */
+#stage { width: 100%; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: clamp(16px, 4vw, 64px); }
+figure { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 16px; }
+#gl { height: min(78svh, 900px); aspect-ratio: 1 / 1.1; max-width: 100%; position: relative; cursor: grab; touch-action: none; }
+#gl:active { cursor: grabbing; }
+#gl canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.tags { position: absolute; inset: 0; pointer-events: none; overflow: visible; }
+.tag { position: absolute; left: 0; top: 0; display: flex; align-items: center; gap: 6px; white-space: nowrap; transition: opacity .18s; will-change: transform; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
+.tag i { flex: none; width: 7px; height: 7px; margin: -3.5px 0 0 -3.5px; border-radius: 50%; background: var(--fg); box-shadow: 0 0 0 3px color-mix(in srgb, var(--bg) 70%, transparent); }
+.tag b { font-weight: 500; color: var(--fg); background: color-mix(in srgb, var(--bg) 78%, transparent); padding: 2px 7px; border-radius: 999px; border: 1px solid var(--line); }
+.tag.left { flex-direction: row-reverse; }
+.tag.left i { margin: -3.5px -3.5px 0 0; }
+.tag.corners i { background: #e84a1c; }
+.tag.edges i { background: #3c8c5a; border-radius: 1px; }
+.tag.edges b { color: var(--muted); }
+.toggles { display: flex; gap: 8px; }
+.toggles button { font: inherit; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); background: none; border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px; cursor: pointer; }
+.toggles button[aria-pressed="true"] { color: var(--fg); border-color: var(--fg); }
+.cap { font-size: 12px; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); margin: 0; }
+/* left rail: reference photos, scrolls on its own */
+.layout { display: flex; min-height: 100svh; }
+.layout > main { flex: 1; min-width: 0; }
+.refs { flex: none; width: clamp(300px, 30vw, 440px); height: 100svh; position: sticky; top: 0; overflow-y: auto; overscroll-behavior: contain; padding: 84px 20px 40px var(--gutter); border-right: 1px solid var(--line); display: flex; flex-direction: column; gap: 22px; scrollbar-width: thin; }
+.refs figure { margin: 0; display: flex; flex-direction: column; align-items: stretch; gap: 8px; }
+.refs img { width: 100%; height: auto; display: block; border-radius: 8px; cursor: zoom-in; transition: opacity .2s; }
+.refs img:hover { opacity: .88; }
+.lightbox { position: fixed; inset: 0; z-index: 50; display: none; align-items: center; justify-content: center; padding: 24px; background: color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter: blur(6px); cursor: zoom-out; }
+.lightbox.on { display: flex; }
+.lightbox img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 8px; }
+.refs figcaption { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+@media (max-width: 860px) {
+  .layout { flex-direction: column; }
+    .refs { order: 2; width: 100%; height: auto; position: static; border-right: 0; border-top: 1px solid var(--line); padding: 32px var(--gutter) 48px; }
+}
+.credit { font-size: 12px; color: var(--muted); margin: 0; }
+.credit a { color: inherit; }
+</style>
+</head>
+<body>
+<button class="theme" id="theme" type="button">Theme</button>
+<div class="layout">
+<aside class="refs" aria-label="Reference photos">
+  <p class="cap">Reference · click to enlarge</p>
+  <figure><img src="gameboy-dmg.jpg" alt="Nintendo Game Boy (DMG-01), front view" width="1049" height="1800"><figcaption>Front</figcaption></figure>
+  <figure><img src="gameboy-ref/0247.jpg" alt="Game Boy back" loading="lazy"><figcaption>Back</figcaption></figure>
+  <figure><img src="gameboy-ref/top.jpg" alt="Game Boy top edge, straight on, showing the cap, the seam and the open cartridge tunnel" loading="lazy"><figcaption>Top edge · cap, seam, cartridge tunnel</figcaption></figure>
+  <figure><img src="gameboy-ref/top-angle.jpg" alt="Game Boy from above and behind with the cartridge bay open" loading="lazy"><figcaption>Top · angle into the cartridge bay</figcaption></figure>
+  <figure><img src="gameboy-ref/bottom.jpg" alt="Game Boy bottom edge, straight on" loading="lazy"><figcaption>Bottom edge · straight on</figcaption></figure>
+  <figure><img src="gameboy-ref/side-a.jpg" alt="Game Boy side profile, left" loading="lazy"><figcaption>Side profile · thickness and ribs</figcaption></figure>
+  <figure><img src="gameboy-ref/side-b.jpg" alt="Game Boy side profile, right" loading="lazy"><figcaption>Side profile · EXT connector side</figcaption></figure>
+  <figure><img src="gameboy-ref/0244.jpg" alt="Game Boy side with volume dial and EXT connector" loading="lazy"><figcaption>Side · volume + EXT connector</figcaption></figure>
+  <figure><img src="gameboy-ref/0245.jpg" alt="Game Boy side with contrast dial and headphone jack" loading="lazy"><figcaption>Side · contrast + headphones</figcaption></figure>
+  <figure><img src="gameboy-ref/0242.jpg" alt="Game Boy from the bottom edge" loading="lazy"><figcaption>Bottom edge</figcaption></figure>
+  <figure><img src="gameboy-ref/0243.jpg" alt="Game Boy at an angle, top and right edge" loading="lazy"><figcaption>Angle · right edge + top lip</figcaption></figure>
+  <p class="credit">Front: <a href="https://commons.wikimedia.org/wiki/File:DMG-01.jpg">DMG-01.jpg</a>, CC BY-SA 3.0. Back and side shots: Raimond Spekking, CC BY-SA 4.0. Top, bottom and profile shots: Collection Charles Cros (BnF), public domain. All via Wikimedia Commons.</p>
+</aside>
+<div class="lightbox" id="lightbox" role="dialog" aria-label="Enlarged photo"><img alt=""></div>
+<main>
+  <div id="stage">
+    <figure>
+      <div id="gl" aria-label="Low-poly Game Boy, drag to rotate"></div>
+      <p class="cap">Low poly · drag to rotate · L/R as seen from the front</p>
+      <div class="toggles"><button type="button" data-tags="faces" aria-pressed="true">Faces</button><button type="button" data-tags="corners" aria-pressed="true">Corners</button><button type="button" data-tags="edges" aria-pressed="true">Edges</button></div>
+    </figure>
+  </div>
+</main>
+</div>
+
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"
+} }
+</script>
+<script type="module">
+import * as THREE from 'three'
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
+
+// Everything is laid out in photo pixels (1166 x 2000) and scaled to world units, so it lines up with the picture.
+const PW = 1166, PH = 2000, S = 1 / 1000
+const X = px => (px - PW / 2) * S, Y = py => (PH / 2 - py) * S
+const DEPTH = 0.4, FRONT = DEPTH / 2
+
+const host = document.getElementById('gl')
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2))
+host.appendChild(renderer.domElement)
+const scene = new THREE.Scene()
+const camera = new THREE.PerspectiveCamera(26, 1 / 1.25, 0.1, 50)
+camera.position.set(0, 0, 5.6)
+scene.add(new THREE.HemisphereLight(0xffffff, 0x6a6660, 1.55))
+const sun = new THREE.DirectionalLight(0xffffff, 1.5); sun.position.set(-2, 3, 4); scene.add(sun)
+
+const mat = (c, o = {}) => new THREE.MeshLambertMaterial({ color: c, ...o })
+const M = { body: mat(0xd2cec4), bezel: mat(0x85848d), lens: mat(0x8f9a22), dark: mat(0x2b2b2e), btn: mat(0xa5305c), pill: mat(0x8a8993), groove: mat(0x8d8a82), led: mat(0x7a2a1c), switch: mat(0x74737b) }
+
+// rounded rectangle in pixel coords, corners [tl, tr, br, bl] as {rx, ry} quarter-ellipses, sampled finely so the curve reads smooth
+function rr(x0, y0, x1, y1, [tl, tr, br, bl], seg = 32) {
+  const pts = []
+  const arc = (cx, cy, rx, ry, a0) => {
+    for (let i = 0; i <= seg; i++) { const a = a0 + (i / seg) * Math.PI / 2; pts.push(new THREE.Vector2(X(cx + Math.cos(a) * rx), Y(cy + Math.sin(a) * ry))) }
+  }
+  arc(x1 - tr.rx, y0 + tr.ry, tr.rx, tr.ry, -Math.PI / 2)  // top right
+  arc(x1 - br.rx, y1 - br.ry, br.rx, br.ry, 0)             // bottom right
+  arc(x0 + bl.rx, y1 - bl.ry, bl.rx, bl.ry, Math.PI / 2)   // bottom left
+  arc(x0 + tl.rx, y0 + tl.ry, tl.rx, tl.ry, Math.PI)       // top left
+  return new THREE.Shape(pts)
+}
+const rad = r => ({ rx: r, ry: r })
+// the photo's silhouette: x 24..1142, y 34..1958, big curve at the bottom right
+const SIL = [rad(44), rad(44), { rx: 262, ry: 270 }, rad(46)]
+
+// Two shells meet at the seam, as on the real thing (top, bottom and side photos):
+//  - front shell (white): tight, crisp edges, overhangs the back shell a little
+//  - back shell (cream): a short straight wall under the seam, then one wide soft round-over
+//    that runs unbroken round the whole back edge (top-back, bottom-back, L-back, R-back, and the big curve)
+const SEAM_Z = 0
+
+const shellShape = inset => rr(24 + inset, 34 + inset, 1142 - inset, 1958 - inset,
+  SIL.map(c => ({ rx: Math.max(c.rx - inset, 4), ry: Math.max(c.ry - inset, 4) })))
+const FRONT_B = 0.02
+const fg = new THREE.ExtrudeGeometry(shellShape(FRONT_B * 1000),
+  { depth: (FRONT - SEAM_Z) - 2 * FRONT_B, curveSegments: 1, bevelEnabled: true, bevelSize: FRONT_B, bevelThickness: FRONT_B, bevelSegments: 6 })
+fg.translate(0, 0, SEAM_Z + FRONT_B)
+const frontShell = new THREE.Mesh(fg, M.body)
+
+// back shell, lofted from rings: each ring is the silhouette pulled in by d px, so corner radii shrink as it rounds over
+const LEDGE = 10          // px the back shell sits in from the front shell
+const WALL = 0.09         // straight wall below the seam
+const ROUND_Z = 0.11      // how far the round-over drops (z)
+const ROUND_D = 140       // how far it sweeps in (px)
+const ring = (d, seg = 24) => {
+  const x0 = 24 + d, y0 = 34 + d, x1 = 1142 - d, y1 = 1958 - d
+  const [tl, tr, br, bl] = SIL.map(c => ({ rx: Math.max(c.rx - d, 0), ry: Math.max(c.ry - d, 0) }))
+  const pts = []
+  const arc = (cx, cy, rx, ry, a0) => { for (let i = 0; i <= seg; i++) { const a = a0 + (i / seg) * Math.PI / 2; pts.push(new THREE.Vector2(X(cx + Math.cos(a) * rx), Y(cy + Math.sin(a) * ry))) } }
+  arc(x1 - tr.rx, y0 + tr.ry, tr.rx, tr.ry, -Math.PI / 2)
+  arc(x1 - br.rx, y1 - br.ry, br.rx, br.ry, 0)
+  arc(x0 + bl.rx, y1 - bl.ry, bl.rx, bl.ry, Math.PI / 2)
+  arc(x0 + tl.rx, y0 + tl.ry, tl.rx, tl.ry, Math.PI)
+  return pts
+}
+const layers = [{ z: SEAM_Z + 0.06, d: LEDGE }, { z: SEAM_Z, d: LEDGE }, { z: -WALL, d: LEDGE }]
+const STEPS = 14
+for (let i = 1; i <= STEPS; i++) { const t = i / STEPS * Math.PI / 2; layers.push({ z: -WALL - ROUND_Z * Math.sin(t), d: LEDGE + ROUND_D * (1 - Math.cos(t)) }) }
+const rings = layers.map(l => ring(l.d))
+const K = rings[0].length
+const pos = [], idx = []
+rings.forEach((r, li) => r.forEach(v => pos.push(v.x, v.y, layers[li].z)))
+const tri = (a, b, c) => { // keep every face pointing away from the body's middle
+  const va = new THREE.Vector3(pos[a * 3], pos[a * 3 + 1], pos[a * 3 + 2]), vb = new THREE.Vector3(pos[b * 3], pos[b * 3 + 1], pos[b * 3 + 2]), vc = new THREE.Vector3(pos[c * 3], pos[c * 3 + 1], pos[c * 3 + 2])
+  const n = vb.clone().sub(va).cross(vc.clone().sub(va)); if (n.lengthSq() < 1e-14) return
+  const mid = va.clone().add(vb).add(vc).multiplyScalar(1 / 3).sub(new THREE.Vector3(0, 0, 0.05))
+  idx.push(...(n.dot(mid) >= 0 ? [a, b, c] : [a, c, b]))
+}
+for (let l = 0; l < rings.length - 1; l++) for (let i = 0; i < K; i++) {
+  const j = (i + 1) % K, a = l * K + i, b = l * K + j, c = (l + 1) * K + i, d = (l + 1) * K + j
+  tri(a, c, b); tri(b, c, d)
+}
+{ // back face cap
+  const last = rings.length - 1, uniq = [], map = []
+  rings[last].forEach((v, i) => { if (!uniq.length || v.distanceTo(uniq[uniq.length - 1]) > 1e-6) { uniq.push(v); map.push(last * K + i) } })
+  if (uniq[0].distanceTo(uniq[uniq.length - 1]) < 1e-6) { uniq.pop(); map.pop() }
+  THREE.ShapeUtils.triangulateShape(uniq, []).forEach(([a, b, c]) => tri(map[a], map[b], map[c]))
+}
+const bg = new THREE.BufferGeometry()
+bg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); bg.setIndex(idx); bg.computeVertexNormals()
+const backShell = new THREE.Mesh(bg, M.body)
+
+const gb = new THREE.Group(); scene.add(gb)
+gb.add(frontShell, backShell)
+
+// ── floating labels: each one is pinned to a spot on the body and hides when that spot turns away from you ──
+// L / R are as seen from the front (screen side). Corners read upper/lower, left/right, front/back.
+const HX = 0.559, TOP = Y(34), BOT = Y(1958), HZ = FRONT
+const CUR = { x: X(1065), y: Y(1879) } // 45 degrees round the big bottom-right curve
+const A = []
+const add = (group, name, pos, n) => A.push({ group, name, pos: new THREE.Vector3(...pos), n: new THREE.Vector3(...n).normalize() })
+add('faces', 'Front face', [0, 0.15, HZ], [0, 0, 1])
+add('faces', 'Back face', [0, 0.15, -HZ], [0, 0, -1])
+add('faces', 'Top', [0, TOP, 0.04], [0, 1, 0])
+add('faces', 'Bottom', [-0.12, BOT, 0.04], [0, -1, 0])
+add('faces', 'L side', [-HX, 0.2, 0.04], [-1, 0, 0])
+add('faces', 'R side', [HX, 0.2, 0.04], [1, 0, 0])
+add('corners', 'ULF', [-HX + 0.012, TOP - 0.012, HZ], [-1, 1, 1])
+add('corners', 'URF', [HX - 0.012, TOP - 0.012, HZ], [1, 1, 1])
+add('corners', 'LLF', [-HX + 0.012, BOT + 0.012, HZ], [-1, -1, 1])
+add('corners', 'LRF', [CUR.x, CUR.y, HZ], [1, -1, 1])
+add('corners', 'ULB', [-HX + 0.012, TOP - 0.012, -HZ], [-1, 1, -1])
+add('corners', 'URB', [HX - 0.012, TOP - 0.012, -HZ], [1, 1, -1])
+add('corners', 'LLB', [-HX + 0.012, BOT + 0.012, -HZ], [-1, -1, -1])
+add('corners', 'LRB', [CUR.x, CUR.y, -HZ], [1, -1, -1])
+add('edges', 'Top-front edge', [0.15, TOP, HZ], [0, 1, 1])
+add('edges', 'Top-back edge', [0.15, TOP, -HZ], [0, 1, -1])
+add('edges', 'Bottom-front edge', [-0.2, BOT, HZ], [0, -1, 1])
+add('edges', 'Bottom-back edge', [-0.2, BOT, -HZ], [0, -1, -1])
+add('edges', 'L-front edge', [-HX, -0.3, HZ], [-1, 0, 1])
+add('edges', 'L-back edge', [-HX, -0.3, -HZ], [-1, 0, -1])
+add('edges', 'R-front edge', [HX, -0.25, HZ], [1, 0, 1])
+add('edges', 'R-back edge', [HX, -0.25, -HZ], [1, 0, -1])
+add('edges', 'Top-L edge', [-HX, TOP, 0], [-1, 1, 0])
+add('edges', 'Top-R edge', [HX, TOP, 0], [1, 1, 0])
+add('edges', 'Bottom-L edge', [-HX, BOT, 0], [-1, -1, 0])
+add('edges', 'Curve edge', [CUR.x, CUR.y, 0], [1, -1, 0])
+
+const tagLayer = document.createElement('div'); tagLayer.className = 'tags'; host.appendChild(tagLayer)
+for (const a of A) {
+  a.el = document.createElement('div'); a.el.className = 'tag ' + a.group
+  a.el.innerHTML = `<i></i><b>${a.name}</b>`
+  tagLayer.appendChild(a.el)
+}
+const shown = { faces: true, corners: true, edges: true }
+document.querySelectorAll('[data-tags]').forEach(btn => btn.addEventListener('click', () => {
+  const k = btn.dataset.tags; shown[k] = !shown[k]; btn.setAttribute('aria-pressed', shown[k])
+}))
+const _p = new THREE.Vector3(), _n = new THREE.Vector3(), _c = new THREE.Vector3()
+function placeTags() {
+  gb.updateMatrixWorld()
+  const w = host.clientWidth, h = host.clientHeight
+  for (const a of A) {
+    _p.copy(a.pos).applyMatrix4(gb.matrixWorld)
+    _n.copy(a.n).applyQuaternion(gb.quaternion)
+    _c.copy(camera.position).sub(_p).normalize()
+    const facing = _n.dot(_c) > 0.12 && shown[a.group]
+    a.el.style.opacity = facing ? 1 : 0
+    if (!facing) continue
+    _p.project(camera)
+    a.el.style.transform = `translate(${(_p.x * .5 + .5) * w}px, ${(-_p.y * .5 + .5) * h}px)`
+    a.el.classList.toggle('left', _n.x < -0.05) // text goes to the outside of the object
+  }
+}
+
+// controls: drag to turn; a slow sway shows the facets until you touch it
+const controls = new OrbitControls(camera, renderer.domElement)
+controls.enableZoom = false; controls.enablePan = false; controls.enableDamping = true
+controls.minPolarAngle = 0.5; controls.maxPolarAngle = Math.PI - 0.5
+let touched = false
+controls.addEventListener('start', () => { touched = true })
+
+function size() {
+  const w = host.clientWidth, h = host.clientHeight
+  renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix()
+}
+new ResizeObserver(size).observe(host); size()
+
+renderer.setAnimationLoop(t => {
+  if (!touched) gb.rotation.y = Math.sin(t / 1800) * 0.5, gb.rotation.x = Math.sin(t / 2600) * 0.08
+  controls.update(); placeTags(); renderer.render(scene, camera)
+})
+</script>
+<script>
+  const lb = document.getElementById('lightbox'), lbImg = lb.querySelector('img')
+  document.querySelectorAll('.refs img').forEach(i => i.addEventListener('click', () => { lbImg.src = i.src; lbImg.alt = i.alt; lb.classList.add('on') }))
+  lb.addEventListener('click', () => lb.classList.remove('on'))
+  addEventListener('keydown', e => { if (e.key === 'Escape') lb.classList.remove('on') })
+</script>
+<script>
+  const root = document.documentElement
+  document.getElementById('theme').addEventListener('click', () => {
+    root.dataset.theme = root.dataset.theme === 'light' ? 'dark' : 'light'
+  })
+</script>
+</body>
+</html>

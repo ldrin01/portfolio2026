@@ -4,7 +4,7 @@ const { data: doc } = await useAsyncData(`study-${route.params.slug}`, () => que
 if (!doc.value) throw createError({ statusCode: 404, statusMessage: 'Case study not found', fatal: true })
 // SEO title and description from the article, or its title and summary when those are left empty
 const { seo } = useSite()
-const seoTitle = doc.value.seoTitle || `${doc.value.title} — ${seo.siteName}`
+const seoTitle = doc.value.seoTitle || `${doc.value.title} | ${seo.siteName}`
 const seoDescription = doc.value.seoDescription || doc.value.summary
 const asset = useAssetUrl()
 // the header settles in once the loader has gone: title words rise one after another, then the lead, then a hairline draws

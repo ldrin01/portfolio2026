@@ -484,10 +484,10 @@ function windowsStyle() {
     { x: 420, y: 470, w: 490, h: 380, t: 'neck_v3.fig', dx: 22, dy: -6 },
     { x: 262, y: 22, w: 600, h: 470, t: 'eldrin.png — 100%', dx: -10, dy: -14 },
     { x: 18, y: 380, w: 230, h: 0, t: 'Layers', panel: ['Hair', 'Glasses', 'Face', 'Neck', 'Shirt', 'Arm'], dx: -6, dy: 4 },
-    { x: 296, y: 182, w: 270, h: 170, t: 'Inspect — eyes', dx: -26, dy: 12 },
+    { x: 600, y: 130, w: 270, h: 170, t: 'Inspect — hair', dx: -26, dy: 12 },
     // small ones
     { x: 548, y: 262, w: 120, h: 150, t: 'ear.png', dx: 30, dy: -18 },
-    { x: 300, y: 430, w: 150, h: 110, t: 'chin', dx: -34, dy: 20 },
+    { x: 470, y: 618, w: 150, h: 110, t: 'collar.png', dx: -10, dy: 8 },
     { x: 700, y: 600, w: 170, h: 0, t: 'Colours', swatches: true, dx: 40, dy: 8 },
   ]
   // colours for the swatch window, sampled from the photo: hair, skin, lips, shirt, glasses
@@ -555,7 +555,7 @@ function windowsStyle() {
 function cmykStyle() {
   const cv = $('cCmyk'), gl = cv.getContext('webgl', { premultipliedAlpha: true })
   const prog = glProgram(gl, QUAD_VS, PREC + `
-varying vec2 vUv; uniform sampler2D uImg; uniform vec2 uRes, uO0, uO1, uO2, uO3; uniform float uCell;
+varying vec2 vUv; uniform sampler2D uImg; uniform vec2 uRes, uO0, uO1, uO2, uO3; uniform float uCell, uDark;
 // the canvas bleeds 10% past the artwork on every side
 vec2 art(vec2 px) { return (px / uRes) * 1.2 - .1; }
 vec4 img(vec2 uv) { return (uv.x < 0. || uv.y < 0. || uv.x > 1. || uv.y > 1.) ? vec4(0.) : texture2D(uImg, uv); }
@@ -574,6 +574,16 @@ float plate(vec2 px, vec2 off, float ang, int i, out float paper) {
   float r = sqrt(clamp(ink(c, i), 0., 1.) * c.a) * .72, d = length(g - cc), aa = 1.2 / uCell;
   return (1. - smoothstep(r - aa, r + aa, d)) * paper;
 }
+// dark mode: the paper becomes a white dot screen. Dot size follows how light the photo is, so white shows where the
+// picture is light, and the ink plates cut it away where they print.
+float whiteDots(vec2 px) {
+  float ang = .5236, cs = cos(ang), sn = sin(ang);
+  vec2 g = vec2(cs * px.x + sn * px.y, -sn * px.x + cs * px.y) / uCell, cc = floor(g) + .5;
+  vec2 cpx = vec2(cs * cc.x - sn * cc.y, sn * cc.x + cs * cc.y) * uCell;
+  vec4 c = img(art(cpx));
+  float r = sqrt(clamp(min(c.r, min(c.g, c.b)), 0., 1.) * c.a) * .72, d = length(g - cc), aa = 1.2 / uCell;
+  return (1. - smoothstep(r - aa, r + aa, d)) * img(art(px)).a;
+}
 void main() {
   vec2 px = vUv * uRes; float a0, a1, a2, a3;
   float c = plate(px, uO0, .2618, 0, a0), m = plate(px, uO1, 1.309, 1, a1), y = plate(px, uO2, 0., 2, a2), k = plate(px, uO3, .7854, 3, a3);
@@ -583,7 +593,10 @@ void main() {
   col *= mix(vec3(1.), vec3(.93, .05, .55), m);
   col *= mix(vec3(1.), vec3(1., .91, .05), y);
   col *= mix(vec3(1.), vec3(.1, .1, .12), k);
-  gl_FragColor = vec4(col * paper, paper);
+  if (uDark > .5) {
+    float ic = max(max(c, m), max(y, k)), w = whiteDots(px) * (1. - ic); // white only in the gaps between inks
+    gl_FragColor = vec4(col * ic + vec3(.97, .95, .91) * w, ic + w);
+  } else gl_FragColor = vec4(col * paper, paper);
 }`)
   quad(gl, prog); glTexture(gl, photo, 0)
   const u = (n) => gl.getUniformLocation(prog, n)
@@ -607,7 +620,7 @@ void main() {
       const drift = 6 + m * 34 + Math.sin(t / 900) * 2.5 // the cursor pulls the plates apart
       const offs = DIRS.map((d, i) => [Math.cos(ang + d) * drift + Math.cos(d + 1) * intro, Math.sin(ang + d) * drift + Math.sin(d + 1) * intro]).concat([[0, 0]])
       offs.forEach(([x, y], i) => gl.uniform2f(u('uO' + i), x * dpr, -y * dpr))
-      gl.uniform2f(u('uRes'), cv.width, cv.height); gl.uniform1f(u('uCell'), (coarse ? 5 : 6.5) * dpr)
+      gl.uniform2f(u('uRes'), cv.width, cv.height); gl.uniform1f(u('uCell'), (coarse ? 5 : 6.5) * dpr); gl.uniform1f(u('uDark'), isLight() ? 0 : 1)
       gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT); gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
       marks.forEach((svgs) => svgs.forEach((s, i) => { s.style.transform = `translate(${offs[i][0]}px, ${offs[i][1]}px)` }))
     },
