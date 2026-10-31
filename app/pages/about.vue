@@ -2,7 +2,7 @@
 // "More About Me": the longer story, told to the reader in order. A lenticular photo card, the day job (an ID card
 // and the talk's photos in a moving strip), the making that came before (the first tools' logos inside big lines of
 // text, family, writing, a wall of run and ride routes), the kid with the family computer (the encyclopedia's logo,
-// a working paint program, a handheld, Mayon as a miniature, paintings and sketches in strips going other ways), a
+// a working paint program, the 3D handheld from the lab, Mayon as a miniature, paintings and sketches in strips going other ways), a
 // photo falling onto a table for the personal part, and what's next as reactive type.
 // Everything is in content/about-page.json (Pages → More about me).
 const { data: doc } = await useAsyncData('about-page', () => queryCollection('aboutPage').first())
@@ -87,7 +87,7 @@ usePageSeo('about')
           <h3>{{ doc.evenMore.gameboy.title }}</h3>
           <p>{{ doc.evenMore.gameboy.body }}</p>
         </div>
-        <AboutGameBoy />
+        <AboutGameBoy3D />
       </div>
       <div class="sub">
         <div class="head">

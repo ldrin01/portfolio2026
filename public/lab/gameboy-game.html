@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Gameboy Game</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Funnel+Display:wght@300..800&display=swap">
+<script>
+  document.documentElement.dataset.theme = new URLSearchParams(location.search).get('theme') || (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark')
+</script>
+<style>
+:root {
+  --bg: #0f0f13; --fg: #e6e9ed; --muted: #a8aaaf;
+  --line: color-mix(in srgb, #a8aaaf 22%, transparent);
+  --gutter: clamp(16px, 4vw, 48px);
+  --font: 'Funnel Display', system-ui, sans-serif;
+  color-scheme: dark;
+}
+:root[data-theme="light"] {
+  --bg: #f2efe9; --fg: #16161b; --muted: #5d5f66;
+  --line: color-mix(in srgb, #16161b 16%, transparent);
+  color-scheme: light;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--bg); color: var(--fg); font: 400 17px/1.6 var(--font); -webkit-font-smoothing: antialiased; transition: background-color .45s, color .45s; }
+main { min-height: 100svh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; padding: 72px var(--gutter); }
+.theme { position: fixed; top: 20px; right: var(--gutter); font: inherit; font-size: 12px; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); background: none; border: 1px solid var(--line); border-radius: 999px; padding: 8px 14px; cursor: pointer; }
+.theme:hover { color: var(--fg); }
+#screen { width: min(800px, 100%, (100svh - 220px) * 160 / 144); aspect-ratio: 160 / 144; cursor: pointer; touch-action: manipulation; user-select: none; }
+#screen canvas { width: 100%; height: 100%; display: block; image-rendering: pixelated; border-radius: 4px; }
+.cap { font-size: 12px; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); margin: 0; text-align: center; }
+.toggles { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+.toggles button { font: inherit; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); background: none; border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px; cursor: pointer; }
+.toggles button:hover { color: var(--fg); border-color: var(--fg); }
+</style>
+</head>
+<body>
+<button class="theme" id="theme" type="button">Theme</button>
+<main>
+  <div id="screen" aria-label="The handheld's game. Click, or press A, B or Space, to jump."></div>
+  <p class="cap">Click · A · B · Space to play</p>
+  <div class="toggles">
+    <button type="button" id="restart" title="Power off and on: boots again from the logo (key: P)">Restart</button>
+    <button type="button" id="reload" title="Re-fetch gameboy-game.js and restart (key: R)">Reload game</button>
+    <button type="button" id="select" title="Select: fast-forward to the win, the finish party, then the prizes (key: S)">Select</button>
+    <button type="button" id="tofinish" title="Jump to just before Taft Ave. in a real run (key: F)">Skip to finish</button>
+    <button type="button" id="prizes" title="Show the prizes now (key: W)">Prizes</button>
+  </div>
+</main>
+
+<script>
+// Just the game: loads gameboy-game.js (cache-busted), runs it, and maps the keys. "Reload game" picks up edits without a page refresh.
+const host = document.getElementById('screen')
+let game = null, last = performance.now()
+const load = () => new Promise((ok, fail) => {
+  const s = document.createElement('script')
+  s.src = 'gameboy-game.js?v=' + Date.now(); s.onload = () => { s.remove(); ok() }; s.onerror = () => fail(new Error('could not load gameboy-game.js'))
+  document.head.appendChild(s)
+})
+async function start() {
+  await load()
+  game = window.GBGame.create()
+  host.replaceChildren(game.canvas)
+}
+const loop = (t) => { if (game) game.step(t - last); last = t; requestAnimationFrame(loop) }
+requestAnimationFrame(loop)
+start()
+
+const restart = () => { if (!game) return; game.setPower(false); game.setPower(true) }
+document.getElementById('restart').addEventListener('click', restart)
+document.getElementById('reload').addEventListener('click', () => start().catch(console.error))
+document.getElementById('select').addEventListener('click', () => game?.win())
+document.getElementById('tofinish').addEventListener('click', () => game?.debug.toFinish())
+document.getElementById('prizes').addEventListener('click', () => game?.debug.prizes())
+
+const KEYS = { a: 'a', b: 'b', ' ': 'a', arrowup: 'a', enter: 'a' }
+addEventListener('keydown', e => {
+  if (e.metaKey || e.ctrlKey) return
+  const k = e.key.toLowerCase()
+  if (KEYS[k]) { e.preventDefault(); game?.press(KEYS[k]) }
+  else if (k === 'r') start().catch(console.error)
+  else if (k === 'p') restart()
+  else if (k === 's') game?.win()
+  else if (k === 'f') game?.debug.toFinish()
+  else if (k === 'w') game?.debug.prizes()
+})
+addEventListener('keyup', e => { const k = KEYS[e.key.toLowerCase()]; if (k) game?.release(k) })
+host.addEventListener('pointerdown', () => game?.press('a'))
+addEventListener('pointerup', () => game?.release('a'))
+
+document.querySelectorAll('button').forEach(b => b.addEventListener('click', () => b.blur()))   // so Space jumps instead of pressing the button again
+const root = document.documentElement
+document.getElementById('theme').addEventListener('click', () => { root.dataset.theme = root.dataset.theme === 'light' ? 'dark' : 'light' })
+</script>
+</body>
+</html>

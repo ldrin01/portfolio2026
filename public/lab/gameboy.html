@@ -45,6 +45,8 @@ figure { margin: 0; display: flex; flex-direction: column; align-items: center; 
 .tag.left i { margin: -3.5px -3.5px 0 0; }
 .tag.corners i { background: #e84a1c; }
 .tag.edges i { background: #3c8c5a; border-radius: 1px; }
+.tag.gridlabels b { font-size: 10px; padding: 1px 5px; border-color: transparent; background: none; color: inherit; }
+.tag.gridlabels i { display: none; }
 .tag.edges b { color: var(--muted); }
 .toggles { display: flex; gap: 8px; }
 .toggles button { font: inherit; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); background: none; border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px; cursor: pointer; }
@@ -85,7 +87,8 @@ figure { margin: 0; display: flex; flex-direction: column; align-items: center; 
   <figure><img src="gameboy-ref/0245.jpg" alt="Game Boy side with contrast dial and headphone jack" loading="lazy"><figcaption>Side · contrast + headphones</figcaption></figure>
   <figure><img src="gameboy-ref/0242.jpg" alt="Game Boy from the bottom edge" loading="lazy"><figcaption>Bottom edge</figcaption></figure>
   <figure><img src="gameboy-ref/0243.jpg" alt="Game Boy at an angle, top and right edge" loading="lazy"><figcaption>Angle · right edge + top lip</figcaption></figure>
-  <p class="credit">Front: <a href="https://commons.wikimedia.org/wiki/File:DMG-01.jpg">DMG-01.jpg</a>, CC BY-SA 3.0. Back and side shots: Raimond Spekking, CC BY-SA 4.0. Top, bottom and profile shots: Collection Charles Cros (BnF), public domain. All via Wikimedia Commons.</p>
+  <figure><img src="gameboy-ref/cartridge.jpg" alt="Game Boy cartridge with a blank label" width="1280" height="1239" loading="lazy"><figcaption>Cartridge</figcaption></figure>
+  <p class="credit">Front: <a href="https://commons.wikimedia.org/wiki/File:DMG-01.jpg">DMG-01.jpg</a>, CC BY-SA 3.0. Back and side shots: Raimond Spekking, CC BY-SA 4.0. Top, bottom and profile shots: Collection Charles Cros (BnF), public domain. Cartridge: Nintendo-Game-Boy-Cartridge.jpg, public domain. All via Wikimedia Commons.</p>
 </aside>
 <div class="lightbox" id="lightbox" role="dialog" aria-label="Enlarged photo"><img alt=""></div>
 <main>
@@ -93,7 +96,7 @@ figure { margin: 0; display: flex; flex-direction: column; align-items: center; 
     <figure>
       <div id="gl" aria-label="Low-poly Game Boy, drag to rotate"></div>
       <p class="cap">Low poly · drag to rotate · L/R as seen from the front</p>
-      <div class="toggles"><button type="button" id="reload3d" title="Rebuild only the 3D model (key: R)">Reload 3D</button><button type="button" data-tags="faces" aria-pressed="true">Faces</button><button type="button" data-tags="corners" aria-pressed="true">Corners</button><button type="button" data-tags="edges" aria-pressed="true">Edges</button></div>
+      <div class="toggles"><button type="button" id="reload3d" title="Rebuild only the 3D model (key: R)">Reload 3D</button></div>
     </figure>
   </div>
 </main>
