@@ -143,6 +143,10 @@ onBeforeUnmount(() => { window.removeEventListener('keydown', onKey); cancelAnim
   display: flex; flex-direction: column; justify-content: safe center; align-items: flex-start; overflow-y: auto; overscroll-behavior: contain; background: var(--bg) var(--bg-image);
   padding: 96px var(--gutter) 48px calc(max(calc(var(--gutter) - 8px), env(safe-area-inset-left)) + 56px);
 }
+/* phones: the links sit halfway between the page's edge and the logo (they were a full logo-width in) */
+@media (max-width: 700px) {
+  .sheet { padding-left: calc(max(var(--gutter), env(safe-area-inset-left)) + 24px); }
+}
 
 .big { list-style: none; margin: 0; padding: 0; }
 
