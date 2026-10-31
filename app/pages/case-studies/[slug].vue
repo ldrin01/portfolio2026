@@ -57,5 +57,5 @@ article:not(.in) :is(.w, .lead, .rule) { opacity: 0; }
 /* dark world: body copy a step down from pure white so it reads softer on black; headings and bold stay bright */
 [data-theme="dark"] .prose { color: color-mix(in srgb, var(--fg) 76%, var(--bg)); }
 [data-theme="dark"] .prose :deep(:is(h2, h3, strong)) { color: var(--fg); }
-.prose :deep(img) { display: block; max-width: 100%; height: auto; margin: 28px 0; border-radius: 12px; }
+.prose :deep(img), .prose :deep(video) { display: block; max-width: 100%; height: auto; margin: 28px 0; border-radius: 12px; }
 </style>
