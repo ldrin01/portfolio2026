@@ -1443,6 +1443,7 @@ window.GB3D = {
       if (k === 'volume' || k === 'contrast') { turning = { m: abMeshes[k], y: e.clientY }; controls.enabled = false; return }
       held = k; controls.enabled = false; isAB(k) ? setBtn(k, true) : feel(k, true)
       if (k === 'select') game.win?.()                       // Select fast-forwards to the win
+      if (k === 'start') game.restart?.()                    // Start resets: a fresh run from Monumento
     }, { capture: true, signal: ac.signal })
     // the wheels: drag up or down on one and it turns with your finger, tooth by tooth
     let turning = null

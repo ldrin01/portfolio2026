@@ -46,6 +46,7 @@ main { min-height: 100svh; display: flex; flex-direction: column; align-items: c
     <button type="button" id="restart" title="Power off and on: boots again from the logo (key: P)">Restart</button>
     <button type="button" id="reload" title="Re-fetch gameboy-game.js and restart (key: R)">Reload game</button>
     <button type="button" id="select" title="Select: fast-forward to the win, the finish party, then the prizes (key: S)">Select</button>
+    <button type="button" id="start" title="Start: reset to a fresh run from Monumento">Start</button>
     <button type="button" id="tofinish" title="Jump to just before Taft Ave. in a real run (key: F)">Skip to finish</button>
     <button type="button" id="prizes" title="Show the prizes now (key: W)">Prizes</button>
   </div>
@@ -73,6 +74,7 @@ const restart = () => { if (!game) return; game.setPower(false); game.setPower(t
 document.getElementById('restart').addEventListener('click', restart)
 document.getElementById('reload').addEventListener('click', () => start().catch(console.error))
 document.getElementById('select').addEventListener('click', () => game?.win())
+document.getElementById('start').addEventListener('click', () => game?.restart())
 document.getElementById('tofinish').addEventListener('click', () => game?.debug.toFinish())
 document.getElementById('prizes').addEventListener('click', () => game?.debug.prizes())
 

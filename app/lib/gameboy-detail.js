@@ -436,6 +436,7 @@ export async function mountGameboyDetail(host, opts = {}) {
       if (k === 'volume' || k === 'contrast') { turning = { m: wheels[k], y: e.clientY, s: k === 'volume' ? -1 : 1 }; controls.enabled = false; return }
       held = k; controls.enabled = false; isAB(k) ? setBtn(k, true) : feel(k, true)
       if (k === 'select') game.win?.()
+      if (k === 'start') game.restart?.()                    // Start resets: a fresh run from Monumento
     }, { capture: true, signal: ac.signal })
     // the wheels: drag up or down on one and it turns with your finger, tooth by tooth
     addEventListener('pointermove', e => { if (!turning) return; const dy = e.clientY - turning.y; turning.y = e.clientY; turning.m.rotation.z += dy * 0.02 * turning.s }, { signal: ac.signal })

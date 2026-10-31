@@ -275,6 +275,7 @@ export async function mountGameboyLite(host, opts = {}) {
       if (k === 'power') { setPower(!powered); return }
       held = k; controls.enabled = false; isAB(k) ? setBtn(k, true) : feel(k, true)
       if (k === 'select') game.win?.()                       // Select fast-forwards to the win
+      if (k === 'start') game.restart?.()                    // Start resets: a fresh run from Monumento
     }, { capture: true, signal: ac.signal })
     addEventListener('pointerup', () => { if (!held) return; isAB(held) ? setBtn(held, false) : feel(held, false); held = null; controls.enabled = true }, { signal: ac.signal })
     el.addEventListener('pointermove', e => { if (!held) el.style.cursor = hitBtn(e) ? 'pointer' : '' }, { signal: ac.signal })

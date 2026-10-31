@@ -687,6 +687,9 @@ window.GBGame = {
       signs = [{ x: KX - 6, name: lastStop, w: lastStop.length * 8 + 7, last: true, passed: true }]
       finish = 1; banner = { t: 'FINISH!', f: 220 }
     }
+    // Start: reset. A fresh run from Monumento (it plays itself until you press), from anywhere: mid-run, the party, the prizes.
+    // The best distance (HI) stays.
+    const restart = () => { if (mode === 'off') return; mode = 'play'; manual = false; reset() }
     // for the lab: jump to just before Taft in a real run, or straight to the prizes
     const debug = {
       toFinish() {
@@ -696,6 +699,6 @@ window.GBGame = {
       },
       prizes() { if (mode !== 'off') startPrize() }
     }
-    return { canvas, step, press, release, setPower, isOn: () => mode !== 'off', win, debug }
+    return { canvas, step, press, release, setPower, isOn: () => mode !== 'off', win, restart, debug }
   }
 }
