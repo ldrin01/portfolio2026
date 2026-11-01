@@ -76,7 +76,7 @@ export async function mountGameboyDetail(host, opts = {}) {
     const cc = canvas(w * scaleC, h * scaleC), hc = canvas(w * scaleH, h * scaleH)
     paint(cc.getContext('2d'), 'c', scaleC); paint(hc.getContext('2d'), 'h', scaleH)
     const map = new THREE.CanvasTexture(cc); map.colorSpace = THREE.SRGBColorSpace; map.anisotropy = 8; keep(map)
-    return std(0xffffff, 0.62, { map, normalMap: normalFrom(hc, strength), ...matOpts })
+    const m = std(0xffffff, 0.62, { map, normalMap: normalFrom(hc, strength), ...matOpts }); m.userData.plastic = true; return m
   }
   // fills and strokes that mean something in both maps: colour in 'c', height (0 deep .. 255 high) in 'h'
   const ink = (g, mode) => (col, hgt) => mode === 'c' ? col : `rgb(${hgt},${hgt},${hgt})`
@@ -84,11 +84,14 @@ export async function mountGameboyDetail(host, opts = {}) {
   // ── the two shells: a front slab with a hairline bevel at the seam, and a back slab with a deep soft round-over at the back ──
   const bt = 0.008, bb = 0.05
   gb.add(new THREE.Mesh(new THREE.ExtrudeGeometry(shell(bt / S), { depth: FRONT - 2 * bt, bevelEnabled: true, bevelSize: bt, bevelThickness: bt, bevelSegments: 2, curveSegments: 1 }).translate(0, 0, bt), std(0xc4bdad, 0.66)))
-  gb.add(new THREE.Mesh(new THREE.ExtrudeGeometry(shell(bb / S), { depth: FRONT - 2 * bb, bevelEnabled: true, bevelSize: bb, bevelThickness: bb, bevelSegments: 6, curveSegments: 1 }).translate(0, 0, -(FRONT - 2 * bb) - bb), std(0xc4b592, 0.66)))
+  // (backSlab(hole): the old unit's has a hole through it where the battery door was)
+  const backSlab = hole => { const sh = shell(bb / S); if (hole) sh.holes.push(hole); return new THREE.ExtrudeGeometry(sh, { depth: FRONT - 2 * bb, bevelEnabled: true, bevelSize: bb, bevelThickness: bb, bevelSegments: 6, curveSegments: 1 }).translate(0, 0, -(FRONT - 2 * bb) - bb) }
+  const backShell = new THREE.Mesh(backSlab(), std(0xc4b592, 0.66)); gb.add(backShell)
 
   // a face plate: the flat cap of a shell, redrawn with relief. uv.x is mirrored for the back so it reads the right way round
-  const plate = (inset, z, material, back) => {
-    const g = new THREE.ShapeGeometry(shell(inset), 24), p = g.attributes.position, uv = g.attributes.uv
+  const plate = (inset, z, material, back, hole) => {
+    const sh = shell(inset); if (hole) sh.holes.push(hole)
+    const g = new THREE.ShapeGeometry(sh, 24), p = g.attributes.position, uv = g.attributes.uv
     const x0 = X(BX0), w = BW * S, y0 = Y(BY0 + BH), h = BH * S
     for (let i = 0; i < p.count; i++) uv.setXY(i, back ? 1 - (p.getX(i) - x0) / w : (p.getX(i) - x0) / w, (p.getY(i) - y0) / h)
     if (back) material.side = THREE.BackSide
@@ -97,6 +100,7 @@ export async function mountGameboyDetail(host, opts = {}) {
 
   // ── the front face ──
   const abMeshes = {}, screenRect = {}
+  const plates = {}                                   // the front and back plates and their paint, so the old unit can repaint them
   const SIDEK = Math.PI / 180 * 23
   {
     const paint = (g, mode, s) => {
@@ -146,7 +150,7 @@ export async function mountGameboyDetail(host, opts = {}) {
       const tilted = (t, x, y, w) => { g.save(); g.translate(cx(x), cy(y)); g.rotate(-SIDEK); g.font = `700 ${px(30)}px ${FONT}`; g.fillStyle = INK; g.textAlign = 'center'; const tw = g.measureText(t).width || 1; g.scale(px(w) / tw, 1); g.fillText(t, 0, 0); g.restore() }
       tilted('SELECT', 401, 1518, 125); tilted('START', 575, 1514, 112)
     }
-    plate(bt / S, FRONT + 0.0004, relief(BW, BH, 1, 0.5, paint, 3.2, { roughness: 0.66 }), false)
+    plates.front = plate(bt / S, FRONT + 0.0004, relief(BW, BH, 1, 0.5, paint, 3.2, { roughness: 0.66 }), false); plates.frontPaint = paint
   }
 
   // the screen bezel: a grey plate with the big round corner at the bottom right, standing BEZEL_H above the face, with the screen window cut through it
@@ -179,10 +183,12 @@ export async function mountGameboyDetail(host, opts = {}) {
 
   // ── the back: grip grooves, the battery door with its screws and finger ridges, and the cartridge slot ──
   // painted as fractions of the body as you LOOK AT THE BACK (fx from the left of that view, fy from the top)
-  const CART = { w: 0.7277, h: 0.7277 * 1187 / 1034 }   // the cartridge picture in world units (a cut-out, so its corners are see-through)
+  const CART = { w: 0.7277, h: 0.7277 * 1187 / 1034 }
+  const cartMats = {}                                    // kept so the theme can swap the cartridge (gameboy-cart-zombie.webp on the old unit)   // the cartridge picture in world units (a cut-out, so its corners are see-through)
   const cartY = 0.966 + 0.02 - CART.h / 2               // its middle; the top edge pokes 0.02 above the console
   {
-    const paint = (g, mode, k) => {
+    // old: the old unit, whose battery door is gone (gameboy-wear.js paints the open pocket there instead)
+    const paint = (g, mode, k, old = false) => {
       const c = mode === 'c', I = ink(g, mode), W = BW * k, H = BH * k
       g.fillStyle = I(BACK_C, 128); g.fillRect(0, 0, W, H)
       const fxp = f => f * W, fyp = f => f * H, u = n => n * k
@@ -196,6 +202,7 @@ export async function mountGameboyDetail(host, opts = {}) {
         g.lineCap = 'round'; g.lineWidth = u(14); g.beginPath(); g.moveTo(fxp(0.07), y); g.lineTo(fxp(0.93), y); g.strokeStyle = I('rgba(70,60,40,.45)', 26); g.stroke()
       }
       // the battery door: a rounded panel with a groove round it, two screws and finger ridges
+      if (old) return
       const dx = fxp(0.3), dy = fyp(0.585), dw = fxp(0.4), dh = fyp(0.155)
       g.beginPath(); g.roundRect(dx, dy, dw, dh, u(22)); g.fillStyle = I(BACK_C, 150); g.fill(); g.lineWidth = u(8); g.strokeStyle = I('rgba(50,42,26,.7)', 20); g.stroke()
       for (let i = 0; i < 6; i++) { const y = dy + dh * (0.58 + i * 0.07); g.lineWidth = u(5); g.beginPath(); g.moveTo(dx + dw * 0.32, y); g.lineTo(dx + dw * 0.68, y); g.strokeStyle = I('rgba(70,60,40,.5)', 60); g.stroke() }
@@ -206,7 +213,7 @@ export async function mountGameboyDetail(host, opts = {}) {
       })
       if (c) { g.fillStyle = 'rgba(70,60,40,.6)'; g.font = `600 ${u(15)}px ${FONT}`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('PUSH', dx + dw / 2, dy + dh * 0.3); g.fillText('Drinworks', dx + dw / 2, dy + dh * 0.86) }
     }
-    plate(bb / S, -FRONT - 0.0004, relief(BW, BH, 0.7, 0.45, paint, 3, { roughness: 0.7 }), true)
+    plates.back = plate(bb / S, -FRONT - 0.0004, relief(BW, BH, 0.7, 0.45, paint, 3, { roughness: 0.7 }), true); plates.backPaint = paint
 
     // the cartridge: a thin body poking above the top edge, its label facing out (the photo is public/lab/gameboy-cart.webp)
     // the body is a rounded block just inside the picture's outline; the picture itself (with its see-through corners) is the face
@@ -219,11 +226,12 @@ export async function mountGameboyDetail(host, opts = {}) {
     body.computeBoundingBox(); body.translate(0, 0, -FRONT - 0.003 - body.boundingBox.min.z)
     const face = new THREE.PlaneGeometry(CART.w, CART.h).rotateY(Math.PI)
     const cart = new THREE.Group(); cart.position.y = cartY
-    cart.add(new THREE.Mesh(body, std(0x8a858c, 0.6)))
-    const faceMat = std(0xffffff, 0.55, { alphaTest: 0.5, polygonOffset: true, polygonOffsetFactor: -2 })
+    cartMats.body = std(0x8a858c, 0.6)
+    cart.add(new THREE.Mesh(body, cartMats.body))
+    const faceMat = cartMats.face = std(0xffffff, 0.55, { alphaTest: 0.5, polygonOffset: true, polygonOffsetFactor: -2 })
     const face_ = new THREE.Mesh(face, faceMat); face_.position.z = -FRONT - 0.0035; cart.add(face_)
     gb.add(cart)
-    new THREE.TextureLoader().load(LAB + 'gameboy-cart.webp', t => { t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; faceMat.map = keep(t); faceMat.needsUpdate = true })
+    new THREE.TextureLoader().load(LAB + 'gameboy-cart.webp', t => { t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; cartMats.day = keep(t); if (!cartMats.old) { faceMat.map = t; faceMat.needsUpdate = true } })
   }
 
   // ── the sides: a flat plate on each wall, painted with its pockets, openings and the grip ridges, with relief ──
@@ -403,6 +411,7 @@ export async function mountGameboyDetail(host, opts = {}) {
     const ledOn = new THREE.Color(0xff3b2a), ledOff = new THREE.Color(0x3a2b27)
     const setPower = on => { powered = on; game.setPower(on); abMeshes.led.material.color.copy(on ? ledOn : ledOff) }
     setPower(true)
+    frameHooks.push(() => { if (powered && game.led) abMeshes.led.material.color.copy(ledOff).lerp(ledOn, game.led()) })   // weak batteries dim the light
     frameHooks.push(dt => { const k = power.knob, to = powered ? power.onX : power.offX; k.position.x += (to - k.position.x) * Math.min(1, dt / 60) })
     const ray = new THREE.Raycaster(), ndc = new THREE.Vector2(), el = renderer.domElement
     const targets = [abMeshes.a, abMeshes.b, abMeshes.dpad, abMeshes.select, abMeshes.start, power.knob, ...power.hits, wheels.volume, wheels.contrast]
@@ -448,11 +457,181 @@ export async function mountGameboyDetail(host, opts = {}) {
     addEventListener('keyup', e => { const k = keyOf(e); if (k) setBtn(k, false) }, { signal: ac.signal })
   } catch (e) { console.warn('game screen not loaded', e) }
 
+  // ── new or old, by the theme (public/lab/gameboy-wear.js): light is a brand new unit, clean grey with the screen film still on and
+  //    a Figma sticker on the back; dark is the old one, yellowed, scuffed and scratched, "Drin" in marker on the front, a peeling
+  //    Photoshop sticker on the back, a dent and scratches in the screen cover, a broken corner, a melted spot, no battery door,
+  //    a PH flag sticker, worn buttons, lint, and "Eldrin ♥ Elis" scratched into the back ──
+  let unwatch = () => {}
+  try {
+    if (!window.GBWear) await new Promise((ok, fail) => { const s = document.createElement('script'); s.src = LAB + 'gameboy-wear.js'; s.onload = ok; s.onerror = fail; document.head.appendChild(s) })
+    const W = window.GBWear
+    const solid = new Map(), tinted = new Map()        // plain beige materials (with their old colour), and textured ones (with their texture's beige)
+    gb.traverse(o => [].concat(o.material || []).forEach(m => {
+      if (!m.color) return
+      if (m.userData.plastic && m.map) { tinted.set(m, { old: m.map, fresh: null }); return }
+      if (m.map || solid.has(m)) return
+      const c = m.color.getRGB({}, THREE.SRGBColorSpace), rgb = [c.r, c.g, c.b]
+      if (W.isPlastic(rgb)) solid.set(m, rgb)
+    }))
+    const layer = (cv, paint) => { paint(cv.getContext('2d')); const t = keep(new THREE.CanvasTexture(cv)); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t }
+    const sheetMat = map => new THREE.MeshBasicMaterial({ map, transparent: true, depthWrite: false })
+    // the face: same shape and mapping as the front plate, just above it (the bezel, standing proud, covers its middle)
+    const fm = { x: x => x * KX - BX0, y: y => y * KY - BY0, s: KX }
+    // (kept clear inside the bezel: the LCD sits at this same height, and the two would flicker over each other in squares.
+    //  The screen cover's own scratches and dent are on the cover above the bezel)
+    const oldFront = plate(bt / S, FRONT + 0.0008, sheetMat(layer(canvas(BW, BH), g => {
+      W.body(g, fm); W.dust(g, fm)
+      g.save(); g.globalCompositeOperation = 'destination-out'; g.beginPath(); g.roundRect(fm.x(86), fm.y(176), (962 - 86) * fm.s, (847 - 176) * fm.s, [26 * fm.s, 26 * fm.s, 118 * fm.s, 26 * fm.s]); g.fill(); g.restore()
+    })), false)
+    // the screen cover: a sheet over the bezel (a margin round it for the film's tab)
+    const L0 = 60, T0 = 150, R0 = 990, B0 = 910, k = 1.2, lm = { x: x => (x - L0) * k, y: y => (y - T0) * k, s: k }
+    const cover = paint => { const m = new THREE.Mesh(new THREE.PlaneGeometry((R0 - L0) * KX * S, (B0 - T0) * KY * S), sheetMat(layer(canvas((R0 - L0) * k, (B0 - T0) * k), paint))); m.position.set((wx(L0) + wx(R0)) / 2, (wy(T0) + wy(B0)) / 2, FRONT + BEZEL_H + 0.0034); gb.add(m); return m }
+    const oldLens = cover(g => W.lens(g, lm)), newFilm = cover(g => W.film(g, lm))
+    // the back: the back plate's shape and mapping (as you look at the back), just outside it
+    // the old one's battery pocket, bigger than the door it lost so real-sized AAs fit (fractions as you look at the back)
+    const POCKET = { left: 0.2, right: 0.8, top: 0.56, bottom: 0.88 }
+    const bm = { x: f => f * BW, y: f => f * BH, u: 1000 }, backArea = { left: 0.08, right: 0.92, top: 0.2, bottom: 0.95 }
+    // (the open battery pocket is kept clear of the scratches and lint, they would float over the batteries)
+    const oldBack = plate(bb / S, -FRONT - 0.0008, sheetMat(layer(canvas(BW, BH), g => { W.back(g, bm, backArea); W.hole(g, bm, POCKET, 0.012); W.dustBack(g, bm, backArea, POCKET) })), true)
+    // the new one's back: the Figma sticker
+    const newBack = plate(bb / S, -FRONT - 0.0008, sheetMat(layer(canvas(BW, BH), g => W.figma(g, bm))), true)
+
+    // ── the old one's front and back plates, repainted: the broken corner and its cracks, the print rubbed off, the open battery
+    //    "Eldrin ♥ Elis" scratched in. Painted with relief like the new ones, and swapped in by the theme ──
+    const oldFrontMat = relief(BW, BH, 1, 0.5, (g, mode, s) => {
+      plates.frontPaint(g, mode, s)
+      const m = { x: x => (x * KX - BX0) * s, y: y => (y * KY - BY0) * s, s: KX * s }
+      W.crack(g, m, mode, true)
+      if (mode === 'c') W.rubPrint(g, m, FRONT_C)
+    }, 3.2, { roughness: 0.66 })
+    const oldBackMat = relief(BW, BH, 0.7, 0.45, (g, mode, k) => {
+      plates.backPaint(g, mode, k, true)
+      const m = { x: f => f * BW * k, y: f => f * BH * k, u: 1000 * k }
+      W.crackBack(g, m, mode, true); W.names(g, m, mode, 0.94)
+    }, 3, { roughness: 0.7 })
+    const newMats = { front: plates.front.material }
+    const dark = []                                   // the meshes only the old one has
+
+    // ── the battery door is gone: a real hole through the back plate and shell, a dark well behind it, four orange KINGEVER AAs
+    //    (low-poly, the label unrolled from a photo of the real ones), springs and contacts, rust on one end, the broken latch stub ──
+    const BX = f => 0.559 - f * 1.118, BY = f => 0.966 - f * 1.924
+    const pk = { x0: BX(POCKET.right), x1: BX(POCKET.left), y0: BY(POCKET.bottom), y1: BY(POCKET.top) }
+    const holeOf = (grow, r) => { const x0 = pk.x0 - grow, x1 = pk.x1 + grow, y0 = pk.y0 - grow, y1 = pk.y1 + grow, p = new THREE.Path()
+      p.moveTo(x0 + r, y0); p.lineTo(x1 - r, y0); p.quadraticCurveTo(x1, y0, x1, y0 + r); p.lineTo(x1, y1 - r); p.quadraticCurveTo(x1, y1, x1 - r, y1)
+      p.lineTo(x0 + r, y1); p.quadraticCurveTo(x0, y1, x0, y1 - r); p.lineTo(x0, y0 + r); p.quadraticCurveTo(x0, y0, x0 + r, y0); return p }
+    const oldBackPlate = plate(bb / S, -FRONT - 0.0004, oldBackMat, true, holeOf(0, 0.012)); dark.push(oldBackPlate)
+    // the shell's hole is a little bigger: its bevel narrows a hole inside the shell, and the well's walls cover the difference
+    const oldShell = new THREE.Mesh(backSlab(holeOf(0.06, 0.03)), backShell.material); gb.add(oldShell); dark.push(oldShell)
+    {
+      const well = new THREE.Group(), W_ = pk.x1 - pk.x0, H = pk.y1 - pk.y0, DEEP = 0.17
+      const box = new THREE.Mesh(new THREE.BoxGeometry(W_, H, DEEP), std(0x3b362c, 0.85, { side: THREE.BackSide }))   // seen from inside: walls and a floor, open at the back face
+      box.position.set((pk.x0 + pk.x1) / 2, (pk.y0 + pk.y1) / 2, -FRONT + DEEP / 2 - 0.0002); well.add(box)
+      const metal = std(0xc9ccd1, 0.32, { metalness: 0.85, flatShading: true }), label = std(0xffffff, 0.42, { flatShading: true })
+      new THREE.ImageLoader().load(LAB + 'gameboy-battery.webp', img => { const t = keep(new THREE.CanvasTexture(W.batteryWrap(img))); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; label.map = t; label.needsUpdate = true })
+      const rustCv = canvas(256, 256); W.rust(rustCv.getContext('2d'), 256, 256)
+      const rustT = keep(new THREE.CanvasTexture(rustCv)); rustT.colorSpace = THREE.SRGBColorSpace
+      const rusty = std(0xffffff, 0.9, { map: rustT, metalness: 0.25, flatShading: true })
+      const fade = canvas(64, 64), fg = fade.getContext('2d'), gr = fg.createLinearGradient(0, 0, 0, 64); gr.addColorStop(0, '#000'); gr.addColorStop(0.55, '#777'); gr.addColorStop(1, '#fff'); fg.fillStyle = gr; fg.fillRect(0, 0, 64, 64)
+      const creep = std(0xffffff, 0.9, { map: rustT, alphaMap: keep(new THREE.CanvasTexture(fade)), transparent: true, depthWrite: false, flatShading: true })
+      // head to tail, as they go in a real one; and each turned its own way, as nobody lines the brand up
+      const n = 4, R = 0.075, gap = (W_ - 2 * R * n) / (n + 1), len = 0.5, nub = 0.012, SL = 0.035, edge = (H - (SL + len + nub + 0.006)) / 2, zA = -FRONT + R + 0.004
+      const TURN = [Math.PI / 2, -Math.PI / 2 + 0.35, Math.PI / 2 - 0.45, -Math.PI / 2 - 0.25]   // brand side, AA side turned a little, brand turned, AA side
+      const helix = new THREE.Curve(); helix.getPoint = (t, o = new THREE.Vector3()) => o.set(Math.cos(t * 5 * Math.PI * 2) * R * 0.58, t * SL, Math.sin(t * 5 * Math.PI * 2) * R * 0.58)
+      const springGeo = new THREE.TubeGeometry(helix, 160, 0.0032, 6, false)
+      for (let i = 0; i < n; i++) {
+        const up = i % 2 === 0, cx = pk.x0 + gap + R + i * (2 * R + gap)     // up: the + end at the top
+        const b = new THREE.Group()
+        b.add(new THREE.Mesh(new THREE.CylinderGeometry(R, R, len, 12), [label, metal, i === 2 ? rusty : metal]))   // side, + end, - end
+        const nb = new THREE.Mesh(new THREE.CylinderGeometry(R * 0.34, R * 0.38, nub, 8), metal); nb.position.y = len / 2 + nub / 2; b.add(nb)
+        if (i === 2) { const c = new THREE.Mesh(new THREE.CylinderGeometry(R * 1.004, R * 1.004, 0.06, 12, 1, true), creep); c.position.y = -len / 2 + 0.03; b.add(c) }   // the rust creeping up its side
+        const cy = up ? pk.y0 + edge + SL + len / 2 : pk.y1 - edge - SL - len / 2
+        b.rotation.order = 'ZYX'; b.rotation.set(0, TURN[i], up ? 0 : Math.PI)   // turned on its own axis first, then flipped
+        b.position.set(cx, cy, zA); well.add(b)
+        const sp = new THREE.Mesh(springGeo, metal); sp.position.set(cx, up ? pk.y0 + edge : pk.y1 - edge - SL, zA); well.add(sp)          // the spring at the - end
+        const ct = new THREE.Mesh(new THREE.BoxGeometry(R * 1.3, 0.004, R * 1.2), metal)                                               // the flat contact at the + end
+        ct.position.set(cx, up ? cy + len / 2 + nub + 0.003 : cy - len / 2 - nub - 0.003, zA); well.add(ct)
+      }
+      // the broken stub of the door's latch, still in the catch at the top edge, its lower edge snapped off jagged
+      const sx = (pk.x0 + pk.x1) / 2, sw = 0.07, sTop = pk.y1 + 0.004, sh = new THREE.Shape()
+      sh.moveTo(sx - sw, sTop); sh.lineTo(sx + sw, sTop); sh.lineTo(sx + sw, sTop - 0.03)
+      for (let j = 1; j < 9; j++) sh.lineTo(sx + sw - 2 * sw * j / 9, sTop - 0.022 - ((j * 7919) % 13) / 13 * 0.022)
+      sh.lineTo(sx - sw, sTop - 0.036); sh.closePath()
+      well.add(new THREE.Mesh(new THREE.ExtrudeGeometry(sh, { depth: 0.012, bevelEnabled: true, bevelSize: 0.001, bevelThickness: 0.001, bevelSegments: 1 }).translate(0, 0, -FRONT + 0.001), backShell.material))
+      gb.add(well); dark.push(well)
+    }
+
+    // the melted spot on the top edge by the cartridge slot: a glossy, darker, bubbled patch with relief so the light catches it
+    {
+      const w = 0.12, d = 0.12
+      const m = new THREE.Mesh(new THREE.PlaneGeometry(w, d).rotateX(-Math.PI / 2), relief(w, d, 2400, 1600, (g, mode) => W.melt(g, g.canvas.width, g.canvas.height, mode), 3, { transparent: true, depthWrite: false, roughness: 0.2 }))
+      m.position.set(0.44, Y(34) + 0.0005, -0.085); gb.add(m); dark.push(m)
+    }
+    // the PH flag sticker on the right side, below the volume wheel: small, crooked, its edges curling off the wall
+    {
+      const w = 0.075, h = 0.0375, cv = canvas(400, 200); W.flag(cv.getContext('2d'), 400, 200)
+      const tex = keep(new THREE.CanvasTexture(cv)); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8
+      const geo = new THREE.PlaneGeometry(w, h, 20, 10), p = geo.attributes.position
+      for (let i = 0; i < p.count; i++) {   // lifted off the wall all round the edge, most at two corners
+        const u = p.getX(i) / (w / 2), v = p.getY(i) / (h / 2), edge = Math.max(Math.abs(u), Math.abs(v))
+        p.setZ(i, Math.max(0, (edge - 0.75) / 0.25) ** 2 * 0.0012 + Math.max(0, (u + v - 1.3) / 0.7) ** 2 * 0.006 + Math.max(0, (-u - v - 1.5) / 0.5) ** 2 * 0.003)
+      }
+      geo.computeVertexNormals()
+      const f = new THREE.Group()
+      f.add(new THREE.Mesh(geo, std(0xffffff, 0.55, { map: tex, alphaTest: 0.5 })), new THREE.Mesh(geo, std(0xe6e0d2, 0.8, { side: THREE.BackSide })))   // the face, and the paper backing behind the curl
+      f.rotation.set(0, Math.PI / 2, 0.12); f.position.set(X(1142) + 0.0008, 0.1, -0.045); gb.add(f); dark.push(f)
+    }
+    // the thick puffy sticker on the contrast side: level with the D-pad, straddling the parting line, a little crooked. Two cats
+    // with googly eyes, domed in clear epoxy, a little glossy. The flat sheet is pushed up by the height picture, so it really bulges and the light rolls over it
+    new THREE.ImageLoader().load(LAB + 'gameboy-sticker-cats.webp', img => {
+      const p = W.puffy(img), h = 0.3, w = h * img.naturalWidth / img.naturalHeight, THICK = 0.008
+      const hw = p.height.width, hh = p.height.height, hd = p.height.getContext('2d').getImageData(0, 0, hw, hh).data
+      const geo = new THREE.PlaneGeometry(w, h, 50, 100), pos = geo.attributes.position, uv = geo.attributes.uv
+      for (let i = 0; i < pos.count; i++) { const x = Math.round(uv.getX(i) * (hw - 1)), y = Math.round((1 - uv.getY(i)) * (hh - 1)); pos.setZ(i, hd[(y * hw + x) * 4] / 255 * THICK) }
+      geo.computeVertexNormals()
+      const tex = keep(new THREE.CanvasTexture(p.map)); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8
+      const m = new THREE.Mesh(geo, new THREE.MeshPhysicalMaterial({ map: tex, transparent: true, alphaTest: 0.05, roughness: 0.38, metalness: 0, clearcoat: 1, clearcoatRoughness: 0.16 }))
+      m.rotation.set(0, -Math.PI / 2, -0.12); m.position.set(X(24) - 0.0008, wy(1205), 0)   // wy(1205): the D-pad's height; z 0: the parting line
+      m.visible = W.worn(); gb.add(m); dark.push(m)
+    })
+    // the buttons worn by thumbs: A and B polished and faded in the middle, the D-pad's ridges worn down and shinier, Select and Start
+    // rubbed lighter in the centre
+    const bw = W.buttonWear(), tx = (c, srgb = true) => { const t = keep(new THREE.CanvasTexture(c)); if (srgb) t.colorSpace = THREE.SRGBColorSpace; return t }
+    const wornAB = std(0xffffff, 1, { map: tx(bw.ab.map), roughnessMap: tx(bw.ab.rough, false) })
+    const pillTex = [tx(bw.pill.map), tx(bw.pill.rough, false)]; pillTex.forEach(t => { t.repeat.set(1 / 0.17, 1 / 0.08); t.offset.set(0.5, 0.5) })
+    const wornPill = std(0xffffff, 1, { map: pillTex[0], roughnessMap: pillTex[1] })
+    const wornPad = (() => {
+      const bc = canvas(256, 256), bg = bc.getContext('2d'); bg.fillStyle = '#808080'; bg.fillRect(0, 0, 256, 256)
+      const gr = bg.createRadialGradient(128, 128, 0, 128, 128, 34); gr.addColorStop(0, '#666666'); gr.addColorStop(1, '#808080'); bg.fillStyle = gr; bg.fillRect(0, 0, 256, 256)
+      bg.strokeStyle = '#787878'; bg.lineWidth = 2; for (let t = 1; t < 3; t++) { const o = 70 + t * 12; [[128 - o, 'v'], [128 + o, 'v'], [128 - o, 'h'], [128 + o, 'h']].forEach(([q, d]) => { bg.beginPath(); d === 'v' ? (bg.moveTo(q, 104), bg.lineTo(q, 152)) : (bg.moveTo(104, q), bg.lineTo(152, q)); bg.stroke() }) }
+      return std(0x4c4c52, 0.34, { bumpMap: tx(bc, false), bumpScale: 1 })
+    })()
+    const worn = new Map([[abMeshes.a, wornAB], [abMeshes.b, wornAB], [abMeshes.select, wornPill], [abMeshes.start, wornPill], [abMeshes.dpad, wornPad]])
+    const unworn = new Map([...worn.keys()].map(k => [k, k.material]))
+
+    const apply = old => {
+      cartMats.old = old   // the old unit has the bootleg SURVIVE EDSA! cart in it, in a dark green shell
+      if (old && !cartMats.zombie) cartMats.zombie = keep(new THREE.TextureLoader().load(LAB + 'gameboy-cart-zombie.webp', t => { t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; if (cartMats.old) { cartMats.face.map = t; cartMats.face.needsUpdate = true } }))
+      const want = old ? cartMats.zombie : cartMats.day
+      if (want && want.image) { cartMats.face.map = want; cartMats.face.needsUpdate = true }
+      cartMats.body.color.setHex(old ? 0x24302a : 0x8a858c)
+      solid.forEach((rgb, m) => { const c = old ? rgb : W.fresh(rgb); m.color.setRGB(c[0], c[1], c[2], THREE.SRGBColorSpace) })
+      tinted.forEach((p, m) => {   // painted plates: swap in a grey copy of the picture (made once, the first time it's needed)
+        if (!old && !p.fresh) { p.fresh = keep(new THREE.CanvasTexture(W.freshCanvas(p.old.image))); p.fresh.colorSpace = p.old.colorSpace; p.fresh.anisotropy = p.old.anisotropy }
+        m.map = old ? p.old : p.fresh; m.needsUpdate = true
+      })
+      oldFront.visible = oldLens.visible = oldBack.visible = old; newFilm.visible = newBack.visible = !old
+      plates.front.material = old ? oldFrontMat : newMats.front
+      dark.forEach(o => { o.visible = old }); plates.back.visible = backShell.visible = !old
+      worn.forEach((m, mesh) => { mesh.material = old ? m : unworn.get(mesh) })
+    }
+    apply(W.worn()); unwatch = W.watch(apply)
+  } catch (e) { console.warn('wear not loaded', e) }
+
   return {
     pause() { renderer.setAnimationLoop(null); lastT = 0 },
     resume() { renderer.setAnimationLoop(loop) },
     dispose() {
-      renderer.setAnimationLoop(null); ro.disconnect(); ac.abort(); controls.dispose()
+      renderer.setAnimationLoop(null); ro.disconnect(); ac.abort(); controls.dispose(); unwatch()
       scene.traverse(o => { o.geometry?.dispose(); [].concat(o.material || []).forEach(m => m.dispose()) })
       textures.forEach(t => t.dispose()); envRT.dispose()
       renderer.dispose(); renderer.domElement.remove()

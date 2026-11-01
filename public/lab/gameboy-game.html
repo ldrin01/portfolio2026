@@ -49,6 +49,10 @@ main { min-height: 100svh; display: flex; flex-direction: column; align-items: c
     <button type="button" id="start" title="Start: reset to a fresh run from Monumento">Start</button>
     <button type="button" id="tofinish" title="Jump to just before Taft Ave. in a real run (key: F)">Skip to finish</button>
     <button type="button" id="prizes" title="Show the prizes now (key: W)">Prizes</button>
+    <button type="button" id="brownout" title="Dark theme only: the lights go out now">Brownout</button>
+    <button type="button" id="sag" title="Dark theme only: the batteries sag now">Weak battery</button>
+    <button type="button" id="arm" title="Dark theme only: the next weapon now">Next weapon</button>
+    <button type="button" id="horde" title="Dark theme only: a wave of the dead now">Horde</button>
   </div>
 </main>
 
@@ -77,6 +81,10 @@ document.getElementById('select').addEventListener('click', () => game?.win())
 document.getElementById('start').addEventListener('click', () => game?.restart())
 document.getElementById('tofinish').addEventListener('click', () => game?.debug.toFinish())
 document.getElementById('prizes').addEventListener('click', () => game?.debug.prizes())
+document.getElementById('brownout').addEventListener('click', () => game?.debug.brownout())
+document.getElementById('sag').addEventListener('click', () => game?.debug.sag())
+document.getElementById('arm').addEventListener('click', () => game?.debug.arm())
+document.getElementById('horde').addEventListener('click', () => game?.debug.horde())
 
 const KEYS = { a: 'a', b: 'b', ' ': 'a', arrowup: 'a', enter: 'a' }
 addEventListener('keydown', e => {

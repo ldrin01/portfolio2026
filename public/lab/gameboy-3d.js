@@ -716,6 +716,7 @@ window.GB3D = {
       const topZ = BASE + depth + 2 * DB, ccx = wx(223), ccy = wy(1205)
       const SR = 0.08, SD = 0.0045                                      // the dimple: part of a big sphere, SD deep
       g = bev.evaluate(new Brush(g), new Brush(new THREE.SphereGeometry(SR, 40, 20).translate(ccx, ccy, topZ + SR - SD)), SUBTRACTION).geometry
+      const smooth = g                                                  // the old unit's pad: its ridges worn away (see NEW OR OLD)
       const arm = 86 * KX * S, half = 43 * KX * S                       // arm length and half width
       ;[[0, 1], [0, -1], [1, 0], [-1, 0]].forEach(([ux, uy]) => [0.55, 0.68, 0.81].forEach(t => {
         const d = half + arm * t, w = half * 1.3, rid = new THREE.BoxGeometry(ux ? 0.0028 : w, ux ? w : 0.0028, 0.004)
@@ -723,6 +724,7 @@ window.GB3D = {
       }))
       g.computeVertexNormals(); g.translate(-ccx, -ccy, 0)               // pivot at its centre, so it can rock toward the arm you press
       const dpad = new THREE.Mesh(g, plastic(0x47474d, 0.6)); dpad.position.set(ccx, ccy, 0); partA.add(dpad); abMeshes.dpad = dpad
+      smooth.computeVertexNormals(); smooth.translate(-ccx, -ccy, 0); dpad.userData.smooth = smooth
     }
     // A and B: magenta, a gently domed top that rolls over a rounded edge into the straight side
     const disc = (cx, cy) => {
@@ -786,7 +788,7 @@ window.GB3D = {
     }
     const tex = new THREE.CanvasTexture(cv); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8
     const sheet = new THREE.Mesh(new THREE.PlaneGeometry(PW * S, PH * S), new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false }))
-    sheet.position.set(0, 0, FRONT + 0.0058); partA.add(sheet)
+    sheet.position.set(0, 0, FRONT + 0.0058); sheet.name = 'print'; partA.add(sheet)
   }
 
   // ── RIGHT SIDE (as seen from the front): the EXT CONNECTOR and the VOLUME wheel, from the side photo ──
@@ -1032,7 +1034,7 @@ window.GB3D = {
     plateMesh.geometry = g
     // dark floor of the pocket, so the gap reads as a gap
     const floorMat = new THREE.MeshBasicMaterial({ color: 0x24221d, side: THREE.DoubleSide })
-    ;[[xa, xb, ya, yb], [lx0, lx1, ly, ya]].forEach(([x0, x1, y0, y1]) => { const f = new THREE.Mesh(new THREE.PlaneGeometry(Math.abs(x1 - x0), Math.abs(y1 - y0)), floorMat); f.position.set((x0 + x1) / 2, (y0 + y1) / 2, zFloor - 0.0002); partB.add(f) })
+    ;[[xa, xb, ya, yb], [lx0, lx1, ly, ya]].forEach(([x0, x1, y0, y1], i) => { const f = new THREE.Mesh(new THREE.PlaneGeometry(Math.abs(x1 - x0), Math.abs(y1 - y0)), floorMat); f.position.set((x0 + x1) / 2, (y0 + y1) / 2, zFloor - 0.0002); if (!i) f.name = 'pocketFloor'; partB.add(f) })
     // the door: ONE T-shaped piece (door + latch tab), inset by the gap, sunk below the surrounding face, with bevelled edges that catch the light
     const gp = D.gap, bev = 0.0025
     const dx0 = Math.min(xa, xb) + gp + bev, dx1 = Math.max(xa, xb) - gp - bev, dy0 = yb + gp + bev, dy1 = ya - gp - bev
@@ -1182,12 +1184,12 @@ window.GB3D = {
         }
       })
       const cutBack = ev.evaluate(new Brush(holedGeo), new Brush(boxFor(yEnd, yMax, -FRONT - 0.1, zIn)), SUBTRACTION)
-      cutBack.material = M.body; partB.remove(backShell); partB.add(cutBack)
+      cutBack.material = M.body; cutBack.name = 'backShell'; partB.remove(backShell); partB.add(cutBack)
       // lifted face: cut from the back face up to the green edge's height, so a roof is left
       if (plateMesh) {
         const roofZ = -FRONT - TUNNEL.bottomOut
         const cutPlate = ev.evaluate(new Brush(plateMesh.geometry), new Brush(boxFor(yEnd, yMax, roofZ, zIn)), SUBTRACTION)
-        cutPlate.material = M.body; partB.remove(plateMesh); partB.add(cutPlate)
+        cutPlate.material = M.body; cutPlate.name = 'backPlate'; partB.remove(plateMesh); partB.add(cutPlate)
       }
     }
     if (TUNNEL.showGuide) {
@@ -1344,6 +1346,7 @@ window.GB3D = {
   // The photo (gameboy-cart-img.js, a data URL so it also works from file://) is mapped straight onto the outer face.
   // Real sizes: 57 x 65 x 8 mm on a 90 mm wide body, so 1 mm = 1.118 / 90 world units.
   const CART = { topAbove: 0.02, thick: 0.094, color: 0x8d8890 }
+  let cartBodyMat = null, cartFaceMat = null              // kept so the theme can swap the cartridge (gameboy-cart-zombie.webp on the old unit)
   try {
     if (!window.GB_CART_IMG) await new Promise((ok, fail) => { const s = document.createElement('script'); s.src = BASE + 'gameboy-cart-img.js'; s.onload = ok; s.onerror = fail; document.head.appendChild(s) })
     const IW = 0.708 / 0.973, IH = IW * 1174 / 1024                       // the whole photo in world units (the cart fills 97.3% of its width)
@@ -1361,7 +1364,8 @@ window.GB3D = {
     bodyGeo.computeBoundingBox(); bodyGeo.translate(0, 0, zOuter + 0.0006 - bodyGeo.boundingBox.min.z)
     faceGeo.translate(0, 0, zOuter)
     const cart = new THREE.Group(); cart.name = 'cartridge'
-    cart.add(new THREE.Mesh(bodyGeo, mat(CART.color)), new THREE.Mesh(faceGeo, mat(0xffffff, { map: tex, polygonOffset: true, polygonOffsetFactor: -2 })))
+    cartBodyMat = mat(CART.color); cartFaceMat = mat(0xffffff, { map: tex, polygonOffset: true, polygonOffsetFactor: -2 })
+    cart.add(new THREE.Mesh(bodyGeo, cartBodyMat), new THREE.Mesh(faceGeo, cartFaceMat))
     cart.position.y = 0.966 + CART.topAbove - (0.998 - 0.5) * IH          // the top edge pokes CART.topAbove above the console's top
     partB.add(cart)
   } catch (e) { console.warn('cartridge image not loaded', e) }
@@ -1371,7 +1375,7 @@ window.GB3D = {
   try {
     if (!window.GBGame) await new Promise((ok, fail) => { const s = document.createElement('script'); s.src = BASE + 'gameboy-game.js?v=' + Date.now(); s.onload = ok; s.onerror = fail; document.head.appendChild(s) })
     const game = window.GBGame.create()
-    const stex = new THREE.CanvasTexture(game.canvas); stex.colorSpace = THREE.SRGBColorSpace; stex.magFilter = THREE.LinearFilter; stex.anisotropy = 8
+    const stex = new THREE.CanvasTexture(game.canvas); stex.userData.live = true; stex.colorSpace = THREE.SRGBColorSpace; stex.magFilter = THREE.LinearFilter; stex.anisotropy = 8
     const { x0, x1, y0, y1 } = screenRect
     const lcd = new THREE.Mesh(new THREE.PlaneGeometry(x1 - x0, y0 - y1), mat(0xd8d8d8, { map: stex, polygonOffset: true, polygonOffsetFactor: -4 }))   // lit by the room like the plastic: the LCD has no backlight
     lcd.position.set((x0 + x1) / 2, (y0 + y1) / 2, FRONT - WELL + 0.0004); lcd.name = 'lcd'; lcd.receiveShadow = true; partA.add(lcd)
@@ -1412,6 +1416,7 @@ window.GB3D = {
     const ledOn = new THREE.Color(0xff3b2a), ledOff = new THREE.Color(0x3a2b27)
     const setPower = on => { powered = on; game.setPower(on); abMeshes.led.material.color.copy(on ? ledOn : ledOff) }
     setPower(true)
+    frameHooks.push(() => { if (powered && game.led) abMeshes.led.material.color.copy(ledOff).lerp(ledOn, game.led()) })   // weak batteries dim the light
     frameHooks.push(dt => { const k = powerSwitch.knob, to = powered ? powerSwitch.onX : powerSwitch.offX; k.position.x += (to - k.position.x) * Math.min(1, dt / 60) })
     const ray = new THREE.Raycaster(), ndc = new THREE.Vector2(), el = renderer.domElement
     let held = null
@@ -1456,13 +1461,253 @@ window.GB3D = {
     addEventListener('keyup', e => { const k = keyOf(e); if (k) setBtn(k, false) }, { signal: ac.signal })
   } catch (e) { console.warn('game screen not loaded', e) }
 
+  // ── NEW OR OLD, by the theme (gameboy-wear.js): light is a brand new unit, clean grey with the screen film still on and a Figma
+  //    sticker on the back; dark is the old one, yellowed, scuffed and scratched, "Drin" in marker on the front, a peeling Photoshop
+  //    sticker on the back, a dented screen, a chunk broken off the big corner, a melted spot by the cartridge slot, no battery door,
+  //    a PH flag sticker by the volume wheel, worn buttons, lint, and "Eldrin ♥ Elis" scratched into the back ──
+  let unwatch = () => {}
+  try {
+    if (!window.GBWear) await new Promise((ok, fail) => { const s = document.createElement('script'); s.src = BASE + 'gameboy-wear.js?v=' + Date.now(); s.onload = ok; s.onerror = fail; document.head.appendChild(s) })
+    const W = window.GBWear, KX = PW / 1049, KY = PH / 1800
+    const plastics = new Map(), painted = new Map()   // every plain beige material, with its old colour; every painted one, with its old picture
+    gb.traverse(o => [].concat(o.material || []).forEach(m => {
+      if (m.map && m.map.image instanceof HTMLCanvasElement && !m.map.userData.live && !painted.has(m)) { painted.set(m, { old: m.map, fresh: null }); return }
+      if (!m.color || m.map || plastics.has(m)) return
+      const c = m.color.getRGB({}, THREE.SRGBColorSpace), rgb = [c.r, c.g, c.b]
+      if (W.isPlastic(rgb)) plastics.set(m, rgb)
+    }))
+    const layer = (w, h, paint) => { const cv = document.createElement('canvas'); cv.width = w; cv.height = h; paint(cv.getContext('2d')); const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t }
+    const fm = { x: x => x * KX, y: y => y * KY, s: KX }                 // Front photo px -> canvas px (one canvas px per model px)
+    const front = paint => { const m = new THREE.Mesh(new THREE.PlaneGeometry(PW * S, PH * S), new THREE.MeshBasicMaterial({ map: layer(PW, PH, paint), transparent: true, depthWrite: false })); m.position.set(0, 0, FRONT + 0.0062); partA.add(m); return m }
+    // (the flat sheet is kept clear round the broken corner, where there is no plastic under it any more)
+    const oldFront = front(g => {
+      W.body(g, fm); W.lens(g, fm); W.dust(g, fm, { slots: false })
+      g.save(); g.globalCompositeOperation = 'destination-out'; g.beginPath(); g.arc(fm.x(W.HIT.front[0]), fm.y(W.HIT.front[1]), 75 * fm.s, 0, Math.PI * 2); g.fill(); g.restore()
+    }), newFront = front(g => W.film(g, fm))
+    const bm = { x: f => f * 1118, y: f => f * 1924, u: 1000 }          // back fractions -> canvas px (1000 per world unit)
+    const D = BATTERY_DOOR, pocketArea = { left: D.left, right: D.right, top: D.top, bottom: D.bottom }
+    const backArea = { left: BACK_RECT.left + 0.01, right: BACK_RECT.right - 0.01, top: BACK_RECT.top + 0.01, bottom: BACK_RECT.bottom - 0.01 }
+    const backSheet = paint => { const m = new THREE.Mesh(new THREE.PlaneGeometry(1.118, 1.924).rotateY(Math.PI), new THREE.MeshBasicMaterial({ map: layer(1118, 1924, paint), transparent: true, depthWrite: false })); m.position.set(0, (0.966 - 0.958) / 2, -FRONT - BACK_RECT.lift - 0.0012); partB.add(m); return m }
+    // the old back: scratches and the Photoshop sticker, lint in the grooves and "Eldrin ♥ Elis" scratched in; clear over the open battery pocket
+    const oldBack = backSheet(g => { W.back(g, bm, backArea); W.hole(g, bm, pocketArea, 0.012); W.dustBack(g, bm, backArea, pocketArea); W.names(g, bm) })
+    const newBack = backSheet(g => W.figma(g, bm))                        // the new back: the Figma sticker
+    let zombieCart = null
+
+    // ── the old one's damage, built once and swapped in by the theme ──
+    const dark = []                                                       // meshes only the old one has
+    const swaps = []                                                      // [mesh, 'geometry' or 'material', old one's, new one's]
+    const cev = new Evaluator(); cev.useGroups = false; cev.attributes = ['position', 'normal']
+    const cut = (geo, by) => cev.evaluate(new Brush(geo), new Brush(by), SUBTRACTION).geometry
+    const backMesh = partB.getObjectByName('backShell'), backPlate = partB.getObjectByName('backPlate')
+    const BX = f => 0.559 - f * 1.118, BY = f => 0.966 - f * 1.924       // back fractions -> world
+    const pk = { x0: Math.min(BX(D.left), BX(D.right)), x1: Math.max(BX(D.left), BX(D.right)), y0: BY(D.bottom), y1: BY(D.top) }   // the battery pocket
+    const tex = (c, srgb = true) => { const t = new THREE.CanvasTexture(c); if (srgb) t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t }
+    const canvasOf = (w, h, paint) => { const c = document.createElement('canvas'); c.width = w; c.height = h; paint(c.getContext('2d'), w, h); return c }
+
+    // the chunk knocked out of the big corner: cut with a lumpy rock-shaped cutter, so the break is jagged and faceted.
+    // A big bite out of the front shell's edge and a smaller one out of the back shell's round-over, from the same drop.
+    const rock = (cx, cy, cz, rx, ry, rz, seed) => {
+      const g = new THREE.IcosahedronGeometry(1, 3); g.deleteAttribute('uv')
+      const p = g.attributes.position, v = new THREE.Vector3()
+      const n = d => Math.sin(d.x * 3.1 + seed) * 0.5 + Math.sin(d.y * 4.7 + seed * 2) * 0.35 + Math.sin(d.z * 5.3 + seed * 3) * 0.3 + Math.sin((d.x + d.y) * 9 + seed) * 0.2
+        + Math.sin((d.y - d.z) * 14 + seed * 5) * 0.12 + Math.sin((d.x + d.z) * 19 + seed * 7) * 0.1    // the small ones make it jagged
+      for (let i = 0; i < p.count; i++) { v.fromBufferAttribute(p, i).normalize(); const k = 1 + 0.35 * n(v); p.setXYZ(i, cx + v.x * rx * k, cy + v.y * ry * k, cz + v.z * rz * k) }
+      g.computeVertexNormals(); return g
+    }
+    const hit = new THREE.Vector2(X(1065), Y(1879))                       // the middle of the big curve
+    let zEdge = 0; { const p = frontShell.geometry.attributes.position; for (let i = 0; i < p.count; i++) if (Math.hypot(p.getX(i) - hit.x, p.getY(i) - hit.y) < 0.04) zEdge = Math.max(zEdge, p.getZ(i)) }   // the face's height there (the facet is pressed down)
+    const oldFrontGeo = cut(frontShell.geometry, rock(hit.x + 0.03, hit.y - 0.03, zEdge - 0.02, 0.085, 0.085, 0.075, 1.3))   // centred outside the edge, so it takes the edge off
+    swaps.push([frontShell, 'geometry', oldFrontGeo, frontShell.geometry])
+    // the back shell: its bite, then the battery well dug out under the open pocket, then the melted spot
+    let oldBackGeo = cut(backMesh.geometry, rock(0.48, -0.9, -0.16, 0.055, 0.055, 0.05, 2.1))
+    oldBackGeo = cut(oldBackGeo, new THREE.BoxGeometry(pk.x1 - pk.x0 - 0.004, pk.y1 - pk.y0 - 0.004, 0.27).translate((pk.x0 + pk.x1) / 2, (pk.y0 + pk.y1) / 2, -0.165))
+
+    // the melted spot by the cartridge slot (a hot jeepney dashboard): the shell there is split finer, then pushed. It sags, the back
+    // edge slumps outward, the surface wobbles and little bubbles rise in it. Only triangles within reach are split, and a split is
+    // always at the middle of the longest edge, so the two sides of a shared edge split alike and nothing tears open.
+    const MELT = { x: 0.45, y: 0.966, z: -0.14, R: 0.075 }
+    const meltGeo = geo => {
+      const src = geo.index ? geo.toNonIndexed() : geo, pa = src.attributes.position, na = src.attributes.normal, C = [MELT.x, MELT.y, MELT.z]
+      const reach = t => { let d = 0; for (let k = 0; k < 3; k++) { const lo = Math.min(t[k], t[k + 3], t[k + 6]), hi = Math.max(t[k], t[k + 3], t[k + 6]), e = C[k] < lo ? lo - C[k] : C[k] > hi ? C[k] - hi : 0; d += e * e } return Math.sqrt(d) }
+      const done = [], stack = [], near = [], MAXE = 0.005
+      for (let i = 0; i < pa.count; i += 3) {
+        const t = []; for (let j = 0; j < 3; j++) t.push(pa.getX(i + j), pa.getY(i + j), pa.getZ(i + j)); for (let j = 0; j < 3; j++) t.push(na.getX(i + j), na.getY(i + j), na.getZ(i + j))
+        ;(reach(t) < MELT.R ? stack : done).push(t)
+      }
+      while (stack.length) {
+        const t = stack.pop()
+        if (reach(t) >= MELT.R) { done.push(t); continue }
+        const L = [[0, 1], [1, 2], [2, 0]].map(([a, b]) => (t[a * 3] - t[b * 3]) ** 2 + (t[a * 3 + 1] - t[b * 3 + 1]) ** 2 + (t[a * 3 + 2] - t[b * 3 + 2]) ** 2), mx = Math.max(...L)
+        if (mx <= MAXE * MAXE) { near.push(t); continue }
+        const a = L.indexOf(mx), b = (a + 1) % 3, c = (a + 2) % 3, V = i => t.slice(i * 3, i * 3 + 3), N = i => t.slice(9 + i * 3, 12 + i * 3)
+        const M = V(a).map((q, k) => (q + V(b)[k]) / 2), MN = N(a).map((q, k) => (q + N(b)[k]) / 2)
+        stack.push([...V(a), ...M, ...V(c), ...N(a), ...MN, ...N(c)], [...M, ...V(b), ...V(c), ...MN, ...N(b), ...N(c)])
+      }
+      // the push: away from a point inside the body (the same for every copy of a point, so shared corners move together)
+      const r = (s => () => ((s = (s * 16807) % 2147483647) / 2147483647))(77), bub = []
+      for (let i = 0; i < 20; i++) { const a = r() * Math.PI * 2, q = MELT.R * 0.65 * Math.sqrt(r()); bub.push(r() < 0.7 ? [MELT.x + Math.cos(a) * q, MELT.y, MELT.z + Math.sin(a) * q * 0.8, 0.003 + r() * 0.005] : [MELT.x + Math.cos(a) * q, MELT.y - r() * 0.035, -FRONT, 0.003 + r() * 0.004]) }
+      const inside = new THREE.Vector3(MELT.x, MELT.y - 0.06, MELT.z + 0.06), dir = new THREE.Vector3()
+      const push = (x, y, z) => {
+        const d = Math.hypot(x - MELT.x, (y - MELT.y) * 1.2, z - MELT.z) / MELT.R; if (d >= 1) return [x, y, z]
+        const f = (1 - d * d) ** 2
+        let b = 0; bub.forEach(([bx, by, bz, br]) => { const q = Math.hypot(x - bx, y - by, z - bz) / br; if (q < 1) b += (1 - q * q) * br * 0.45 })
+        const o = b + 0.0018 * Math.sin(x * 170 + z * 60) * Math.sin(z * 150 - x * 40) * f
+        dir.set(x, y, z).sub(inside).normalize()
+        return [x + dir.x * o, y - 0.02 * f + dir.y * o, z - 0.01 * f * Math.min(1, Math.max(0, (-0.12 - z) / 0.08)) + dir.z * o]
+      }
+      near.forEach(t => { for (let j = 0; j < 3; j++) { const q = push(t[j * 3], t[j * 3 + 1], t[j * 3 + 2]); t[j * 3] = q[0]; t[j * 3 + 1] = q[1]; t[j * 3 + 2] = q[2] } })
+      // smooth normals over the pushed part, but only between faces less than 60 degrees apart, so it reads soft without smearing
+      const key = (t, j) => Math.round(t[j * 3] * 1e5) + ',' + Math.round(t[j * 3 + 1] * 1e5) + ',' + Math.round(t[j * 3 + 2] * 1e5)
+      const fn = near.map(t => { const ab = new THREE.Vector3(t[3] - t[0], t[4] - t[1], t[5] - t[2]), ac = new THREE.Vector3(t[6] - t[0], t[7] - t[1], t[8] - t[2]); return ab.cross(ac).normalize() })
+      const at = new Map(); near.forEach((t, ti) => { for (let j = 0; j < 3; j++) { const k = key(t, j); if (!at.has(k)) at.set(k, []); at.get(k).push(ti) } })
+      const sum = new THREE.Vector3()
+      near.forEach((t, ti) => { for (let j = 0; j < 3; j++) { sum.set(0, 0, 0); at.get(key(t, j)).forEach(o => { if (fn[o].dot(fn[ti]) > 0.5) sum.add(fn[o]) }); sum.normalize(); t[9 + j * 3] = sum.x; t[10 + j * 3] = sum.y; t[11 + j * 3] = sum.z } })
+      const all = done.concat(near), P = new Float32Array(all.length * 9), Nn = new Float32Array(all.length * 9)
+      all.forEach((t, i) => { P.set(t.slice(0, 9), i * 9); Nn.set(t.slice(9, 18), i * 9) })
+      const out = new THREE.BufferGeometry(); out.setAttribute('position', new THREE.BufferAttribute(P, 3)); out.setAttribute('normal', new THREE.BufferAttribute(Nn, 3))
+      return { geo: out, near }
+    }
+    const melted = meltGeo(oldBackGeo); oldBackGeo = melted.geo
+    swaps.push([backMesh, 'geometry', oldBackGeo, backMesh.geometry])
+    // the raised face keeps a thin floor under the door; with the door gone it is cut right through, so the well shows
+    const oldPlateGeo = cut(backPlate.geometry, new THREE.BoxGeometry(pk.x1 - pk.x0 - 0.004, pk.y1 - pk.y0 - 0.004, 0.2).translate((pk.x0 + pk.x1) / 2, (pk.y0 + pk.y1) / 2, -0.2))
+    swaps.push([backPlate, 'geometry', oldPlateGeo, backPlate.geometry])
+
+    // decals: the triangles of a shape that pass `keep`, lifted a hair off it, with a picture mapped on by `uv`
+    const decal = (geos, keep, uv, material) => {
+      const P = [], N = [], U = [], a = new THREE.Vector3(), b = new THREE.Vector3(), c = new THREE.Vector3(), n = new THREE.Vector3(), e = new THREE.Vector3()
+      geos.forEach(geo => {
+        const src = geo.index ? geo.toNonIndexed() : geo, p = src.attributes.position, nr = src.attributes.normal
+        for (let i = 0; i < p.count; i += 3) {
+          a.fromBufferAttribute(p, i); b.fromBufferAttribute(p, i + 1); c.fromBufferAttribute(p, i + 2)
+          n.subVectors(b, a).cross(e.subVectors(c, a)).normalize()
+          if (!keep(a, b, c, n)) continue
+          for (let j = 0; j < 3; j++) { const v = [a, b, c][j], nx = nr.getX(i + j), ny = nr.getY(i + j), nz = nr.getZ(i + j); P.push(v.x + nx * 0.0005, v.y + ny * 0.0005, v.z + nz * 0.0005); N.push(nx, ny, nz); U.push(...uv(v)) }
+        }
+      })
+      const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(P, 3)); g.setAttribute('normal', new THREE.Float32BufferAttribute(N, 3)); g.setAttribute('uv', new THREE.Float32BufferAttribute(U, 2))
+      return new THREE.Mesh(g, material)
+    }
+    const decalMat = map => mat(0xffffff, { map, transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -4 })
+    const all3 = f => (a, b, c, n) => f(a, n) && f(b, n) && f(c, n)
+    // the cracks running out of the break across the front, and the lint packed into the speaker slots (both on the pressed-down
+    // corner, so they follow its shape instead of floating on the flat sheet)
+    const frontDecal = decal([oldFrontGeo], all3((v, n) => v.x > -0.05 && v.y < -0.5 && v.z > 0 && n.z > 0.25),
+      v => [v.x / (PW * S) + 0.5, v.y / (PH * S) + 0.5], decalMat(layer(PW, PH, g => { W.crack(g, fm); W.dust(g, fm, { buttons: false, specks: false }) })))
+    partA.add(frontDecal); dark.push(frontDecal)
+    // the cracks across the back, over the back shell's round-over and onto the raised face
+    const backDecal = decal([oldBackGeo, oldPlateGeo], all3((v, n) => v.x > 0.15 && v.y < -0.45 && n.z < -0.25),
+      v => [(0.559 - v.x) / 1.118, 1 - (0.966 - v.y) / 1.924], decalMat(layer(1118, 1924, g => W.crackBack(g, bm))))
+    partB.add(backDecal); dark.push(backDecal)
+    // the melted patch: darker and glossy, with its bubbles, laid over the pushed triangles
+    {
+      const P = [], N = [], U = []
+      melted.near.forEach(t => { for (let j = 0; j < 3; j++) {
+        const x = t[j * 3], y = t[j * 3 + 1], z = t[j * 3 + 2], nx = t[9 + j * 3], ny = t[10 + j * 3], nz = t[11 + j * 3]
+        P.push(x + nx * 0.0004, y + ny * 0.0004, z + nz * 0.0004); N.push(nx, ny, nz)
+        const s = z > -FRONT + 0.004 ? z - MELT.z : (-FRONT - MELT.z) - (MELT.y - y)    // along the top, then on down the back face
+        U.push((x - MELT.x) / (2 * MELT.R) + 0.5, 0.5 - s / (2 * MELT.R))
+      } })
+      const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(P, 3)); g.setAttribute('normal', new THREE.Float32BufferAttribute(N, 3)); g.setAttribute('uv', new THREE.Float32BufferAttribute(U, 2))
+      const m = new THREE.Mesh(g, new THREE.MeshStandardMaterial({ map: tex(canvasOf(512, 512, (k, w, h) => W.melt(k, w, h))), roughness: 0.18, metalness: 0, transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -4 }))
+      partB.add(m); dark.push(m)
+    }
+
+    // the battery door is gone: the well behind it, four orange KINGEVER AAs, springs and contacts, rust and dust on one end,
+    // and the broken stub of the latch still in its catch
+    {
+      const well = new THREE.Group(); well.name = 'batteryWell'
+      const floor = new THREE.Mesh(new THREE.PlaneGeometry(pk.x1 - pk.x0, pk.y1 - pk.y0), new THREE.MeshBasicMaterial({ color: 0x2c2924, side: THREE.DoubleSide }))
+      floor.position.set((pk.x0 + pk.x1) / 2, (pk.y0 + pk.y1) / 2, -0.031); well.add(floor)
+      // low-poly batteries (12 sides, flat shaded), the label unrolled from the photo of the real ones
+      const metal = new THREE.MeshStandardMaterial({ color: 0xc9ccd1, metalness: 0.85, roughness: 0.32, flatShading: true })
+      const label = new THREE.MeshStandardMaterial({ roughness: 0.42, flatShading: true })
+      new THREE.ImageLoader().load(BASE + 'gameboy-battery.webp', img => { label.map = tex(W.batteryWrap(img)); label.needsUpdate = true })
+      const rustC = canvasOf(256, 256, W.rust), rusty = new THREE.MeshStandardMaterial({ map: tex(rustC), roughness: 0.9, metalness: 0.25, flatShading: true })
+      const creep = new THREE.MeshStandardMaterial({ map: tex(rustC), alphaMap: tex(canvasOf(64, 64, (g, w, h) => { const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, '#000'); gr.addColorStop(0.55, '#777'); gr.addColorStop(1, '#fff'); g.fillStyle = gr; g.fillRect(0, 0, w, h) }), false), transparent: true, roughness: 0.9, depthWrite: false, flatShading: true })
+      // head to tail, as they go in a real one; and each turned its own way, as nobody lines the brand up
+      const H = pk.y1 - pk.y0, n = 4, R = 0.08, gap = (pk.x1 - pk.x0 - 2 * R * n) / (n + 1), len = 0.53, nub = 0.012, SL = 0.03, edge = (H - (SL + len + nub + 0.006)) / 2, zA = -0.12
+      const TURN = [Math.PI / 2, -Math.PI / 2 + 0.35, Math.PI / 2 - 0.45, -Math.PI / 2 - 0.25]   // brand side, AA side turned a little, brand turned, AA side
+      const helix = new THREE.Curve(); helix.getPoint = (t, o = new THREE.Vector3()) => o.set(Math.cos(t * 5 * Math.PI * 2) * R * 0.58, t * SL, Math.sin(t * 5 * Math.PI * 2) * R * 0.58)
+      const springGeo = new THREE.TubeGeometry(helix, 200, 0.0034, 6, false)
+      for (let i = 0; i < n; i++) {
+        const up = i % 2 === 0, cx = pk.x0 + gap + R + i * (2 * R + gap)     // up: the + end at the top
+        const b = new THREE.Group()
+        b.add(new THREE.Mesh(new THREE.CylinderGeometry(R, R, len, 12), [label, metal, i === 2 ? rusty : metal]))   // side, + end, - end
+        const nb = new THREE.Mesh(new THREE.CylinderGeometry(R * 0.34, R * 0.38, nub, 8), metal); nb.position.y = len / 2 + nub / 2; b.add(nb)
+        if (i === 2) { const c = new THREE.Mesh(new THREE.CylinderGeometry(R * 1.004, R * 1.004, 0.06, 12, 1, true), creep); c.position.y = -len / 2 + 0.03; b.add(c) }   // the rust creeping up its side
+        const cy = up ? pk.y0 + edge + SL + len / 2 : pk.y1 - edge - SL - len / 2
+        b.rotation.order = 'ZYX'; b.rotation.set(0, TURN[i], up ? 0 : Math.PI)   // turned on its own axis first, then flipped
+        b.position.set(cx, cy, zA); well.add(b)
+        const sp = new THREE.Mesh(springGeo, metal); sp.position.set(cx, up ? pk.y0 + edge : pk.y1 - edge - SL, zA); well.add(sp)          // the spring at the - end
+        const ct = new THREE.Mesh(new THREE.BoxGeometry(R * 1.3, 0.004, R * 1.2), metal)                                               // the flat contact at the + end
+        ct.position.set(cx, up ? cy + len / 2 + nub + 0.003 : cy - len / 2 - nub - 0.003, zA); well.add(ct)
+      }
+      // the broken stub of the latch tab, still held by the catch at the top of its notch, its lower edge snapped off jagged
+      const L = D.latch, sx0 = Math.min(BX(L.left), BX(L.right)) + D.gap + 0.003, sx1 = Math.max(BX(L.left), BX(L.right)) - D.gap - 0.003, sTop = BY(L.top) - D.gap - 0.003
+      const sh = new THREE.Shape(); sh.moveTo(sx0, sTop); sh.lineTo(sx1, sTop); sh.lineTo(sx1, sTop - 0.042)
+      for (let j = 1; j < 9; j++) sh.lineTo(sx1 - (sx1 - sx0) * j / 9, sTop - 0.03 - ((j * 7919) % 13) / 13 * 0.03)
+      sh.lineTo(sx0, sTop - 0.05); sh.closePath()
+      const stub = new THREE.Mesh(new THREE.ExtrudeGeometry(sh, { depth: D.doorDepth, bevelEnabled: true, bevelSize: 0.0012, bevelThickness: 0.0012, bevelSegments: 1 }).translate(0, 0, -FRONT - BACK_RECT.lift + D.recess), M.body)
+      well.add(stub)
+      partB.add(well); dark.push(well)
+    }
+    const door = partB.getObjectByName('batteryDoor'), pocketFloor = partB.getObjectByName('pocketFloor')
+
+    // the PH flag sticker on the right side, below the volume wheel: small, crooked, its edges curling off the wall
+    {
+      const w = 0.075, h = 0.0375, geo = new THREE.PlaneGeometry(w, h, 20, 10), p = geo.attributes.position
+      for (let i = 0; i < p.count; i++) {   // lifted off the wall all round the edge, most at two corners
+        const u = p.getX(i) / (w / 2), v = p.getY(i) / (h / 2), edge = Math.max(Math.abs(u), Math.abs(v))
+        p.setZ(i, Math.max(0, (edge - 0.75) / 0.25) ** 2 * 0.0012 + Math.max(0, (u + v - 1.3) / 0.7) ** 2 * 0.006 + Math.max(0, (-u - v - 1.5) / 0.5) ** 2 * 0.003)
+      }
+      geo.computeVertexNormals()
+      const f = new THREE.Group()
+      f.add(new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ map: tex(canvasOf(400, 200, W.flag)), roughness: 0.55, alphaTest: 0.5 })), new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ color: 0xe6e0d2, roughness: 0.8, side: THREE.BackSide })))   // the face, and the paper backing behind the curl
+      f.rotation.set(0, Math.PI / 2, 0.12); f.position.set(X(1142) + 0.0008, 0.1, -0.045); partB.add(f); dark.push(f)
+    }
+
+    // the buttons worn by thumbs: A and B polished and faded in the middle, the D-pad's ridges worn away and shinier, Select and Start
+    // rubbed lighter in the centre; and the printed A, B, SELECT and START half rubbed off
+    {
+      const bw = W.buttonWear()
+      const ab = new THREE.MeshStandardMaterial({ map: tex(bw.ab.map), roughnessMap: tex(bw.ab.rough, false), roughness: 1, metalness: 0 })
+      const pt = [tex(bw.pill.map), tex(bw.pill.rough, false)]; pt.forEach(t => { t.repeat.set(1 / 0.17, 1 / 0.08); t.offset.set(0.5, 0.5) })
+      const pill = new THREE.MeshStandardMaterial({ map: pt[0], roughnessMap: pt[1], roughness: 1, metalness: 0 })
+      ;[[abMeshes.a, ab], [abMeshes.b, ab], [abMeshes.select, pill], [abMeshes.start, pill], [abMeshes.dpad, new THREE.MeshStandardMaterial({ color: 0x4c4c52, roughness: 0.34, metalness: 0 })]].forEach(([m, worn]) => swaps.push([m, 'material', worn, m.material]))
+      swaps.push([abMeshes.dpad, 'geometry', abMeshes.dpad.userData.smooth, abMeshes.dpad.geometry])
+      const print = partA.getObjectByName('print').material, p = painted.get(print)
+      if (p) { const c = canvasOf(p.old.image.width, p.old.image.height, g => { g.drawImage(p.old.image, 0, 0); W.rubPrint(g, { x: x => x * KX * 1.5, y: y => y * KY * 1.5, s: KX * 1.5 }) }); p.worn = tex(c) }
+    }
+
+    const apply = old => {
+      plastics.forEach((rgb, m) => { const c = old ? rgb : W.fresh(rgb); m.color.setRGB(c[0], c[1], c[2], THREE.SRGBColorSpace) })
+      if (cartFaceMat) {   // the old unit has the bootleg SURVIVE EDSA! cart in it, in a dark green shell
+        cartFaceMat.userData.day ??= cartFaceMat.map
+        if (old && !zombieCart) { zombieCart = new THREE.TextureLoader().load(BASE + 'gameboy-cart-zombie.webp'); zombieCart.colorSpace = THREE.SRGBColorSpace; zombieCart.anisotropy = 8 }
+        cartFaceMat.map = old ? zombieCart : cartFaceMat.userData.day; cartFaceMat.needsUpdate = true
+        cartBodyMat.color.setHex(old ? 0x24302a : CART.color)
+      }
+      painted.forEach((p, m) => {
+        if (!old && !p.fresh) { p.fresh = new THREE.CanvasTexture(W.freshCanvas(p.old.image)); p.fresh.colorSpace = p.old.colorSpace; p.fresh.anisotropy = p.old.anisotropy }
+        m.map = old ? (p.worn || p.old) : p.fresh; m.needsUpdate = true
+      })
+      oldFront.visible = oldBack.visible = old; newFront.visible = newBack.visible = !old
+      swaps.forEach(([mesh, k, a, b]) => { mesh[k] = old ? a : b })
+      dark.forEach(o => { o.visible = old })
+      if (door) door.visible = !old
+      if (pocketFloor) pocketFloor.visible = !old
+    }
+    apply(W.worn()); unwatch = W.watch(apply)
+  } catch (e) { console.warn('wear not loaded', e) }
+
   return {
     // what to carry over to the next build, so a reload does not move you
     state: () => ({ touched, shown: { ...shown }, rot: [gb.rotation.x, gb.rotation.y, gb.rotation.z], cam: camera.position.toArray() }),
     pause() { renderer.setAnimationLoop(null); lastT = 0 },
     resume() { renderer.setAnimationLoop(loop) },
     dispose() {
-      renderer.setAnimationLoop(null); ro.disconnect(); ac.abort(); controls.dispose()
+      renderer.setAnimationLoop(null); ro.disconnect(); ac.abort(); controls.dispose(); unwatch()
       scene.traverse(o => { if (o.geometry) o.geometry.dispose() })
       renderer.dispose(); renderer.domElement.remove(); tagLayer.remove()
     }

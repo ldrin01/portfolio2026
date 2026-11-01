@@ -86,6 +86,7 @@ usePageSeo('about')
         <div class="text">
           <h3>{{ doc.evenMore.gameboy.title }}</h3>
           <p>{{ doc.evenMore.gameboy.body }}</p>
+          <NuxtLink to="/play" class="play-link">▶ Laro na, full screen</NuxtLink>
         </div>
         <AboutGameBoy3D />
       </div>
@@ -150,4 +151,6 @@ h3 { font-size: clamp(22px, 2.4vw, 30px); font-weight: 500; letter-spacing: -.01
 @media (max-width: 800px) {
   .split { grid-template-columns: 1fr; }
 }
+.play-link { display: inline-flex; align-items: center; gap: 8px; margin-top: 18px; padding: 10px 18px; border: 1px solid var(--line); border-radius: 999px; color: var(--fg); text-decoration: none; font-size: 14px; letter-spacing: .04em; transition: border-color .2s, color .2s; }
+.play-link:hover { border-color: var(--accent); color: var(--accent); }
 </style>
