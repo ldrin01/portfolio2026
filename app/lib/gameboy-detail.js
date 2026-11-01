@@ -203,7 +203,7 @@ export async function mountGameboyDetail(host, opts = {}) {
       }
       // the battery door: a rounded panel with a groove round it, two screws and finger ridges
       if (old) return
-      const dx = fxp(0.3), dy = fyp(0.585), dw = fxp(0.4), dh = fyp(0.155)
+      const dx = fxp(0.2), dy = fyp(0.56), dw = fxp(0.6), dh = fyp(0.32)   // same size and place as the old unit's battery pocket (POCKET below)
       g.beginPath(); g.roundRect(dx, dy, dw, dh, u(22)); g.fillStyle = I(BACK_C, 150); g.fill(); g.lineWidth = u(8); g.strokeStyle = I('rgba(50,42,26,.7)', 20); g.stroke()
       for (let i = 0; i < 6; i++) { const y = dy + dh * (0.58 + i * 0.07); g.lineWidth = u(5); g.beginPath(); g.moveTo(dx + dw * 0.32, y); g.lineTo(dx + dw * 0.68, y); g.strokeStyle = I('rgba(70,60,40,.5)', 60); g.stroke() }
       ;[[0.08, 0.2], [0.92, 0.2]].forEach(([fx, fy]) => {
