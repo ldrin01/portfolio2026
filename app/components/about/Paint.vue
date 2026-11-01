@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import PAINT_STYLE from '~~/content/paint-style.json'
+import { makeScribble, orderTargets, planMove, type Plan, type ScribbleStyle } from '~/utils/scribble'
 // A working paint program in an old-school window, drawn the way the real one worked: a plain pixel bitmap with no
 // smoothing, so every line is chunky and every fill is exact. Ten tools, a 28-colour palette (left click picks the
 // main colour, right click or long press the second), undo and redo, flips, invert, and Save as a PNG.
@@ -313,21 +315,187 @@ onMounted(() => window.addEventListener('pointerdown', away))
 onBeforeUnmount(() => window.removeEventListener('pointerdown', away))
 
 // cursors are little SVG pictures; everything else uses the plain crosshair
+const PENCIL_CUR = '<path d="M1 23l2-6 13-13 4 4-13 13z" fill="#ff0" stroke="#000"/><path d="M1 23l2-6 4 4z" fill="#f5cc8a" stroke="#000"/>'
+const FILL_CUR = '<path d="M5 14l7-7 8 8-7 7z" fill="#fff" stroke="#000"/><path d="M6 14h11l-4 4z" fill="#00f"/><path d="M2 22l1-3 2 2z" fill="#00f"/>'
 const cur = (svg: string, x: number, y: number) => `url("data:image/svg+xml,${encodeURIComponent(svg)}") ${x} ${y}, crosshair`
 const cursor = computed(() => {
   const t = tool.value, w = width.value
   const open = (body: string, n = 24) => `<svg xmlns="http://www.w3.org/2000/svg" width="${n}" height="${n}" viewBox="0 0 ${n} ${n}" shape-rendering="crispEdges">${body}</svg>`
-  if (t === 'pencil') return cur(open('<path d="M1 23l2-6 13-13 4 4-13 13z" fill="#ff0" stroke="#000"/><path d="M1 23l2-6 4 4z" fill="#f5cc8a" stroke="#000"/>'), 1, 23)
-  if (t === 'fill') return cur(open('<path d="M5 14l7-7 8 8-7 7z" fill="#fff" stroke="#000"/><path d="M6 14h11l-4 4z" fill="#00f"/><path d="M2 22l1-3 2 2z" fill="#00f"/>'), 2, 22)
+  if (t === 'pencil') return cur(open(PENCIL_CUR), 1, 23)
+  if (t === 'fill') return cur(open(FILL_CUR), 2, 22)
   if (t === 'picker') return cur(open('<path d="M15 2l7 7-3 2-1-1-7 7-3-3 7-7-1-1z" fill="#fff" stroke="#000"/><path d="M9 14l3 3-6 6-3 0 0-3z" fill="#808080" stroke="#000"/>'), 3, 22)
   if (t === 'eraser') { const n = w + 2; return cur(open(`<rect x=".5" y=".5" width="${n - 1}" height="${n - 1}" fill="#fff" stroke="#000"/>`, n), n / 2, n / 2) }
   if ((t === 'brush' || t === 'airbrush') && w >= 6) { const n = w + 4; return cur(open(`<circle cx="${n / 2}" cy="${n / 2}" r="${w / 2 + 1}" fill="none" stroke="#000"/>`, n), n / 2, n / 2) }
   return 'crosshair'
 })
+
+// Demo: a ghost cursor scribbles one long closed line all over the canvas at changing speeds, picks the bucket, picks
+// blue (orange in dark mode), then fills every other region like a chessboard. A closed line always splits the canvas
+// into regions that two colours can alternate across, so "inside by the even-odd rule" is exactly the chess pattern.
+// One Ctrl+Z undoes the whole demo; any click or key in the window stops it.
+type Ghost = { x: number; y: number; kind: 'arrow' | 'pencil' | 'fill' }
+const GHOST = {
+  arrow: { svg: '<path d="M1 1v16l4-4 3 7 2-1-3-7h6z" fill="#fff" stroke="#000"/>', hot: [1, 1] },
+  pencil: { svg: PENCIL_CUR, hot: [1, 23] },
+  fill: { svg: FILL_CUR, hot: [2, 22] }
+} as const
+const live = ref(false), ghost = ref<Ghost | null>(null), pressed = ref('')
+let run = 0
+const frame = () => new Promise<number>(r => requestAnimationFrame(r))
+const check = (id: number) => { if (id !== run) throw new Error('stopped') }
+const wait = async (id: number, ms: number) => { const t0 = performance.now(); while (performance.now() - t0 < ms) { await frame(); check(id) } }
+const fromEl = (el: Element): [number, number] => {
+  const r = el.getBoundingClientRect(), o = root.value!.getBoundingClientRect()
+  return [r.left + r.width / 2 - o.left, r.top + r.height / 2 - o.top]
+}
+const fromPx = (x: number, y: number): [number, number] => {
+  x = Math.max(0, Math.min(W - 1, x)); y = Math.max(0, Math.min(H - 1, y))
+  const r = canvas.value!.getBoundingClientRect(), o = root.value!.getBoundingClientRect()
+  return [r.left - o.left + (x + 0.5) / W * r.width, r.top - o.top + (y + 0.5) / H * r.height]
+}
+const glide = async (id: number, to: [number, number], ms: number) => {
+  const g = ghost.value!, fx = g.x, fy = g.y, t0 = performance.now()
+  for (;;) {
+    const t = Math.min(1, (await frame() - t0) / ms), e = t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2
+    check(id)
+    ghost.value = { ...g, x: fx + (to[0] - fx) * e, y: fy + (to[1] - fy) * e }
+    if (t >= 1) return
+  }
+}
+// with a learned fill, the ghost moves the way the recorded hand did (bow, overshoot, speed curve, the rest before a click)
+// the built site reads the style from content/paint-style.json when it is built; the dev server does not watch content/,
+// so on this laptop the latest style comes from the local editor's endpoint instead (it answers only here)
+const STYLE = shallowRef(PAINT_STYLE as ScribbleStyle)
+if (import.meta.dev) onMounted(() => { $fetch<{ style: ScribbleStyle }>('/api/admin/scribbles', { headers: { 'x-admin': '1' } }).then((r) => { STYLE.value = r.style }).catch(() => {}) })
+const sheetK = () => W / canvas.value!.getBoundingClientRect().width // sheet px per screen px
+const toPx = (x: number, y: number): [number, number] => {
+  const r = canvas.value!.getBoundingClientRect(), o = root.value!.getBoundingClientRect()
+  return [(x - (r.left - o.left)) / r.width * W, (y - (r.top - o.top)) / r.height * H]
+}
+const walk = async (id: number, plan: Plan, to: [number, number], slow = 1) => {
+  const t0 = performance.now()
+  for (;;) {
+    const t = (await frame() - t0) / slow
+    check(id)
+    if (t >= plan.total) break
+    const [x, y] = plan.at(t)
+    ghost.value = { ...ghost.value!, x, y }
+  }
+  ghost.value = { ...ghost.value!, x: to[0], y: to[1] }
+}
+const goTo = async (id: number, to: [number, number], ms: number) => {
+  if (!STYLE.value.fill) return glide(id, to, ms)
+  const g = ghost.value!
+  await walk(id, planMove(STYLE.value.fill, [g.x, g.y], to, sheetK(), STYLE.value.tune), to)
+}
+const press = async (id: number, name: string) => { pressed.value = name; await wait(id, 140); pressed.value = '' }
+
+// the scribble is learned from hand-drawn takes (see utils/scribble.ts); with none recorded yet it uses a built-in one
+const scribble = () => makeScribble(STYLE.value, W, H)
+
+// every white region of the canvas, keeping the ones inside the loop by the even-odd rule
+const insideRegions = (pts: [number, number][]) => {
+  const d = new Uint32Array(snap().data.buffer), white = pack('#ffffff'), seen = new Uint8Array(W * H)
+  const path = new Path2D()
+  pts.forEach(([x, y], i) => (i ? path.lineTo(x + 0.5, y + 0.5) : path.moveTo(x + 0.5, y + 0.5)))
+  path.closePath()
+  const out: { x: number; y: number; size: number }[] = []
+  for (let p = 0; p < W * H; p++) {
+    if (d[p] !== white || seen[p]) continue
+    const px: number[] = [], stack = [p]
+    seen[p] = 1
+    let sx = 0, sy = 0
+    while (stack.length) {
+      const q = stack.pop()!, x = q % W, y = (q - x) / W
+      px.push(q); sx += x; sy += y
+      for (const n of [x > 0 ? q - 1 : -1, x < W - 1 ? q + 1 : -1, y > 0 ? q - W : -1, y < H - 1 ? q + W : -1]) {
+        if (n >= 0 && !seen[n] && d[n] === white) { seen[n] = 1; stack.push(n) }
+      }
+    }
+    // a few votes, so a pixel sitting right on the line can't decide it alone
+    const k = Math.min(15, px.length)
+    let odd = 0
+    for (let j = 0; j < k; j++) { const q = px[Math.floor(Math.random() * px.length)]!; if (ctx!.isPointInPath(path, (q % W) + 0.5, Math.floor(q / W) + 0.5, 'evenodd')) odd++ }
+    if (odd * 2 <= k) continue
+    // click the region's pixel nearest its middle
+    const cx = sx / px.length, cy = sy / px.length
+    let best = px[0]!, bd = Infinity
+    for (const q of px) { const dd = ((q % W) - cx) ** 2 + (Math.floor(q / W) - cy) ** 2; if (dd < bd) { bd = dd; best = q } }
+    out.push({ x: best % W, y: Math.floor(best / W), size: px.length })
+  }
+  return out
+}
+
+const demo = async () => {
+  if (live.value || !ctx) return
+  const id = ++run
+  live.value = true; menu.value = ''
+  root.value?.focus({ preventScroll: true })
+  const btn = root.value!.querySelector('.demo-btn')!
+  const [bx, by] = fromEl(btn)
+  ghost.value = { x: bx, y: by, kind: 'arrow' }
+  try {
+    record(snap()); blank()
+    tool.value = 'pencil'; fg.value = '#000000'
+    const { pts, speed, rest } = scribble()
+    hint.value = 'Scribbling...'
+    await glide(id, fromPx(...pts[0]!), 500)
+    ghost.value = { ...ghost.value!, kind: 'pencil' }
+    ctx!.fillStyle = '#000000'
+    let i = 0, carry = 0, prev = performance.now(), hold = 0
+    while (i < pts.length - 1) {
+      const now = await frame(); check(id)
+      const dt = Math.min(50, now - prev); prev = now
+      if (hold > 0) { hold -= dt; continue }
+      carry += dt * speed[i]!
+      while (carry > 0 && i < pts.length - 1) {
+        const a = pts[i]!, b = pts[i + 1]!
+        trace(a, b, 1, false); carry -= Math.hypot(b[0] - a[0], b[1] - a[1]) || 1; i++
+        if (rest.has(i)) { hold = rest.get(i)!; carry = 0; break }
+      }
+      const [gx, gy] = fromPx(...pts[i]!)
+      ghost.value = { x: gx, y: gy, kind: 'pencil' }
+    }
+    ghost.value = { ...ghost.value!, kind: 'arrow' }
+    await wait(id, 250)
+    hint.value = TOOLS[1]!.hint
+    const fillBtn = root.value!.querySelector('.tools button:nth-child(2)')!
+    await goTo(id, fromEl(fillBtn), 550); await press(id, 'tool'); pickTool('fill')
+    const col = document.documentElement.dataset.theme === 'dark' ? '#ff8040' : '#0000ff'
+    const swatch = root.value!.querySelector(`.palette button[aria-label="${col}"]`)!
+    await goTo(id, fromEl(swatch), 600); await press(id, col); fg.value = col
+    hint.value = 'Filling...'
+    const regions = insideRegions(pts)
+    // the bucket visits the biggest regions one by one; the slivers get filled in a sweep at the end
+    regions.sort((a, b) => b.size - a.size)
+    const pool = regions.slice(0, 55).filter(r => r.size >= 40), tiny = regions.slice(pool.length)
+    ghost.value = { ...ghost.value!, kind: 'fill' }
+    // which shape next: learned (near or big, as the recorded hand chose) or as set in the editor
+    const big = orderTargets(pool, toPx(ghost.value.x, ghost.value.y), STYLE.value.fill, STYLE.value.tune)
+    const setMs = STYLE.value.tune?.fill ? STYLE.value.tune.fill * 1000 : 0 // fill time set in the editor
+    if (STYLE.value.fill) {
+      // plan every move first, so a set fill time can stretch or squeeze them all evenly
+      let at: [number, number] = [ghost.value.x, ghost.value.y]
+      const plans = big.map((r) => { const to = fromPx(r.x, r.y), p = planMove(STYLE.value.fill, at, to, sheetK(), STYLE.value.tune); at = to; return { r, to, p } })
+      const slow = setMs ? setMs / Math.max(1, plans.reduce((a, x) => a + x.p.total, 0)) : 1
+      for (const { r, to, p } of plans) { await walk(id, p, to, slow); flood(r.x, r.y, col) }
+    } else {
+      const step = Math.max(16, Math.min(400, (setMs || 2500) / Math.max(1, big.length)))
+      for (const r of big) { await glide(id, fromPx(r.x, r.y), step); flood(r.x, r.y, col); await wait(id, 10) }
+    }
+    for (const r of tiny) flood(r.x, r.y, col)
+    await wait(id, 400)
+  } catch { /* stopped by a click or key */ } finally {
+    if (id === run) run++
+    live.value = false; ghost.value = null; pressed.value = ''; hint.value = IDLE
+  }
+}
+const stopDemo = () => { if (live.value) run++ }
+onBeforeUnmount(stopDemo)
 </script>
 
 <template>
-  <div ref="root" class="win" tabindex="0" role="group" aria-label="Paint, a drawing program" @keydown="key">
+  <div ref="root" class="win" tabindex="0" role="group" aria-label="Paint, a drawing program" @keydown.capture="stopDemo" @keydown="key" @pointerdown.capture="stopDemo">
     <div class="title">
       <svg class="logo" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 2h10v12H3z" fill="#fff" stroke="#000" /><path d="M5 5h3v3H5z" fill="#f00" /><path d="M9 8h3v3H9z" fill="#00f" /><path d="M5 10h3v2H5z" fill="#0a0" /></svg>
       <span>untitled - Paint</span>
@@ -351,7 +519,7 @@ const cursor = computed(() => {
     <div class="main">
       <div class="side">
         <div class="tools" role="toolbar" aria-label="Tools">
-          <button v-for="t in TOOLS" :key="t.id" type="button" :class="{ on: tool === t.id }" :aria-pressed="tool === t.id" :title="t.label" :aria-label="t.label" @click="pickTool(t.id)" @pointerenter="hint = t.hint" @pointerleave="hint = IDLE" @focus="hint = t.hint" @blur="hint = IDLE">
+          <button v-for="t in TOOLS" :key="t.id" type="button" :class="{ on: tool === t.id, press: pressed === 'tool' && t.id === 'fill' }" :aria-pressed="tool === t.id" :title="t.label" :aria-label="t.label" @click="pickTool(t.id)" @pointerenter="hint = t.hint" @pointerleave="hint = IDLE" @focus="hint = t.hint" @blur="hint = IDLE">
             <svg viewBox="0 0 16 16" shape-rendering="crispEdges" aria-hidden="true" v-html="t.icon" />
           </button>
         </div>
@@ -364,6 +532,7 @@ const cursor = computed(() => {
           <div v-if="hasSize" class="sizes" role="radiogroup" aria-label="Size">
             <button v-for="(s, k) in BARS" :key="s" type="button" role="radio" :aria-checked="size === k" :class="{ on: size === k }" :aria-label="`Size ${k + 1}`" @click="size = k"><i :style="{ height: `${s}px` }" /></button>
           </div>
+          <button type="button" class="demo-btn" :disabled="live" title="Watch it draw" aria-label="Play a drawing demo" @click="demo">Demo</button>
         </div>
       </div>
       <div class="well">
@@ -374,10 +543,13 @@ const cursor = computed(() => {
     <div class="colors">
       <button type="button" class="current" title="Swap the two colours" aria-label="Swap the two colours" @click="[fg, bg] = [bg, fg]"><i class="b" :style="{ background: bg }" /><i class="f" :style="{ background: fg }" /></button>
       <div class="palette" role="listbox" aria-label="Colours">
-        <button v-for="c in PALETTE" :key="c" type="button" role="option" :aria-selected="fg === c" :aria-label="c" :title="c" :style="{ background: c }" @click="fg = c" @contextmenu.prevent="bg = c" />
+        <button v-for="c in PALETTE" :key="c" type="button" role="option" :aria-selected="fg === c" :aria-label="c" :title="c" :class="{ press: pressed === c }" :style="{ background: c }" @click="fg = c" @contextmenu.prevent="bg = c" />
       </div>
     </div>
     <div class="status"><span class="help">{{ hint }}</span><span class="cell">{{ pos }}</span><span class="cell">{{ dims }}</span></div>
+    <div v-if="ghost" class="ghost" aria-hidden="true" :style="{ transform: `translate(${ghost.x - GHOST[ghost.kind].hot[0]}px, ${ghost.y - GHOST[ghost.kind].hot[1]}px)` }">
+      <svg width="24" height="24" viewBox="0 0 24 24" shape-rendering="crispEdges" v-html="GHOST[ghost.kind].svg" />
+    </div>
     <div v-if="about" class="dialog" role="dialog" aria-modal="true" aria-label="About Paint">
       <div class="title"><span>About Paint</span><span class="btns"><button type="button" class="x" aria-label="Close" @click="about = false"><svg viewBox="0 0 8 8"><path d="M0 0h2l2 2 2-2h2v1L5 4l3 3v1H6L4 6 2 8H0V7l3-3-3-3z" /></svg></button></span></div>
       <div class="body">
@@ -418,7 +590,12 @@ button { padding: 0; border: 0; background: var(--face); color: inherit; cursor:
 .tools button.on { background: conic-gradient(var(--hi) 25%, var(--face) 0 50%, var(--hi) 0 75%, var(--face) 0) 0 0 / 2px 2px; box-shadow: inset 1px 1px var(--dk), inset -1px -1px var(--hi), inset 2px 2px var(--lo); }
 .tools button.on svg { transform: translate(1px, 1px); }
 .tools svg { width: 16px; height: 16px; }
-.options { margin-top: 4px; min-height: 72px; padding: 3px; box-shadow: inset 1px 1px var(--lo), inset -1px -1px var(--hi); }
+.options { display: flex; flex-direction: column; margin-top: 4px; min-height: 72px; padding: 3px; box-shadow: inset 1px 1px var(--lo), inset -1px -1px var(--hi); }
+.demo-btn { margin-top: auto; padding: 4px 0; box-shadow: var(--raised); }
+.demo-btn:active:not(:disabled), .tools button.press, .palette button.press { box-shadow: inset 1px 1px var(--dk), inset -1px -1px var(--hi), inset 2px 2px var(--lo); }
+.demo-btn:disabled { color: var(--lo); text-shadow: 1px 1px var(--hi); }
+.ghost { position: absolute; z-index: 15; left: 0; top: 0; width: 24px; height: 24px; pointer-events: none; }
+.ghost svg { display: block; }
 .styles, .sizes { display: grid; gap: 1px; }
 .styles { margin-bottom: 3px; }
 .styles button { display: grid; place-items: center; height: 14px; padding: 2px; color: #808080; }

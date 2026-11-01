@@ -41,9 +41,9 @@ onMounted(() => {
 }
 .far-in { display: grid; grid-template-columns: minmax(220px, 380px) 1fr; gap: clamp(36px, 7vw, 100px); align-items: center; }
 .drop { position: relative; perspective: 1100px; }
-/* the photo print: white border, a little thicker at the bottom */
-.print { position: relative; margin: 0; padding: 14px 14px 46px; background: #f4f1ea; border-radius: 2px; transform-origin: 50% 50%; opacity: 0; transform: translate3d(0, -12vh, 760px) rotateX(-40deg) rotateY(24deg) rotate(-28deg); }
-.print img { display: block; width: 100%; aspect-ratio: 4 / 5; object-fit: cover; filter: grayscale(.35) sepia(.3) contrast(.95); }
+/* the photo itself, shown exactly as uploaded: no border, no crop, no tint */
+.print { position: relative; margin: 0; transform-origin: 50% 50%; opacity: 0; transform: translate3d(0, -12vh, 760px) rotateX(-40deg) rotateY(24deg) rotate(-28deg); }
+.print img { display: block; width: 100%; height: auto; }
 .on .print { animation: fall 2.4s cubic-bezier(.3, .1, .3, 1) forwards; }
 @keyframes fall {
   0% { opacity: 0; transform: translate3d(0, -12vh, 760px) rotateX(-40deg) rotateY(24deg) rotate(-28deg); }

@@ -3,11 +3,11 @@
   "intro": "The longer version, told the way I'd tell it over coffee: what I do now, what came before, and where I'm heading.",
   "lenticular": [
     {
-      "image": "/pictures/about/lion.webp",
+      "image": "/pictures/1719123393161.webp",
       "alt": "Placeholder: a lion (your photo goes here)"
     },
     {
-      "image": "/pictures/about/tiger.webp",
+      "image": "/pictures/screenshot-2026-11-01-at-10-41-47-am.webp",
       "alt": "Placeholder: a tiger (your second photo goes here)"
     }
   ],
@@ -18,7 +18,7 @@
       "Draft: I lead projects from the first requirements meeting to handover and QA, keep our design system in shape, and help the juniors on the team find their footing."
     ],
     "card": {
-      "photo": "/pictures/about/id-photo.webp",
+      "photo": "/pictures/ezgif-optimized.webp",
       "company": "Praxxys Solutions Inc.",
       "name": "Eldrin Bernardino",
       "role": "Senior UI/UX Designer",
@@ -34,24 +34,36 @@
     ],
     "photos": [
       {
-        "image": "/pictures/about/talk-1.webp",
-        "caption": "Placeholder: the talk"
+        "image": "/pictures/1745855291314.webp",
+        "caption": ""
       },
       {
-        "image": "/pictures/about/talk-2.webp",
-        "caption": "Placeholder: on stage"
+        "image": "/pictures/1745855282629.webp",
+        "caption": ""
       },
       {
-        "image": "/pictures/about/talk-3.webp",
-        "caption": "Placeholder: the panel"
+        "image": "/pictures/1745855274849.webp",
+        "caption": ""
       },
       {
-        "image": "/pictures/about/talk-4.webp",
-        "caption": "Placeholder: with the team"
+        "image": "/pictures/1745855259861.webp",
+        "caption": ""
       },
       {
-        "image": "/pictures/about/talk-5.webp",
-        "caption": "Placeholder: questions from the crowd"
+        "image": "/pictures/1745855205214.webp",
+        "caption": ""
+      },
+      {
+        "image": "/pictures/1745855004781.webp",
+        "caption": ""
+      },
+      {
+        "image": "/pictures/1745854987380.webp",
+        "caption": ""
+      },
+      {
+        "image": "/pictures/1745854636354.webp",
+        "caption": ""
       }
     ]
   },
@@ -6290,7 +6302,7 @@
   },
   "tooFar": {
     "title": "You scrolled too far… anyway,",
-    "photo": "/pictures/about/kid.webp",
+    "photo": "/pictures/753513229-17977409232111254-7744901448691091311-n-1.webp",
     "alt": "Placeholder: a childhood photo",
     "body": [
       "Draft: this is me as a kid. Who I was, what I loved, and who I looked up to.",
