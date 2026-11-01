@@ -14,8 +14,8 @@
   "work": {
     "title": "What I do these days",
     "body": [
-      "Draft: I'm a Senior UI/UX Designer and Assistant Creative Director at Praxxys Solutions, where I've been since 2022. Most days I'm somewhere between a client call, a Figma file and a developer's desk, making sure what we promised is what gets built.",
-      "Draft: I lead projects from the first requirements meeting to handover and QA, keep our design system in shape, and help the juniors on the team find their footing."
+      "I'm a Senior UI/UX Designer and Assistant Creative Director at Praxxys Solutions, where I've been since 2022. Most days I'm somewhere between a client call, a Figma file and a developer's desk, making sure what we promised is what gets built.",
+      "I lead projects from the first requirements meeting to handover and QA, keep our design system in shape, and help the juniors on the team find their footing."
     ],
     "card": {
       "photo": "/pictures/ezgif-optimized.webp",
@@ -6250,52 +6250,108 @@
       "body": "Draft: a papier-mâché Mayon Volcano, vinegar and baking soda, and a very proud kid. This is the real one."
     },
     "paintings": {
-      "title": "My paintings",
+      "title": "Some of my artowrks",
       "items": [
         {
-          "image": "/pictures/about/painting-1.webp",
-          "caption": "Placeholder painting"
+          "image": "/pictures/gemini-generated-image-pdccg7pdccg7pdcc.webp",
+          "caption": ""
         },
         {
-          "image": "/pictures/about/painting-2.webp",
-          "caption": "Placeholder painting"
+          "image": "/pictures/gemini-generated-image-ppfmp0ppfmp0ppfm.webp",
+          "caption": ""
         },
         {
-          "image": "/pictures/about/painting-3.webp",
-          "caption": "Placeholder painting"
+          "image": "/pictures/gemini-generated-image-4ex5qv4ex5qv4ex5.webp",
+          "caption": ""
         },
         {
-          "image": "/pictures/about/painting-4.webp",
-          "caption": "Placeholder painting"
+          "image": "/pictures/gemini-generated-image-8eg57k8eg57k8eg5.webp",
+          "caption": ""
         },
         {
-          "image": "/pictures/about/painting-5.webp",
-          "caption": "Placeholder painting"
+          "image": "/pictures/gemini-generated-image-fr46tbfr46tbfr46.webp",
+          "caption": ""
+        },
+        {
+          "image": "/pictures/gemini-generated-image-w5j35xw5j35xw5j3.webp",
+          "caption": ""
+        },
+        {
+          "image": "/pictures/gemini-generated-image-por0uspor0uspor0.webp",
+          "caption": ""
+        },
+        {
+          "image": "/pictures/gemini-generated-image-k4myegk4myegk4my.webp",
+          "caption": ""
+        },
+        {
+          "image": "/pictures/03e36601-98be-495c-b915-bd05e6a1d3c1.webp",
+          "caption": ""
         }
       ]
     },
     "sketches": {
-      "title": "From the sketchbooks",
+      "title": "From the sketchbook",
       "items": [
         {
-          "image": "/pictures/about/sketch-1.webp",
-          "caption": "Placeholder sketch"
+          "image": "/pictures/gemini-generated-image-8fhp1b8fhp1b8fhp.webp",
+          "caption": ""
         },
         {
-          "image": "/pictures/about/sketch-2.webp",
-          "caption": "Placeholder sketch"
+          "image": "/pictures/gemini-generated-image-obj829obj829obj8.webp",
+          "caption": ""
         },
         {
-          "image": "/pictures/about/sketch-3.webp",
-          "caption": "Placeholder sketch"
+          "image": "/pictures/gemini-generated-image-o63ymbo63ymbo63y.webp",
+          "caption": ""
         },
         {
-          "image": "/pictures/about/sketch-4.webp",
-          "caption": "Placeholder sketch"
+          "image": "/pictures/gemini-generated-image-q307iyq307iyq307.webp",
+          "caption": ""
         },
         {
-          "image": "/pictures/about/sketch-5.webp",
-          "caption": "Placeholder sketch"
+          "image": "/pictures/gemini-generated-image-l3rbial3rbial3rb.webp",
+          "caption": ""
+        },
+        {
+          "image": "/pictures/gemini-generated-image-5xgqt05xgqt05xgq.webp",
+          "caption": ""
+        },
+        {
+          "image": "/pictures/gemini-generated-image-xah450xah450xah4.webp",
+          "caption": ""
+        },
+        {
+          "image": "/pictures/gemini-generated-image-1cohci1cohci1coh.webp",
+          "caption": ""
+        },
+        {
+          "image": "/pictures/gemini-generated-image-8a5ppu8a5ppu8a5p.webp",
+          "caption": ""
+        },
+        {
+          "image": "/pictures/gemini-generated-image-ub7c6rub7c6rub7c.webp",
+          "caption": ""
+        },
+        {
+          "image": "/pictures/gemini-generated-image-6zvbjv6zvbjv6zvb.webp",
+          "caption": ""
+        },
+        {
+          "image": "/pictures/gemini-generated-image-hyhby9hyhby9hyhb.webp",
+          "caption": ""
+        },
+        {
+          "image": "/pictures/gemini-generated-image-6jq6sm6jq6sm6jq6.webp",
+          "caption": ""
+        },
+        {
+          "image": "/pictures/gemini-generated-image-wj8czcwj8czcwj8c.webp",
+          "caption": ""
+        },
+        {
+          "image": "/pictures/gemini-generated-image-gpiruygpiruygpir.webp",
+          "caption": ""
         }
       ]
     }
