@@ -30,7 +30,8 @@ export default defineNuxtConfig({
         // theme before first paint, so there is no flash: the saved choice, else light
         { innerHTML: "try{var t=localStorage.getItem('theme');if(t!=='light'&&t!=='dark')t='light';document.documentElement.dataset.theme=t}catch(e){document.documentElement.dataset.theme='light'}" },
         // a refresh always starts at the top: no restored scroll position, no jump to a #section
-        { innerHTML: "if('scrollRestoration' in history)history.scrollRestoration='manual';if(location.hash)history.replaceState(null,'',location.pathname+location.search);window.scrollTo(0,0);addEventListener('load',function(){window.scrollTo(0,0)})" }
+        { innerHTML: "if('scrollRestoration' in history)history.scrollRestoration='manual';if(location.hash)history.replaceState(null,'',location.pathname+location.search);window.scrollTo(0,0);addEventListener('load',function(){window.scrollTo(0,0)})" },
+        { src: 'https://static.cloudflareinsights.com/beacon.min.js', type: 'module', defer: true, tagPosition: 'bodyClose', 'data-cf-beacon': '{"token": "7d6fc3bffde04499b51011b2dd4122d6"}' }
       ]
     }
   }
