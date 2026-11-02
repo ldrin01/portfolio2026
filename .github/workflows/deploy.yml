@@ -27,7 +27,7 @@ jobs:
       - run: npm run generate
         env:
           # Project pages are served from /<repo-name>/. Use "/" for a <user>.github.io repo.
-          NUXT_APP_BASE_URL: /${{ github.event.repository.name }}/
+          NUXT_APP_BASE_URL: /
       - uses: actions/upload-pages-artifact@v3
         with:
           path: .output/public
