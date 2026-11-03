@@ -10,13 +10,16 @@ useHead({
   }]
 })
 const roleIndex = ref(-1) // which rotating word is showing; the hero portrait follows it
+const base = useRuntimeConfig().app.baseURL
+const heroReady = ref(false)
 </script>
 
 <template>
 
   <main id="top">
     <section class="hero">
-      <HeroPersonas :role="roleIndex" />
+      <img class="hero-photo" :class="{ gone: heroReady }" :src="`${base}me.webp`" width="970" height="1400" alt="" fetchpriority="high" decoding="async">
+      <HeroPersonas :role="roleIndex" @ready="heroReady = true" />
       <div class="wrap hero-in">
         <h1 :class="{ ready: loaderDone }">
           <span class="line" v-lag="0"><span class="line-in">I am {{ profile.name }}</span></span>
@@ -77,4 +80,9 @@ const roleIndex = ref(-1) // which rotating word is showing; the hero portrait f
 @media (max-width: 600px) { .shout { font-size: 14vw; } }
 @media (max-width: 600px) { .contact-in { --shift: 40px; } }
 @media (min-width: 601px) and (max-width: 800px) { .contact-in { --shift: 35px; } } /* phones: let the longest line fill the width */
+
+.hero-photo { --s: 1; --h: calc(100vh * var(--s)); --h: calc(100svh * var(--s)); position: absolute; z-index: 0; bottom: -10%; height: var(--h); width: auto; aspect-ratio: 970 / 1400; left: calc(66.667vw - var(--h) * 0.693 * 0.583); pointer-events: none; user-select: none; transition: opacity .5s ease; }
+.hero-photo.gone { opacity: 0; }
+@media (max-width: 1024px) { .hero-photo { --s: .9; } }
+@media (max-width: 600px) { .hero-photo { --s: .78; } }
 </style>

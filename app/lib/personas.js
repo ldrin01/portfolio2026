@@ -20,7 +20,9 @@ let dragging = 0
 const loadImg = (src) => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = () => rej(new Error('[HeroPersonas] could not load ' + src)); i.src = src })
 const [photo, depthImg, strokes] = await Promise.all([loadImg(`${base}me.webp`), loadImg(`${base}me-depth.png`), fetch(`${base}me-strokes.json`).then((r) => r.json())])
 const pixels = (img) => { const c = document.createElement('canvas'); c.width = ART_W; c.height = ART_H; const x = c.getContext('2d', { willReadFrequently: true }); x.drawImage(img, 0, 0); return x.getImageData(0, 0, ART_W, ART_H).data }
-const P = pixels(photo), D = pixels(depthImg)
+const P = pixels(photo)
+await new Promise((r) => setTimeout(r))
+const D = pixels(depthImg)
 const at = (x, y) => (Math.min(ART_H - 1, Math.max(0, y | 0)) * ART_W + Math.min(ART_W - 1, Math.max(0, x | 0))) * 4
 const alphaAt = (x, y) => D[at(x, y) + 3] / 255
 const depthAt = (x, y) => Math.max(0, Math.min(1, (D[at(x, y)] - 40) / 215)) // 0 far .. 1 near

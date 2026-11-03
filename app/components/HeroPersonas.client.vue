@@ -4,6 +4,7 @@
 const { profile } = useSite()
 
 const props = defineProps<{ role: number }>() // index into profile.roles; -1 before the first word shows
+const emit = defineEmits<{ ready: [] }>()
 const root = useTemplateRef<HTMLDivElement>('root')
 const base = useRuntimeConfig().app.baseURL // "/" locally, "/portfolio2026/" on GitHub Pages
 
@@ -23,6 +24,7 @@ onMounted(async () => {
     if (!alive) { e.destroy(); return }
     engine = e; map = mod.PERSONA_FOR_ROLE
     apply()
+    emit('ready')
   } catch (err) { console.error('[HeroPersonas]', err) }
 })
 watch(() => props.role, apply)
