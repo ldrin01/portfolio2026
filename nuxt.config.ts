@@ -5,7 +5,7 @@ const base = process.env.NUXT_APP_BASE_URL || '/'
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
-  modules: ['@nuxt/content', '@nuxtjs/sitemap'],
+  modules: ['@nuxt/content', '@nuxtjs/sitemap', '@nuxt/image'],
   // the public address, used for the sitemap and canonical links; set NUXT_PUBLIC_SITE_URL when the domain changes
   site: { url: process.env.NUXT_PUBLIC_SITE_URL || 'https://ldrin01.github.io/portfolio2026', name: 'Eldrin Bernardino' },
   css: ['~/assets/css/main.css'],

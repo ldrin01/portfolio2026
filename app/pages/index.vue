@@ -18,7 +18,7 @@ const heroReady = ref(false)
 
   <main id="top">
     <section class="hero">
-      <img class="hero-photo" :class="{ gone: heroReady }" :src="`${base}me.webp`" width="970" height="1400" alt="" fetchpriority="high" decoding="async">
+      <img class="hero-photo" :class="{ gone: heroReady }" :src="`${base}me.webp`" :srcset="`${base}me-640.webp 640w, ${base}me.webp 970w`" sizes="(max-width: 1024px) 450px, 650px" width="970" height="1400" alt="" fetchpriority="high" decoding="async">
       <HeroPersonas :role="roleIndex" @ready="heroReady = true" />
       <div class="wrap hero-in">
         <h1 :class="{ ready: loaderDone }">
