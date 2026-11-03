@@ -23,7 +23,8 @@ export default defineNuxtConfig({
         { rel: 'icon', href: `${base}favicon-192.png`, type: 'image/png', sizes: '192x192' },
         { rel: 'icon', href: `${base}favicon.ico`, sizes: '48x48' },
         { rel: 'apple-touch-icon', href: `${base}apple-touch-icon.png` },
-        { rel: 'preload', as: 'image', href: `${base}me.webp`, fetchpriority: 'high' }
+        { rel: 'preload', as: 'image', href: `${base}me-640.webp`, media: '(max-width: 1024px)', fetchpriority: 'high' },
+        { rel: 'preload', as: 'image', href: `${base}me.webp`, media: '(min-width: 1025px)', fetchpriority: 'high' }
       ],
       // without JS the loader would never leave, so hide it
       noscript: [{ innerHTML: '<style>.loader{display:none!important}</style>' }],

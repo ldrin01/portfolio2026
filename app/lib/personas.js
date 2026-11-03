@@ -7,7 +7,7 @@ export const PERSONA_FOR_ROLE = {
   'Digital Storyteller': 'ascii', 'UI/UX Designer': 'windows', 'Visual Strategist': 'cmyk',
 }
 
-export async function createPersonas({ stage, base }) {
+export async function createPersonas({ stage, base, lite = false }) {
 const ART_W = 970, ART_H = 1400
 const ROLES = [{ k: 'depth' }, { k: 'chladni' }, { k: 'pencil' }, { k: 'ascii' }, { k: 'windows' }, { k: 'cmyk' }]
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -18,12 +18,13 @@ let dragging = 0
 
 // ── assets ───────────────────────────────────────────────────────────
 const loadImg = (src) => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = () => rej(new Error('[HeroPersonas] could not load ' + src)); i.src = src })
-const [photo, depthImg, strokes] = await Promise.all([loadImg(`${base}me.webp`), loadImg(`${base}me-depth.png`), fetch(`${base}me-strokes.json`).then((r) => r.json())])
-const pixels = (img) => { const c = document.createElement('canvas'); c.width = ART_W; c.height = ART_H; const x = c.getContext('2d', { willReadFrequently: true }); x.drawImage(img, 0, 0); return x.getImageData(0, 0, ART_W, ART_H).data }
+const SC = lite ? .5 : 1, PW = Math.round(ART_W * SC), PH = Math.round(ART_H * SC) // phones read pixels at half size
+const [photo, depthImg, strokes] = await Promise.all([loadImg(`${base}${lite ? 'me-640.webp' : 'me.webp'}`), loadImg(`${base}${lite ? 'me-depth-640.webp' : 'me-depth.webp'}`), fetch(`${base}me-strokes.json`).then((r) => r.json())])
+const pixels = (img) => { const c = document.createElement('canvas'); c.width = PW; c.height = PH; const x = c.getContext('2d', { willReadFrequently: true }); x.drawImage(img, 0, 0, PW, PH); return x.getImageData(0, 0, PW, PH).data }
 const P = pixels(photo)
 await new Promise((r) => setTimeout(r))
 const D = pixels(depthImg)
-const at = (x, y) => (Math.min(ART_H - 1, Math.max(0, y | 0)) * ART_W + Math.min(ART_W - 1, Math.max(0, x | 0))) * 4
+const at = (x, y) => (Math.min(PH - 1, Math.max(0, (y * SC) | 0)) * PW + Math.min(PW - 1, Math.max(0, (x * SC) | 0))) * 4
 const alphaAt = (x, y) => D[at(x, y) + 3] / 255
 const depthAt = (x, y) => Math.max(0, Math.min(1, (D[at(x, y)] - 40) / 215)) // 0 far .. 1 near
 const lumAt = (x, y) => { const i = at(x, y); return (P[i] * .299 + P[i + 1] * .587 + P[i + 2] * .114) / 255 }
@@ -37,7 +38,7 @@ const grade = (v) => { v = Math.max(0, Math.min(1, v)) * 4; const i = Math.min(3
 const hash = (n) => { n = Math.sin(n * 127.1 + 311.7) * 43758.5453; return n - Math.floor(n) }
 
 const fit = (cv) => {
-  const dpr = Math.min(devicePixelRatio || 1, 2)
+  const dpr = Math.min(devicePixelRatio || 1, lite ? 1.5 : 2)
   const w = Math.round(cv.clientWidth * dpr), h = Math.round(cv.clientHeight * dpr)
   if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; return true }
   return false
@@ -177,7 +178,7 @@ function chladniStyle() {
     return f
   })
 
-  const COUNT = coarse ? 14000 : 26000
+  const COUNT = lite ? 10000 : coarse ? 14000 : 26000
   const gx = new Float32Array(COUNT), gy = new Float32Array(COUNT)
   const scatter = () => { for (let i = 0; i < COUNT; i++) { let u, v; do { u = Math.random(); v = Math.random() } while (!grid(inside, u, v)); gx[i] = u; gy[i] = v } }
   // grain colour from the site's depth palette, lifted toward sand
@@ -634,7 +635,7 @@ const factories = { depth: depthStyle, chladni: chladniStyle, pencil: pencilStyl
 const styles = {}
 const layers = Object.fromEntries([...stage.querySelectorAll('.hp-layer')].map((l) => [l.dataset.k, l]))
 const running = new Map() // style key -> time it stops drawing (after its fade out)
-let current = null, raf = 0, visible = true
+let current = null, raf = 0, visible = true, lastT = 0
 
 function show(k) {
   if (k === current || !factories[k]) return
@@ -652,7 +653,9 @@ function show(k) {
 
 function loop(t) {
   raf = requestAnimationFrame(loop)
-  if (!visible) return
+  if (!visible || document.hidden) return
+  if (lite && t - lastT < 30) return // phones: 30fps
+  lastT = t
   input.mx += (input.tx - input.mx) * .08; input.my += (input.ty - input.my) * .08
   input.sw += (Math.min(scrollY / innerHeight, 1) * .8 - input.sw) * .1
   for (const [k, until] of running) { if (t > until) running.delete(k); else styles[k].frame(t) }

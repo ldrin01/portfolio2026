@@ -7,6 +7,7 @@ const props = defineProps<{ role: number }>() // index into profile.roles; -1 be
 const emit = defineEmits<{ ready: [] }>()
 const root = useTemplateRef<HTMLDivElement>('root')
 const base = useRuntimeConfig().app.baseURL // "/" locally, "/portfolio2026/" on GitHub Pages
+const lite = import.meta.client && window.matchMedia('(max-width: 768px)').matches // phones get the lighter settings
 
 let engine: { show: (k: string) => void, destroy: () => void } | null = null
 let map: Record<string, string> = {}
@@ -19,8 +20,10 @@ onMounted(async () => {
   const el = root.value
   if (!el) return
   try {
+    // let the page paint the photo first, then start the heavy part
+    await new Promise<void>(r => (window.requestIdleCallback ? requestIdleCallback(() => r(), { timeout: 1500 }) : setTimeout(r, 300)))
     const mod = await import('~/lib/personas.js')
-    const e = await mod.createPersonas({ stage: el, base })
+    const e = await mod.createPersonas({ stage: el, base, lite })
     if (!alive) { e.destroy(); return }
     engine = e; map = mod.PERSONA_FOR_ROLE
     apply()
@@ -31,7 +34,7 @@ watch(() => props.role, apply)
 </script>
 
 <template>
-  <div ref="root" class="hero-personas" :style="{ '--photo': `url(${base}me.webp)` }" aria-hidden="true">
+  <div ref="root" class="hero-personas" :style="{ '--photo': `url(${base}${lite ? 'me-640.webp' : 'me.webp'})` }" aria-hidden="true">
     <div class="hp-layer" data-k="depth"><canvas id="cDepth" /></div>
     <div class="hp-layer" data-k="chladni"><div id="hpPlate" class="hp-plate"><canvas id="cSand" /></div></div>
     <div class="hp-layer" data-k="pencil"><canvas id="cPencil" class="free" /></div>
