@@ -12,6 +12,7 @@ useHead({
 const roleIndex = ref(-1) // which rotating word is showing; the hero portrait follows it
 const base = useRuntimeConfig().app.baseURL
 const heroReady = ref(false)
+useHead({ link: [{ rel: 'preload', as: 'image', href: `${base}me-640.webp`, media: '(max-width: 1024px)', fetchpriority: 'high' }] })
 </script>
 
 <template>
@@ -31,17 +32,17 @@ const heroReady = ref(false)
       </div>
     </section>
 
-    <AboutIntro />
-
-    <FolderStack />
-
-    <Keyboard />
-
-    <Timeline />
-
-    <Toolkit />
-
-    <Process />
+    <LazyAboutIntro hydrate-on-visible />
+    
+    <LazyFolderStack hydrate-on-visible />
+    
+    <LazyKeyboard hydrate-on-visible />
+    
+    <LazyTimeline hydrate-on-visible />
+    
+    <LazyToolkit hydrate-on-visible />
+    
+    <LazyProcess hydrate-on-visible />
 
     <section id="contact" class="contact">
       <div class="wrap contact-in">
