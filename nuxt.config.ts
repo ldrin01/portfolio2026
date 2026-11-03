@@ -24,7 +24,8 @@ export default defineNuxtConfig({
         { rel: 'icon', href: `${base}favicon.ico`, sizes: '48x48' },
         { rel: 'apple-touch-icon', href: `${base}apple-touch-icon.png` },
         { rel: 'preload', as: 'image', href: `${base}me-640.webp`, media: '(max-width: 1024px)', fetchpriority: 'high' },
-        { rel: 'preload', as: 'image', href: `${base}me.webp`, media: '(min-width: 1025px)', fetchpriority: 'high' }
+        { rel: 'preload', as: 'image', href: `${base}me.webp`, media: '(min-width: 1025px)', fetchpriority: 'high' },
+        { rel: 'preload', as: 'image', href: `${base}me-depth-640.webp`, fetchpriority: 'low' }
       ],
       // without JS the loader would never leave, so hide it
       noscript: [{ innerHTML: '<style>.loader{display:none!important}</style>' }],
@@ -33,7 +34,7 @@ export default defineNuxtConfig({
         { innerHTML: "try{var t=localStorage.getItem('theme');if(t!=='light'&&t!=='dark')t='light';document.documentElement.dataset.theme=t}catch(e){document.documentElement.dataset.theme='light'}" },
         // a refresh always starts at the top: no restored scroll position, no jump to a #section
         { innerHTML: "if('scrollRestoration' in history)history.scrollRestoration='manual';if(location.hash)history.replaceState(null,'',location.pathname+location.search);window.scrollTo(0,0);addEventListener('load',function(){window.scrollTo(0,0)})" },
-        { src: 'https://static.cloudflareinsights.com/beacon.min.js', type: 'module', defer: true, tagPosition: 'bodyClose', 'data-cf-beacon': '{"token": "7d6fc3bffde04499b51011b2dd4122d6"}' }
+        { src: 'https://cloud.umami.is/script.js', defer: true, tagPosition: 'bodyClose', 'data-website-id': '8e124200-42de-4c3e-aa11-f53dcb96f5cb' }
       ]
     }
   }
