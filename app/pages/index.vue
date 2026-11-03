@@ -34,7 +34,7 @@ useHead({ link: [{ rel: 'preload', as: 'image', href: `${base}me-640.webp`, medi
 
     <LazyAboutIntro hydrate-on-visible />
     
-    <LazyFolderStack hydrate-on-visible />
+    <FolderStack />
     
     <LazyKeyboard hydrate-on-visible />
     

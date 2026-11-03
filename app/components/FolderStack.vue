@@ -167,7 +167,7 @@ onMounted(() => {
               </span>
               <span v-if="p.snippet" class="snippet">{{ p.snippet }}</span>
               <!-- a photo print lying on the paper, low enough that the paper in front hides it; hovering the paper slides it up into view -->
-              <span v-if="p.photo" class="photo" aria-hidden="true"><img :src="p.photo" alt="" loading="lazy" width="1600" height="900"></span>
+              <span v-if="p.photo" class="photo" aria-hidden="true"><img :src="open ? p.photo.replace('.webp', '-480.webp') : undefined" alt="" loading="lazy" width="1600" height="900"></span>
             </NuxtLink>
             <button type="button" class="cover front" :aria-expanded="open" @click="open = !open">
               <span class="shape">
