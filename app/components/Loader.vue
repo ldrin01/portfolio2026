@@ -4,33 +4,20 @@ const LINES = ['DRIN', 'WORKS'] // one line on wide screens, two stacked lines o
 const PHONE = '(max-width: 600px)'
 const STACK_LINE_HEIGHT = 0.8225 // leading for the stacked lines (keep in sync with .word.stack in the CSS)
 
-// Timeline: enter 0.5s, hold 0.1s, exit 0.6s.
+// Timeline: enter 0.5s, hold 0.15s, exit 0.55s (1.2s total).
 const DURATION = 1200
 const ENTER_END = 500 / DURATION
-const EXIT_START = 600 / DURATION
-const IN = [0.4, 0, 0.2, 1] as const // ease in-out for the entry; the exit uses the mirror
-const OUT = [0.8, 0, 0.6, 1] as const
-const THICKEN_FROM = 0.1 // word center height (0 = bottom edge, 1 = top edge) where the weight starts rising
-const SAMPLES = 60
+const EXIT_START = 650 / DURATION
+const IN = [0.4, 0, 0.2, 1] as const // ease in-out for the entry
+const OUT = [0.8, 0, 0.6, 1] as const // ease for the exit
+const TRAVEL = 1 // slide distance above/below center, in word heights (try 0.7 to 1.5)
 
 const word = ref<HTMLElement | null>(null)
 const loaderDone = useState('loaderDone', () => false) // tells the hero when to start
+const heroReady = useState('heroPersonaReady', () => false) // set by HeroPersonas once its first style is on screen
 const stack = ref(false)
 const fading = ref(false)
 const done = ref(false)
-
-const bez = (t: number, a: number, b: number) => 3 * (1 - t) ** 2 * t * a + 3 * (1 - t) * t * t * b + t ** 3
-
-// Eased progress (0..1) of the slide at a given fraction (0..1) of the entry time.
-function slideProgress(u: number) {
-  let lo = 0, hi = 1
-  for (let i = 0; i < 40; i++) {
-    const m = (lo + hi) / 2
-    if (bez(m, IN[0], IN[2]) < u) lo = m
-    else hi = m
-  }
-  return bez((lo + hi) / 2, IN[1], IN[3])
-}
 
 const finish = () => {
   done.value = true
@@ -59,7 +46,6 @@ onMounted(async () => {
     return w
   }
   const vw = window.innerWidth
-  const vh = window.innerHeight
   const avail = vw - Math.max(16, vw * 0.02) * 2
 
   // Fit to the full width at the boldest weight: one line (DRINWORKS), or on phones each of
@@ -77,31 +63,26 @@ onMounted(async () => {
     blockH = fs
   }
 
-  // Start just off-screen, travel to center, leave just off the top.
-  const off = vh / 2 + blockH / 2 + 4
+  // Rises from just below center and leaves just above it:
+  // thin and transparent at the ends, thick and opaque at center.
+  const off = blockH * TRAVEL
   const ease = (b: readonly number[]) => `cubic-bezier(${b.join(',')})`
 
-  const opts = { duration: DURATION, fill: 'forwards' as const }
-  el.animate([
-    { transform: `translateY(${off}px)`, offset: 0, easing: ease(IN) },
-    { transform: 'translateY(0)', offset: ENTER_END },
-    { transform: 'translateY(0)', offset: EXIT_START, easing: ease(OUT) },
-    { transform: `translateY(${-off}px)`, offset: 1 }
-  ], opts)
+  const anim = el.animate([
+    { transform: `translateY(${off}px)`, opacity: 0, fontWeight: 300, offset: 0, easing: ease(IN) },
+    { transform: 'translateY(0)', opacity: 1, fontWeight: 800, offset: ENTER_END },
+    { transform: 'translateY(0)', opacity: 1, fontWeight: 800, offset: EXIT_START, easing: ease(OUT) },
+    { transform: `translateY(${-off}px)`, opacity: 0, fontWeight: 300, offset: 1 }
+  ], { duration: DURATION, fill: 'forwards' })
 
-  // Weight rises evenly with the word's height on screen, from THICKEN_FROM up to center.
-  const weightAt = (u: number) => {
-    const height = 0.5 - (off * (1 - slideProgress(u))) / vh // word center, 0 = bottom edge
-    return 300 + 500 * Math.min(1, Math.max(0, (height - THICKEN_FROM) / (0.5 - THICKEN_FROM)))
+  await anim.finished
+  // hold the exit until the hero portrait is on screen, so nothing pops in afterwards (waits 2s at most)
+  if (!heroReady.value) {
+    await new Promise<void>((resolve) => {
+      const stop = watch(heroReady, (v) => { if (v) { stop(); resolve() } })
+      setTimeout(() => { stop(); resolve() }, 2000)
+    })
   }
-  const enter = Array.from({ length: SAMPLES + 1 }, (_, i) => ({ fontWeight: weightAt(i / SAMPLES), offset: (i / SAMPLES) * ENTER_END }))
-  const exit = Array.from({ length: SAMPLES + 1 }, (_, i) => {
-    const u = (SAMPLES - i) / SAMPLES // exit mirrors the entry
-    return { fontWeight: weightAt(u), offset: EXIT_START + (1 - u) * (1 - EXIT_START) }
-  })
-  const weight = el.animate([...enter, ...exit], opts)
-
-  await weight.finished
   fading.value = true
   setTimeout(finish, 250)
 })
@@ -129,8 +110,8 @@ onMounted(async () => {
   font-size: 13vw;
   color: var(--fg);
   font-weight: 300;
-  transform: translateY(110vh);
-  will-change: transform;
+  opacity: 0;
+  will-change: transform, opacity;
 }
 /* phones: DRIN over WORKS, centered, each line fitted to the width in script */
 .word.stack { flex-direction: column; align-items: center; line-height: 0.8225; }

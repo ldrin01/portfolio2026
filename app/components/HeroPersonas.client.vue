@@ -1,37 +1,59 @@
-<script setup lang="ts">
-// Hero portrait with one art style per role. It switches the moment the headline's rotating word changes,
-// so the word sets the pace. The styles themselves live in ~/lib/personas.js.
-const { profile } = useSite()
+  <script setup lang="ts">
+  // Hero portrait with one art style per role. It switches the moment the headline's rotating word changes,
+  // so the word sets the pace. The styles themselves live in ~/lib/personas.js.
+  const { profile } = useSite()
 
-const props = defineProps<{ role: number }>() // index into profile.roles; -1 before the first word shows
-const emit = defineEmits<{ ready: [] }>()
-const root = useTemplateRef<HTMLDivElement>('root')
-const base = useRuntimeConfig().app.baseURL // "/" locally, "/portfolio2026/" on GitHub Pages
-const lite = import.meta.client && window.matchMedia('(max-width: 768px)').matches // phones get the lighter settings
+  const props = defineProps<{ role: number }>() // index into profile.roles; -1 before the first word shows
+  const emit = defineEmits<{ ready: [] }>()
+  const root = useTemplateRef<HTMLDivElement>('root')
+  const base = useRuntimeConfig().app.baseURL // "/" locally, "/portfolio2026/" on GitHub Pages
+  const lite = import.meta.client && window.matchMedia('(max-width: 768px)').matches // phones get the lighter settings
+  const heroReady = useState('heroPersonaReady', () => false) // the loader waits for this before it leaves
 
-let engine: { show: (k: string) => void, destroy: () => void } | null = null
-let map: Record<string, string> = {}
-let alive = true
-const apply = () => { const k = map[profile.roles[props.role] ?? '']; if (engine && k) engine.show(k) }
+  let engine: { show: (k: string) => void, destroy: () => void } | null = null
+  let map: Record<string, string> = {}
+  let alive = true
+  let current = ''
+  const HERO_DELAY = 800 // ms to wait before the first persona shows, tune this (600 to 1000)
+  let shown = false
+  let pending = false
+  const apply = () => {
+    // before the first word shows (role -1) use the first role
+    const k = map[profile.roles[props.role >= 0 ? props.role : 0] ?? '']
+    if (!engine || !k) return
+    if (k !== current) {
+      current = k
+      if (shown) engine.show(k)
+      else if (!pending) {
+        // first show waits, so the last windows animate after the loader is gone
+        pending = true
+        setTimeout(() => {
+          pending = false
+          shown = true
+          if (alive && engine) engine.show(current)
+        }, HERO_DELAY)
+      }
+    }
+    // stays immediate so the loader is not held
+    if (!heroReady.value) { heroReady.value = true; emit('ready') }
+  }
 
-onBeforeUnmount(() => { alive = false; engine?.destroy() })
-onMounted(async () => {
-  await nextTick()
-  const el = root.value
-  if (!el) return
-  try {
-    // let the page paint the photo first, then start the heavy part
-    await new Promise<void>(r => (window.requestIdleCallback ? requestIdleCallback(() => r(), { timeout: 1500 }) : setTimeout(r, 300)))
-    const mod = await import('~/lib/personas.js')
-    const e = await mod.createPersonas({ stage: el, base, lite })
-    if (!alive) { e.destroy(); return }
-    engine = e; map = mod.PERSONA_FOR_ROLE
-    apply()
-    emit('ready')
-  } catch (err) { console.error('[HeroPersonas]', err) }
-})
-watch(() => props.role, apply)
-</script>
+  onBeforeUnmount(() => { alive = false; engine?.destroy() })
+  onMounted(async () => {
+    await nextTick()
+    const el = root.value
+    if (!el) return
+    try {
+      // start right away: the loader is covering the hero while this builds
+      const mod = await import('~/lib/personas.js')
+      const e = await mod.createPersonas({ stage: el, base, lite })
+      if (!alive) { e.destroy(); return }
+      engine = e; map = mod.PERSONA_FOR_ROLE
+      apply()
+    } catch (err) { console.error('[HeroPersonas]', err) }
+  })
+  watch(() => props.role, apply)
+  </script>
 
 <template>
   <div ref="root" class="hero-personas" :style="{ '--photo': `url(${base}${lite ? 'me-640.webp' : 'me.webp'})` }" aria-hidden="true">

@@ -26,8 +26,8 @@ export default defineNuxtConfig({
         { rel: 'apple-touch-icon', href: `${base}apple-touch-icon.png` },
         { rel: 'preload', as: 'image', href: `${base}me-640.webp`, media: '(max-width: 1024px)', fetchpriority: 'high' },
         { rel: 'preload', as: 'image', href: `${base}me.webp`, media: '(min-width: 1025px)', fetchpriority: 'high' },
-        { rel: 'preload', as: 'image', href: `${base}me-depth-640.webp`, fetchpriority: 'low' },
-          { rel: 'preload', as: 'font', type: 'font/woff2', href: `${base}_nuxt/funnel-display-latin-wght-normal.h7i3A3FI.woff2`, crossorigin: 'anonymous' }
+        { rel: 'preload', as: 'image', href: `${base}me-depth-640.webp` },
+        { rel: 'preload', as: 'font', type: 'font/woff2', href: `${base}_nuxt/funnel-display-latin-wght-normal.h7i3A3FI.woff2`, crossorigin: 'anonymous' }
       ],
       // without JS the loader would never leave, so hide it
       noscript: [{ innerHTML: '<style>.loader{display:none!important}</style>' }],
