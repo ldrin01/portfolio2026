@@ -4,10 +4,10 @@ const LINES = ['DRIN', 'WORKS'] // one line on wide screens, two stacked lines o
 const PHONE = '(max-width: 600px)'
 const STACK_LINE_HEIGHT = 0.8225 // leading for the stacked lines (keep in sync with .word.stack in the CSS)
 
-// Timeline: enter 1.2s, hold 0.4s, exit 1.2s.
-const DURATION = 1500
-const ENTER_END = 700 / DURATION
-const EXIT_START = 800 / DURATION
+// Timeline: enter 0.5s, hold 0.1s, exit 0.6s.
+const DURATION = 1200
+const ENTER_END = 500 / DURATION
+const EXIT_START = 600 / DURATION
 const IN = [0.4, 0, 0.2, 1] as const // ease in-out for the entry; the exit uses the mirror
 const OUT = [0.8, 0, 0.6, 1] as const
 const THICKEN_FROM = 0.1 // word center height (0 = bottom edge, 1 = top edge) where the weight starts rising
@@ -34,6 +34,7 @@ function slideProgress(u: number) {
 
 const finish = () => {
   done.value = true
+  loaderDone.value = true
   document.documentElement.style.overflow = ''
 }
 
@@ -102,7 +103,6 @@ onMounted(async () => {
 
   await weight.finished
   fading.value = true
-  loaderDone.value = true
   setTimeout(finish, 250)
 })
 </script>

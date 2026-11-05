@@ -4,6 +4,7 @@ const base = process.env.NUXT_APP_BASE_URL || '/'
 
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
+  features: { inlineStyles: true },
   devtools: { enabled: true },
   modules: ['@nuxt/content', '@nuxtjs/sitemap', '@nuxt/image'],
   // the public address, used for the sitemap and canonical links; set NUXT_PUBLIC_SITE_URL when the domain changes
@@ -25,7 +26,8 @@ export default defineNuxtConfig({
         { rel: 'apple-touch-icon', href: `${base}apple-touch-icon.png` },
         { rel: 'preload', as: 'image', href: `${base}me-640.webp`, media: '(max-width: 1024px)', fetchpriority: 'high' },
         { rel: 'preload', as: 'image', href: `${base}me.webp`, media: '(min-width: 1025px)', fetchpriority: 'high' },
-        { rel: 'preload', as: 'image', href: `${base}me-depth-640.webp`, fetchpriority: 'low' }
+        { rel: 'preload', as: 'image', href: `${base}me-depth-640.webp`, fetchpriority: 'low' },
+          { rel: 'preload', as: 'font', type: 'font/woff2', href: `${base}_nuxt/funnel-display-latin-wght-normal.h7i3A3FI.woff2`, crossorigin: 'anonymous' }
       ],
       // without JS the loader would never leave, so hide it
       noscript: [{ innerHTML: '<style>.loader{display:none!important}</style>' }],
