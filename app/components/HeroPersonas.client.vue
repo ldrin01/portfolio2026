@@ -14,9 +14,11 @@
   let map: Record<string, string> = {}
   let alive = true
   let current = ''
-  const HERO_DELAY = 800 // ms to wait before the first persona shows, tune this (600 to 1000)
+  const HERO_DELAY = lite ? 300 : 800 // phones start the persona sooner for a better score
+  const loaderDone = useState('loaderDone', () => false)
   let shown = false
   let pending = false
+  let announced = false
   const apply = () => {
     // before the first word shows (role -1) use the first role
     const k = map[profile.roles[props.role >= 0 ? props.role : 0] ?? '']
@@ -25,17 +27,18 @@
       current = k
       if (shown) engine.show(k)
       else if (!pending) {
-        // first show waits, so the last windows animate after the loader is gone
+        // delay only on the first site load, never when coming back to home
         pending = true
         setTimeout(() => {
           pending = false
           shown = true
           if (alive && engine) engine.show(current)
-        }, HERO_DELAY)
+        }, loaderDone.value ? 0 : HERO_DELAY)
       }
     }
-    // stays immediate so the loader is not held
-    if (!heroReady.value) { heroReady.value = true; emit('ready') }
+    // emit on every mount so the home page always hides the static photo
+    if (!announced) { announced = true; emit('ready') }
+    if (!heroReady.value) heroReady.value = true
   }
 
   onBeforeUnmount(() => { alive = false; engine?.destroy() })

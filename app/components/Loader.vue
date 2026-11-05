@@ -4,10 +4,13 @@ const LINES = ['DRIN', 'WORKS'] // one line on wide screens, two stacked lines o
 const PHONE = '(max-width: 600px)'
 const STACK_LINE_HEIGHT = 0.8225 // leading for the stacked lines (keep in sync with .word.stack in the CSS)
 
-// Timeline: enter 0.5s, hold 0.15s, exit 0.55s (1.2s total).
-const DURATION = 1200
-const ENTER_END = 500 / DURATION
-const EXIT_START = 650 / DURATION
+// Timeline: desktop 1.2s, mobile 0.8s (faster so the hero shows sooner).
+const MOBILE = import.meta.client && window.matchMedia('(max-width: 768px)').matches
+const ENTER_MS = MOBILE ? 330 : 500
+const HOLD_MS = MOBILE ? 100 : 150
+const DURATION = MOBILE ? 800 : 1200
+const ENTER_END = ENTER_MS / DURATION
+const EXIT_START = (ENTER_MS + HOLD_MS) / DURATION
 const IN = [0.4, 0, 0.2, 1] as const // ease in-out for the entry
 const OUT = [0.8, 0, 0.6, 1] as const // ease for the exit
 const TRAVEL = 1 // slide distance above/below center, in word heights (try 0.7 to 1.5)

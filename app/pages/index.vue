@@ -11,7 +11,7 @@ useHead({
 })
 const roleIndex = ref(-1) // which rotating word is showing; the hero portrait follows it
 const base = useRuntimeConfig().app.baseURL
-const heroReady = ref(false)
+const heroReady = ref(loaderDone.value) // on a revisit the loader is already done, so the static photo starts hidden
 </script>
 
 <template>
