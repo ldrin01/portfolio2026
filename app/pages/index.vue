@@ -12,7 +12,6 @@ useHead({
 const roleIndex = ref(-1) // which rotating word is showing; the hero portrait follows it
 const base = useRuntimeConfig().app.baseURL
 const heroReady = ref(false)
-useHead({ link: [{ rel: 'preload', as: 'image', href: `${base}me-640.webp`, media: '(max-width: 1024px)', fetchpriority: 'high' }] })
 </script>
 
 <template>
@@ -23,7 +22,7 @@ useHead({ link: [{ rel: 'preload', as: 'image', href: `${base}me-640.webp`, medi
         <source media="(max-width: 1024px)" :srcset="`${base}me-640.webp`">
         <img class="hero-photo" :class="{ gone: heroReady }" :src="`${base}me.webp`" width="970" height="1400" alt="" fetchpriority="high" decoding="async">
       </picture>
-      <HeroPersonas :role="roleIndex" @ready="heroReady = true" />
+          <HeroPersonas :role="roleIndex" @ready="heroReady = true" />
       <div class="wrap hero-in">
         <h1 :class="{ ready: loaderDone }">
           <span class="line" v-lag="0"><span class="line-in">I am {{ profile.name }}</span></span>

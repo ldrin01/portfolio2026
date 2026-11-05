@@ -5,9 +5,9 @@ const PHONE = '(max-width: 600px)'
 const STACK_LINE_HEIGHT = 0.8225 // leading for the stacked lines (keep in sync with .word.stack in the CSS)
 
 // Timeline: enter 1.2s, hold 0.4s, exit 1.2s.
-const DURATION = 2800
-const ENTER_END = 1200 / DURATION
-const EXIT_START = 1600 / DURATION
+const DURATION = 1500
+const ENTER_END = 700 / DURATION
+const EXIT_START = 800 / DURATION
 const IN = [0.4, 0, 0.2, 1] as const // ease in-out for the entry; the exit uses the mirror
 const OUT = [0.8, 0, 0.6, 1] as const
 const THICKEN_FROM = 0.1 // word center height (0 = bottom edge, 1 = top edge) where the weight starts rising
@@ -34,7 +34,6 @@ function slideProgress(u: number) {
 
 const finish = () => {
   done.value = true
-  loaderDone.value = true
   document.documentElement.style.overflow = ''
 }
 
@@ -103,7 +102,8 @@ onMounted(async () => {
 
   await weight.finished
   fading.value = true
-  setTimeout(finish, 450)
+  loaderDone.value = true
+  setTimeout(finish, 250)
 })
 </script>
 
@@ -118,7 +118,7 @@ onMounted(async () => {
   position: fixed; inset: 0; z-index: 1000; overflow: hidden;
   display: grid; place-items: center;
   background: var(--bg);
-  transition: opacity .4s ease;
+  transition: opacity .25s ease;
   /* failsafe: never stay on screen if JS or the font fails */
   animation: failsafe 0s 8s forwards;
 }
