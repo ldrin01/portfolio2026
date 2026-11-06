@@ -12,6 +12,13 @@ useHead({
 const roleIndex = ref(-1) // which rotating word is showing; the hero portrait follows it
 const base = useRuntimeConfig().app.baseURL
 const heroReady = ref(loaderDone.value) // on a revisit the loader is already done, so the static photo starts hidden
+useHead({
+  link: [
+    { rel: 'preload', as: 'image', href: `${base}me-640.webp`, media: '(max-width: 1024px)', fetchpriority: 'high' },
+    { rel: 'preload', as: 'image', href: `${base}me.webp`, media: '(min-width: 1025px)', fetchpriority: 'high' },
+    { rel: 'preload', as: 'image', href: `${base}me-depth-640.webp` },
+  ],
+})
 </script>
 
 <template>
