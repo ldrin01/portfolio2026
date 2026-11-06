@@ -6,12 +6,25 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   features: { inlineStyles: true },
   devtools: { enabled: true },
-  modules: ['@nuxt/content', '@nuxtjs/sitemap', '@nuxt/image'],
+  modules: ['@nuxt/ui', '@nuxt/content', '@nuxtjs/sitemap', '@nuxt/image', '@nuxtjs/robots'],
   // the public address, used for the sitemap and canonical links; set NUXT_PUBLIC_SITE_URL when the domain changes
-  site: { url: process.env.NUXT_PUBLIC_SITE_URL || 'https://ldrin01.github.io/portfolio2026', name: 'Eldrin Bernardino' },
+    // Used by the sitemap and robots modules for absolute URLs
+  site: {
+    url: 'https://drin.works',
+    name: 'Eldrin Bernardino',
+    defaultLocale: 'en',
+  },
   css: ['~/assets/css/main.css'],
-  nitro: { preset: 'github_pages' },
+  nitro: { 
+    prerender: {
+      crawlLinks: true,
+      routes: ['/', '/about', '/contact', '/case-studies', '/legal'],
+    },
+    preset: 'github_pages'
+  },
   app: {
+    // Custom domain is served from the root, so no /portfolio2026/ prefix
+    baseURL: '/',
     head: {
       htmlAttrs: { lang: 'en' },
       meta: [

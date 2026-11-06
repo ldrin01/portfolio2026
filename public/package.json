@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@nuxtjs/robots": "^7.0.2"
+  }
+}
