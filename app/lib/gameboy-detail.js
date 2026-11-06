@@ -10,6 +10,8 @@ export async function mountGameboyDetail(host, opts = {}) {
     import('three'), import('three/examples/jsm/controls/OrbitControls.js'), import('three/examples/jsm/environments/RoomEnvironment.js')
   ])
   const LAB = opts.base || '/lab/'
+  const wearP = window.GBWear ? Promise.resolve() : new Promise((ok, fail) => { const s = document.createElement('script'); s.src = LAB + 'gameboy-wear.js'; s.onload = ok; s.onerror = fail; document.head.appendChild(s) })
+  wearP.catch(() => {})
 
   // laid out in photo pixels (1166 x 2000) and scaled to world units; the front art uses the Front photo's own 1049 x 1800
   const PW = 1166, PH = 2000, S = 1 / 1000, KX = PW / 1049, KY = PH / 1800
@@ -22,7 +24,11 @@ export async function mountGameboyDetail(host, opts = {}) {
 
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
   renderer.setPixelRatio(Math.min(devicePixelRatio, 2))
-  host.appendChild(renderer.domElement)
+  const cv0 = renderer.domElement
+  cv0.style.cssText = 'opacity:0;transition:opacity .45s ease'   // hidden until the theme look is applied, so the wrong colours never show
+  const reveal = () => requestAnimationFrame(() => { cv0.style.opacity = '1' })
+  const tick = () => new Promise(r => setTimeout(r, 0))            // gives the browser a turn between heavy steps
+  host.appendChild(cv0)
   const scene = new THREE.Scene()
   const camera = new THREE.PerspectiveCamera(26, 1 / 1.25, 0.1, 50)
   camera.position.fromArray(opts.cam || [1.8, 0.8, 4.65])
@@ -153,6 +159,7 @@ export async function mountGameboyDetail(host, opts = {}) {
     plates.front = plate(bt / S, FRONT + 0.0004, relief(BW, BH, 1, 0.5, paint, 3.2, { roughness: 0.66 }), false); plates.frontPaint = paint
   }
 
+  await tick()
   // the screen bezel: a grey plate with the big round corner at the bottom right, standing BEZEL_H above the face, with the screen window cut through it
   {
     const bezel = new THREE.Shape(), bx0 = 88, bx1 = 960, by0 = 178, by1 = 845, r = 26, R = 118
@@ -181,6 +188,7 @@ export async function mountGameboyDetail(host, opts = {}) {
     abMeshes.led.scale.z = 0.4; abMeshes.led.position.set(wx(152), wy(432), FRONT + BEZEL_H + 0.0026); gb.add(abMeshes.led)
   }
 
+  await tick()
   // ── the back: grip grooves, the battery door with its screws and finger ridges, and the cartridge slot ──
   // painted as fractions of the body as you LOOK AT THE BACK (fx from the left of that view, fy from the top)
   const CART = { w: 0.7277, h: 0.7277 * 1187 / 1034 }
@@ -234,6 +242,7 @@ export async function mountGameboyDetail(host, opts = {}) {
     new THREE.TextureLoader().load(LAB + 'gameboy-cart.webp', t => { t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; cartMats.day = keep(t); if (!cartMats.old) { faceMat.map = t; faceMat.needsUpdate = true } })
   }
 
+  await tick()
   // ── the sides: a flat plate on each wall, painted with its pockets, openings and the grip ridges, with relief ──
   const SK = 1400                                         // plate canvas px per world unit
   const ZH = 0.13, SY0 = -0.7, SY1 = 0.76                 // each plate spans z -ZH..ZH and y SY0..SY1
@@ -304,6 +313,7 @@ export async function mountGameboyDetail(host, opts = {}) {
     const cw = wheel(X(24), -1, 0.376, 0.0755, 0.13, 0.03); wheels.contrast = cw
   }
 
+  await tick()
   // ── the parts you press ──
   const BASE = FRONT - 0.012                                               // the buttons start just under the face and stand up through the printing
   {
@@ -357,6 +367,7 @@ export async function mountGameboyDetail(host, opts = {}) {
     Object.assign(power, { knob, offX: xa + 0.003 + kw / 2, onX: xb - 0.003 - kw / 2, hits: [hit, label] })
   }
 
+  await tick()
   // ── controls: drag to turn; a slow sway shows the shape until you touch it ──
   const controls = new OrbitControls(camera, renderer.domElement)
   controls.enableZoom = false; controls.enablePan = false; controls.enableDamping = true
@@ -375,7 +386,6 @@ export async function mountGameboyDetail(host, opts = {}) {
     if (!touched && !still) gb.rotation.y = Math.sin(t / 1900) * 0.3
     controls.update(); renderer.render(scene, camera)
   }
-  renderer.setAnimationLoop(loop)
 
   // ── the screen: the About page's pixel game on the LCD, and A / B you can click ──
   try {
@@ -463,7 +473,7 @@ export async function mountGameboyDetail(host, opts = {}) {
   //    a PH flag sticker, worn buttons, lint, and "Eldrin ♥ Elis" scratched into the back ──
   let unwatch = () => {}
   try {
-    if (!window.GBWear) await new Promise((ok, fail) => { const s = document.createElement('script'); s.src = LAB + 'gameboy-wear.js'; s.onload = ok; s.onerror = fail; document.head.appendChild(s) })
+    await wearP
     const W = window.GBWear
     const solid = new Map(), tinted = new Map()        // plain beige materials (with their old colour), and textured ones (with their texture's beige)
     gb.traverse(o => [].concat(o.material || []).forEach(m => {
@@ -496,6 +506,7 @@ export async function mountGameboyDetail(host, opts = {}) {
     // the new one's back: the Figma sticker
     const newBack = plate(bb / S, -FRONT - 0.0008, sheetMat(layer(canvas(BW, BH), g => W.figma(g, bm))), true)
 
+    await tick()
     // ── the old one's front and back plates, repainted: the broken corner and its cracks, the print rubbed off, the open battery
     //    "Eldrin ♥ Elis" scratched in. Painted with relief like the new ones, and swapped in by the theme ──
     const oldFrontMat = relief(BW, BH, 1, 0.5, (g, mode, s) => {
@@ -512,6 +523,7 @@ export async function mountGameboyDetail(host, opts = {}) {
     const newMats = { front: plates.front.material }
     const dark = []                                   // the meshes only the old one has
 
+    await tick()
     // ── the battery door is gone: a real hole through the back plate and shell, a dark well behind it, four orange KINGEVER AAs
     //    (low-poly, the label unrolled from a photo of the real ones), springs and contacts, rust on one end, the broken latch stub ──
     const BX = f => 0.559 - f * 1.118, BY = f => 0.966 - f * 1.924
@@ -560,6 +572,7 @@ export async function mountGameboyDetail(host, opts = {}) {
       gb.add(well); dark.push(well)
     }
 
+    await tick()
     // the melted spot on the top edge by the cartridge slot: a glossy, darker, bubbled patch with relief so the light catches it
     {
       const w = 0.12, d = 0.12
@@ -593,6 +606,7 @@ export async function mountGameboyDetail(host, opts = {}) {
       m.rotation.set(0, -Math.PI / 2, -0.12); m.position.set(X(24) - 0.0008, wy(1205), 0)   // wy(1205): the D-pad's height; z 0: the parting line
       m.visible = W.worn(); gb.add(m); dark.push(m)
     })
+    await tick()
     // the buttons worn by thumbs: A and B polished and faded in the middle, the D-pad's ridges worn down and shinier, Select and Start
     // rubbed lighter in the centre
     const bw = W.buttonWear(), tx = (c, srgb = true) => { const t = keep(new THREE.CanvasTexture(c)); if (srgb) t.colorSpace = THREE.SRGBColorSpace; return t }
@@ -626,6 +640,10 @@ export async function mountGameboyDetail(host, opts = {}) {
     }
     apply(W.worn()); unwatch = W.watch(apply)
   } catch (e) { console.warn('wear not loaded', e) }
+
+  for (const t of textures) { if (t.image) { renderer.initTexture(t); await tick() } }   // upload textures one per turn, not all on the first frame
+  renderer.setAnimationLoop(loop)
+  reveal()
 
   return {
     pause() { renderer.setAnimationLoop(null); lastT = 0 },

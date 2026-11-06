@@ -8,6 +8,12 @@ const active = ref(false)
 const base = useRuntimeConfig().app.baseURL
 onMounted(() => {
   let model: { pause(): void; resume(): void; dispose(): void } | undefined, gone = false
+  const warm = () => {   // fetch the code and assets early, build later
+    import('three'); import('~/lib/gameboy-detail.js')
+    ;['gameboy-wear.js', 'gameboy-game.js', 'gameboy-cart.webp', 'gameboy-cart-zombie.webp', 'gameboy-sticker-cats.webp'].forEach(f => fetch(`${base}lab/${f}`).catch(() => {}))
+  }
+  if ('requestIdleCallback' in window) window.requestIdleCallback(warm, { timeout: 2000 })
+  else setTimeout(warm, 1200)
   const seen = new IntersectionObserver(([e]) => { if (!model) return; e?.isIntersecting ? model.resume() : model.pause() })
   const near = new IntersectionObserver(async ([e]) => {
     if (!e?.isIntersecting || model) return
@@ -17,7 +23,7 @@ onMounted(() => {
     if (gone) { m.dispose(); return }
     model = m
     seen.observe(host.value!)
-  }, { rootMargin: '600px' })
+  }, { rootMargin: '1500px' })
   near.observe(host.value!)
   onBeforeUnmount(() => { gone = true; near.disconnect(); seen.disconnect(); model?.dispose() })
 })
