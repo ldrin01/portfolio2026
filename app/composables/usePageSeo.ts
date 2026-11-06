@@ -1,7 +1,10 @@
 // Title, description and share card for a page, from content/seo.json (edited under SEO in the local editor).
 // Share images need a full address (https://…), so the site URL is put in front of the picture's path.
 export function shareImageUrl(path: string) {
-  return /^https?:/.test(path) ? path : useSiteConfig().url.replace(/\/$/, '') + path
+  const siteUrl = 'https://ldrin01.github.io/portfolio2026'
+  return /^https?:/.test(path)
+    ? path
+    : siteUrl.replace(/\/$/, '') + path
 }
 
 // Site-wide defaults, set once in app.vue; each page overrides what it has.
