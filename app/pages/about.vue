@@ -1,122 +1,155 @@
 <script setup lang="ts">
-// "More About Me": the longer story, told to the reader in order. A lenticular photo card, the day job (an ID card
-// and the talk's photos in a moving strip), the making that came before (the first tools' logos inside big lines of
-// text, family, writing, a wall of run and ride routes), the kid with the family computer (the encyclopedia's logo,
-// a working paint program, the 3D handheld from the lab, Mayon as a miniature, paintings and sketches in strips going other ways), a
-// photo falling onto a table for the personal part, and what's next as reactive type.
+// "More About Me": the longer story, told to the reader in order, in 12 frames.
+// Frames 1-2 load with the page. Every later frame loads when the one before it is reached (seen[n] releases frame n+1).
 // Everything is in content/about-page.json (Pages → More about me).
 const { data: doc } = await useAsyncData('about-page', () => queryCollection('aboutPage').first())
 usePageSeo('about')
+const seen = reactive<Record<number, boolean>>({})
 </script>
 
 <template>
   <main v-if="doc" class="about-page">
+    <!-- 1: More about me + lenticular -->
     <header class="wrap top">
       <h1>{{ doc.title }}</h1>
       <p class="intro">{{ doc.intro }}</p>
     </header>
-
     <AboutLenticular :images="doc.lenticular" />
 
-    <!-- the day job -->
-    <section class="chapter wrap">
-      <div class="split">
-        <div class="text">
-          <h2>{{ doc.work.title }}</h2>
-          <p v-for="p in doc.work.body" :key="p">{{ p }}</p>
+    <!-- 2: what I do these days + ID card -->
+    <Defer eager @seen="seen[2] = true">
+      <section class="chapter wrap">
+        <div class="split">
+          <div class="text">
+            <h2>{{ doc.work.title }}</h2>
+            <p v-for="p in doc.work.body" :key="p">{{ p }}</p>
+          </div>
+          <AboutIdCard :card="doc.work.card" />
         </div>
-        <AboutIdCard :card="doc.work.card" />
-      </div>
-      <div class="sub">
+      </section>
+    </Defer>
+
+    <!-- 3: the talk + conference gallery -->
+    <Defer :load="seen[2]" min-height="70vh" @seen="seen[3] = true">
+      <section class="wrap sub">
         <div class="head">
           <h3>{{ doc.talk.title }}</h3>
           <p v-for="p in doc.talk.body" :key="p" class="lead">{{ p }}</p>
         </div>
         <AboutMarquee :items="doc.talk.photos" dir="left" :tilt="-3" />
-      </div>
-    </section>
+      </section>
+    </Defer>
 
-    <!-- a little more -->
-    <section class="chapter wrap">
-      <div class="head">
-        <h2>{{ doc.more.title }}</h2>
-        <p v-for="p in doc.more.body" :key="p" class="lead">{{ p }}</p>
-      </div>
-      <!-- the first tools, as 3D logos sitting inside big lines of text -->
-      <div v-for="t in doc.more.tools" :key="t.name" class="tool">
-        <p class="say">{{ t.before }} <AboutCorelBalloon v-if="t.kind === 'corel'" /><AboutToolLogo v-else :kind="t.kind" :label="`${t.name} logo`" /> <b>{{ t.name }}</b></p>
-        <p class="lead">{{ t.body }}</p>
-      </div>
-      <div class="cards">
-        <article v-for="s in doc.more.stories" :key="s.title" class="card">
-          <h3>{{ s.title }}</h3>
-          <p>{{ s.body }}</p>
-        </article>
-      </div>
-      <div class="sub">
+    <!-- 4: before design, there was making (tools, family, writing) -->
+    <Defer :load="seen[3]" min-height="120vh" @seen="seen[4] = true">
+      <section class="chapter wrap">
+        <div class="head">
+          <h2>{{ doc.more.title }}</h2>
+          <p v-for="p in doc.more.body" :key="p" class="lead">{{ p }}</p>
+        </div>
+        <div v-for="t in doc.more.tools" :key="t.name" class="tool">
+          <p class="say">{{ t.before }} <AboutCorelBalloon v-if="t.kind === 'corel'" /><AboutToolLogo v-else :kind="t.kind" :label="`${t.name} logo`" /> <b>{{ t.name }}</b></p>
+          <p class="lead">{{ t.body }}</p>
+        </div>
+        <div class="cards">
+          <article v-for="s in doc.more.stories" :key="s.title" class="card">
+            <h3>{{ s.title }}</h3>
+            <p>{{ s.body }}</p>
+          </article>
+        </div>
+      </section>
+    </Defer>
+
+    <!-- 5: off the clock, I move (routes) -->
+    <Defer :load="seen[4]" min-height="100vh" @seen="seen[5] = true">
+      <section class="wrap sub">
         <div class="head">
           <h3>{{ doc.more.hobbies.title }}</h3>
           <p class="lead">{{ doc.more.hobbies.body }}</p>
         </div>
         <AboutRouteWall :routes="doc.more.hobbies.routes" />
-      </div>
-    </section>
+      </section>
+    </Defer>
 
-    <!-- even more: the kid with the family computer -->
-    <section class="chapter wrap">
-      <div class="head">
-        <h2>{{ doc.evenMore.title }}</h2>
-        <p v-for="p in doc.evenMore.body" :key="p" class="lead">{{ p }}</p>
-      </div>
-      <div class="split">
-        <div class="text">
-          <h3>{{ doc.evenMore.encarta.title }}</h3>
-          <p>{{ doc.evenMore.encarta.body }}</p>
-        </div>
-        <AboutEncarta />
-      </div>
-      <div class="sub">
+    <!-- 6: the kid with the family computer (Encarta + Paint) -->
+    <Defer :load="seen[5]" min-height="120vh" @seen="seen[6] = true">
+      <section class="chapter wrap">
         <div class="head">
-          <h3>{{ doc.evenMore.paint.title }}</h3>
-          <p class="lead">{{ doc.evenMore.paint.body }}</p>
+          <h2>{{ doc.evenMore.title }}</h2>
+          <p v-for="p in doc.evenMore.body" :key="p" class="lead">{{ p }}</p>
         </div>
-        <AboutPaint />
-      </div>
-      <div class="split sub">
-        <div class="text">
-          <h3>{{ doc.evenMore.gameboy.title }}</h3>
-          <p>{{ doc.evenMore.gameboy.body }}</p>
-          <NuxtLink to="/play" class="play-link">▶ Laro na, full screen</NuxtLink>
+        <div class="split">
+          <div class="text">
+            <h3>{{ doc.evenMore.encarta.title }}</h3>
+            <p>{{ doc.evenMore.encarta.body }}</p>
+          </div>
+          <LazyAboutEncarta />
         </div>
-        <AboutGameBoy3D />
-      </div>
-      <div class="sub">
+        <div class="sub">
+          <div class="head">
+            <h3>{{ doc.evenMore.paint.title }}</h3>
+            <p class="lead">{{ doc.evenMore.paint.body }}</p>
+          </div>
+          <LazyAboutPaint />
+        </div>
+      </section>
+    </Defer>
+
+    <!-- 7: a GameBoy in the bag -->
+    <Defer :load="seen[6]" min-height="80vh" @seen="seen[7] = true">
+      <section class="wrap">
+        <div class="split sub">
+          <div class="text">
+            <h3>{{ doc.evenMore.gameboy.title }}</h3>
+            <p>{{ doc.evenMore.gameboy.body }}</p>
+            <NuxtLink to="/play" class="play-link">▶ Laro na, full screen</NuxtLink>
+          </div>
+          <LazyAboutGameBoy3D />
+        </div>
+      </section>
+    </Defer>
+
+    <!-- 8: the school project I still remember (volcano) -->
+    <Defer :load="seen[7]" min-height="80vh" @seen="seen[8] = true">
+      <section class="wrap sub">
         <div class="head">
           <h3>{{ doc.evenMore.volcano.title }}</h3>
           <p class="lead">{{ doc.evenMore.volcano.body }}</p>
         </div>
-        <AboutVolcano />
-      </div>
-      <div class="sub">
+        <LazyAboutVolcano />
+      </section>
+    </Defer>
+
+    <!-- 9: some of my artworks -->
+    <Defer :load="seen[8]" min-height="60vh" @seen="seen[9] = true">
+      <section class="wrap sub">
         <div class="head"><h3>{{ doc.evenMore.paintings.title }}</h3></div>
         <AboutMarquee :items="doc.evenMore.paintings.items" dir="right" :tilt="4" :speed="34" />
-      </div>
-      <div class="sub">
+      </section>
+    </Defer>
+
+    <!-- 10: from the sketchbook -->
+    <Defer :load="seen[9]" min-height="60vh" @seen="seen[10] = true">
+      <section class="wrap sub">
         <div class="head"><h3>{{ doc.evenMore.sketches.title }}</h3></div>
         <AboutMarquee :items="doc.evenMore.sketches.items" dir="left" :tilt="-4" :speed="30" />
-      </div>
-    </section>
+      </section>
+    </Defer>
 
-    <!-- too far: the quiet, personal part -->
-    <AboutTooFar :photo="doc.tooFar.photo" :alt="doc.tooFar.alt" :title="doc.tooFar.title" :body="doc.tooFar.body" />
+    <!-- 11: you scrolled too far -->
+    <Defer :load="seen[10]" @seen="seen[11] = true">
+      <LazyAboutTooFar :photo="doc.tooFar.photo" :alt="doc.tooFar.alt" :title="doc.tooFar.title" :body="doc.tooFar.body" />
+    </Defer>
 
-    <!-- what's next -->
-    <section class="chapter wrap">
-      <div class="head">
-        <h2>{{ doc.next.title }}</h2>
-      </div>
-      <AboutPlans :plans="doc.next.plans" />
-    </section>
+    <!-- 12: where I'm heading -->
+    <Defer :load="seen[11]" min-height="60vh">
+      <section class="chapter wrap">
+        <div class="head">
+          <h2>{{ doc.next.title }}</h2>
+        </div>
+        <LazyAboutPlans :plans="doc.next.plans" />
+      </section>
+    </Defer>
   </main>
 </template>
 
