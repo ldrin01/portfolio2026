@@ -121,3 +121,5 @@ section > .wrap { width: 100%; }
 [data-theme="dark"] img { image-rendering: pixelated; }
 
 /* the room for the footer's glasses is the footer's own margin-top (SiteFooter.vue), so no page can override it */
+.page-enter-active, .page-leave-active { transition: opacity 0.4s ease; }
+.page-enter-from, .page-leave-to { opacity: 0; }

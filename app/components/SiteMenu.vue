@@ -65,7 +65,33 @@ watch(open, async (v) => {
 const close = () => { open.value = false }
 // a click anywhere on the sheet that isn't a link closes it
 const onSheetClick = (e: MouseEvent) => { if (!(e.target as Element).closest('a')) close() }
-watch(() => route.fullPath, close)
+let navigating = false
+const onLink = (e: MouseEvent, to: string) => {
+  if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return // new-tab clicks still work
+  e.preventDefault()
+  go(to)
+}
+const nuxtApp = useNuxtApp()
+async function go(to: string) {
+  if (navigating) return
+  navigating = true
+  try {
+    if (to !== route.fullPath) {
+      // resolves when the new page is actually on screen (or after 2s as a safety net)
+      const shownPage = new Promise<void>((resolve) => {
+        const off = nuxtApp.hook('page:finish', () => { off(); resolve() })
+        setTimeout(() => { off(); resolve() }, 2000)
+      })
+      await navigateTo(to)
+      await shownPage
+      await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)))
+    }
+  } finally {
+    close()
+    navigating = false
+  }
+}
+watch(() => route.fullPath, () => { if (!navigating) close() })
 const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') close() }
 onMounted(() => window.addEventListener('keydown', onKey))
 onBeforeUnmount(() => { window.removeEventListener('keydown', onKey); cancelAnimationFrame(raf) })
@@ -84,8 +110,10 @@ onBeforeUnmount(() => { window.removeEventListener('keydown', onKey); cancelAnim
     <nav ref="sheet" class="layer sheet" style="clip-path: inset(0 100% 0 0)" aria-label="Main" @click="onSheetClick">
       <ul class="big">
         <li v-for="(l, i) in links" :key="l.to" :style="{ '--n': i }">
-          <NuxtLink :to="l.to" :class="{ here: isHere(l.to) }" :aria-label="l.label" @click="close">
-            <span v-for="(c, j) in chars(l.label)" :key="j" class="ch" :style="{ '--i': j }" aria-hidden="true">{{ c }}</span>
+          <NuxtLink :to="l.to" custom v-slot="{ href }">
+            <a :href="href" :class="{ here: isHere(l.to) }" :aria-label="l.label" @click="onLink($event, l.to)">
+              <span v-for="(c, j) in chars(l.label)" :key="j" class="ch" :style="{ '--i': j }" aria-hidden="true">{{ c }}</span>
+            </a>
           </NuxtLink>
         </li>
       </ul>
@@ -93,7 +121,9 @@ onBeforeUnmount(() => { window.removeEventListener('keydown', onKey); cancelAnim
       <div class="small" :style="{ '--n': links.length }">
         <ul>
           <li v-for="l in small" :key="l.label">
-            <NuxtLink v-if="l.to" :to="l.to" @click="close">{{ l.label }}</NuxtLink>
+            <NuxtLink v-if="l.to" :to="l.to" custom v-slot="{ href }">
+              <a :href="href" @click="onLink($event, l.to)">{{ l.label }}</a>
+            </NuxtLink>
             <a v-else :href="l.href" :target="l.href.startsWith('http') ? '_blank' : undefined" rel="noopener">{{ l.label }}</a>
           </li>
         </ul>

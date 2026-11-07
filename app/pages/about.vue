@@ -4,6 +4,11 @@ import { gameboyWarmTo } from '~/lib/gameboy-warm'
 // Frames 1-2 load with the page. Every later frame loads when the one before it is reached (seen[n] releases frame n+1).
 // Everything is in content/about-page.json (Pages → More about me).
 const { data: doc } = await useAsyncData('about-page', () => queryCollection('aboutPage').first())
+// about.vue: add this right after the useAsyncData line, so a direct visit to /about starts the downloads in <head>
+const asset = useAssetUrl()
+useHead({
+  link: (doc.value?.lenticular ?? []).slice(0, 3).map((p: { image: string }) => ({ rel: 'preload', as: 'image', href: asset(p.image), fetchpriority: 'high' }))
+})
 usePageSeo('about')
 const seen = reactive<Record<number, boolean>>({})
 
