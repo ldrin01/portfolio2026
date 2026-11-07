@@ -1,16 +1,44 @@
 <script setup lang="ts">
+import { gameboyWarmTo } from '~/lib/gameboy-warm'
 // "More About Me": the longer story, told to the reader in order, in 12 frames.
 // Frames 1-2 load with the page. Every later frame loads when the one before it is reached (seen[n] releases frame n+1).
 // Everything is in content/about-page.json (Pages → More about me).
 const { data: doc } = await useAsyncData('about-page', () => queryCollection('aboutPage').first())
 usePageSeo('about')
 const seen = reactive<Record<number, boolean>>({})
+
+// The Game Boy's downloads are released one stage per frame (stage 1 with the page, 2 to 4 at frames 2 to 4, see lib/gameboy-warm.ts).
+// Its section mounts at frame 4 and builds itself hidden, so by frame 7 there is nothing left to do but fade in.
+const lab = `${useRuntimeConfig().app.baseURL}lab/`
+onMounted(() => { gameboyWarmTo(1, lab) })
+for (const n of [2, 3, 4]) watch(() => seen[n], v => { if (v) gameboyWarmTo(n, lab) })
+if (import.meta.client && location.search.includes('gbprof')) onMounted(() => {   // ?gbprof: every stall over 50 ms, tagged with the frame you were on
+  const timeline: [number, string][] = []
+  let last = ''
+  const frameAt = () => {
+    const mid = innerHeight / 2
+    let best = '?', bestTop = -Infinity
+    for (const el of document.querySelectorAll<HTMLElement>('[data-frame]')) {
+      const r = el.getBoundingClientRect()
+      if (r.top <= mid && r.bottom >= mid) return el.dataset.frame!
+      if (r.top <= mid && r.top > bestTop) { bestTop = r.top; best = `after ${el.dataset.frame}` }
+    }
+    return best
+  }
+  const sample = () => { const f = frameAt(); if (f !== last) { last = f; timeline.push([performance.now(), f]) } }
+  addEventListener('scroll', sample, { passive: true }); setInterval(sample, 250); sample()
+  new PerformanceObserver(l => l.getEntries().forEach(e => {
+    const f = [...timeline].reverse().find(([t]) => t <= e.startTime)?.[1] ?? '?'
+    console.log(`STALL ${Math.round(e.duration)}ms, started ${Math.round(e.startTime)}ms, frame ${f}, scrollY ${Math.round(scrollY)}`)
+  })).observe({ type: 'longtask', buffered: true })
+  for (const n of [2, 3, 4, 5, 6, 7, 8, 9, 10]) watch(() => seen[n], v => { if (v) console.log(`MARK ${Math.round(performance.now())}ms frame ${n} reached, frame ${n + 1} released`) })
+})
 </script>
 
 <template>
   <main v-if="doc" class="about-page">
     <!-- 1: More about me + lenticular -->
-    <header class="wrap top">
+    <header class="wrap top" data-frame="1">
       <h1>{{ doc.title }}</h1>
       <p class="intro">{{ doc.intro }}</p>
     </header>
@@ -18,7 +46,7 @@ const seen = reactive<Record<number, boolean>>({})
 
     <!-- 2: what I do these days + ID card -->
     <Defer eager @seen="seen[2] = true">
-      <section class="chapter wrap">
+      <section data-frame="2" class="chapter wrap">
         <div class="split">
           <div class="text">
             <h2>{{ doc.work.title }}</h2>
@@ -31,7 +59,7 @@ const seen = reactive<Record<number, boolean>>({})
 
     <!-- 3: the talk + conference gallery -->
     <Defer :load="seen[2]" min-height="70vh" @seen="seen[3] = true">
-      <section class="wrap sub">
+      <section data-frame="3" class="wrap sub">
         <div class="head">
           <h3>{{ doc.talk.title }}</h3>
           <p v-for="p in doc.talk.body" :key="p" class="lead">{{ p }}</p>
@@ -42,7 +70,7 @@ const seen = reactive<Record<number, boolean>>({})
 
     <!-- 4: before design, there was making (tools, family, writing) -->
     <Defer :load="seen[3]" min-height="120vh" @seen="seen[4] = true">
-      <section class="chapter wrap">
+      <section data-frame="4" class="chapter wrap">
         <div class="head">
           <h2>{{ doc.more.title }}</h2>
           <p v-for="p in doc.more.body" :key="p" class="lead">{{ p }}</p>
@@ -62,7 +90,7 @@ const seen = reactive<Record<number, boolean>>({})
 
     <!-- 5: off the clock, I move (routes) -->
     <Defer :load="seen[4]" min-height="100vh" @seen="seen[5] = true">
-      <section class="wrap sub">
+      <section data-frame="5" class="wrap sub">
         <div class="head">
           <h3>{{ doc.more.hobbies.title }}</h3>
           <p class="lead">{{ doc.more.hobbies.body }}</p>
@@ -73,7 +101,7 @@ const seen = reactive<Record<number, boolean>>({})
 
     <!-- 6: the kid with the family computer (Encarta + Paint) -->
     <Defer :load="seen[5]" min-height="120vh" @seen="seen[6] = true">
-      <section class="chapter wrap">
+      <section data-frame="6" class="chapter wrap">
         <div class="head">
           <h2>{{ doc.evenMore.title }}</h2>
           <p v-for="p in doc.evenMore.body" :key="p" class="lead">{{ p }}</p>
@@ -96,8 +124,8 @@ const seen = reactive<Record<number, boolean>>({})
     </Defer>
 
     <!-- 7: a GameBoy in the bag -->
-    <Defer :load="seen[6]" min-height="80vh" @seen="seen[7] = true">
-      <section class="wrap">
+    <Defer :load="seen[4]" min-height="80vh" @seen="seen[7] = true">
+      <section data-frame="7" class="wrap">
         <div class="split sub">
           <div class="text">
             <h3>{{ doc.evenMore.gameboy.title }}</h3>
@@ -110,8 +138,8 @@ const seen = reactive<Record<number, boolean>>({})
     </Defer>
 
     <!-- 8: the school project I still remember (volcano) -->
-    <Defer :load="seen[7]" min-height="80vh" @seen="seen[8] = true">
-      <section class="wrap sub">
+    <Defer :load="seen[6]" min-height="80vh" @seen="seen[8] = true">
+      <section data-frame="8" class="wrap sub">
         <div class="head">
           <h3>{{ doc.evenMore.volcano.title }}</h3>
           <p class="lead">{{ doc.evenMore.volcano.body }}</p>
@@ -122,7 +150,7 @@ const seen = reactive<Record<number, boolean>>({})
 
     <!-- 9: some of my artworks -->
     <Defer :load="seen[8]" min-height="60vh" @seen="seen[9] = true">
-      <section class="wrap sub">
+      <section data-frame="9" class="wrap sub">
         <div class="head"><h3>{{ doc.evenMore.paintings.title }}</h3></div>
         <AboutMarquee :items="doc.evenMore.paintings.items" dir="right" :tilt="4" :speed="34" />
       </section>
@@ -130,7 +158,7 @@ const seen = reactive<Record<number, boolean>>({})
 
     <!-- 10: from the sketchbook -->
     <Defer :load="seen[9]" min-height="60vh" @seen="seen[10] = true">
-      <section class="wrap sub">
+      <section data-frame="10" class="wrap sub">
         <div class="head"><h3>{{ doc.evenMore.sketches.title }}</h3></div>
         <AboutMarquee :items="doc.evenMore.sketches.items" dir="left" :tilt="-4" :speed="30" />
       </section>
@@ -143,7 +171,7 @@ const seen = reactive<Record<number, boolean>>({})
 
     <!-- 12: where I'm heading -->
     <Defer :load="seen[11]" min-height="60vh">
-      <section class="chapter wrap">
+      <section data-frame="12" class="chapter wrap">
         <div class="head">
           <h2>{{ doc.next.title }}</h2>
         </div>

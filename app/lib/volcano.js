@@ -9,6 +9,10 @@ export async function mountVolcano(canvas) {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true })
   renderer.setPixelRatio(Math.min(2, devicePixelRatio))
   renderer.outputColorSpace = THREE.SRGBColorSpace
+  canvas.style.opacity = '0'; canvas.style.transition = 'opacity .45s ease'   // hidden until it is built, then it fades in
+  const nextTurn = () => new Promise(r => setTimeout(r, 0))
+  let t0 = performance.now()
+  const breathe = async () => { if (performance.now() - t0 > 6) { await nextTurn(); t0 = performance.now() } }   // gives the page a turn after every ~6 ms of work
   const scene = new THREE.Scene()
   const camera = new THREE.PerspectiveCamera(30, 1, .1, 100)
   scene.add(new THREE.HemisphereLight(0xdfe9ff, 0x5a4a38, 1.1))
@@ -40,10 +44,10 @@ export async function mountVolcano(canvas) {
     return Math.max(.02, h) - .08
   }
   const top = new THREE.PlaneGeometry(S * 2, S * 2, N, N); top.rotateX(-Math.PI / 2)
-  const tp = top.attributes.position, colors = []
+  const tp = top.attributes.position, colors = [], H = new Float32Array(tp.count)   // H: the height of every grid point, kept for the lava
   const C = { field: new THREE.Color('#6f9a45'), forest: new THREE.Color('#3f6b32'), scrub: new THREE.Color('#8a8150'), rock: new THREE.Color('#857869'), ash: new THREE.Color('#b5ada2'), pit: new THREE.Color('#3a302a'), line: new THREE.Color('#2a2420') }
   for (let i = 0; i < tp.count; i++) {
-    const x = tp.getX(i), z = tp.getZ(i), y = height(x, z), r = Math.hypot(x, z); tp.setY(i, y)
+    const x = tp.getX(i), z = tp.getZ(i), y = height(x, z), r = Math.hypot(x, z); tp.setY(i, y); H[i] = y
     let c
     if (r < RIM - .02) c = C.pit.clone()
     else if (y < .1) c = C.field.clone().lerp(C.forest, fbm(x * 3, z * 3))
@@ -52,8 +56,17 @@ export async function mountVolcano(canvas) {
     else c = C.rock.clone().lerp(C.ash, Math.min(1, (y - .6) / .3))
     if (Math.abs(((y + 10) / .08) % 1 - .5) < .045 && r > RIM) c.lerp(C.line, .2) // a faint contour line
     colors.push(c.r, c.g, c.b)
+    if ((i & 127) === 127) await breathe()
   }
   top.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3)); top.computeVertexNormals()
+  await breathe()
+  // the ground's height anywhere, read off the grid above (the lava asks 2400 times a frame, so it must be cheap)
+  const seg = (S * 2) / N
+  const heightAt = (x, z) => {
+    const fx = Math.min(N - 1e-6, Math.max(0, (x + S) / seg)), fz = Math.min(N - 1e-6, Math.max(0, (z + S) / seg))
+    const ix = Math.floor(fx), iz = Math.floor(fz), u = fx - ix, v = fz - iz, i0 = iz * (N + 1) + ix
+    return (H[i0] * (1 - u) + H[i0 + 1] * u) * (1 - v) + (H[i0 + N + 1] * (1 - u) + H[i0 + N + 2] * u) * v
+  }
   const land = new THREE.Group()
   land.add(new THREE.Mesh(top, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: .92 })))
 
@@ -65,9 +78,10 @@ export async function mountVolcano(canvas) {
 
   // the four cut faces: the edge of the land down to the base, in soil layers
   const strata = ['#5b4632', '#7a5f42', '#9a7d58', '#6a5a4a', '#8c7a63', '#4a3b2c']
-  const sideGeo = (pts) => {
+  const sideGeo = async (pts) => {
     const pos = [], col = [], idx = [], STEPS = 14
-    pts.forEach(([x, z], k) => {
+    for (let k = 0; k < pts.length; k++) {
+      const [x, z] = pts[k]
       const y = height(x, z)
       for (let j = 0; j <= STEPS; j++) {
         const yy = y + (BASE - y) * (j / STEPS)
@@ -77,14 +91,15 @@ export async function mountVolcano(canvas) {
         col.push(c.r, c.g, c.b)
         if (k && j) { const a = (k - 1) * (STEPS + 1) + j - 1, b = k * (STEPS + 1) + j - 1; idx.push(a, b, a + 1, b, b + 1, a + 1) }
       }
-    })
+      await breathe()
+    }
     const g = new THREE.BufferGeometry()
     g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3)); g.setIndex(idx); g.computeVertexNormals()
     return g
   }
   const edge = fn => Array.from({ length: N + 1 }, (_, i) => fn(-S + (2 * S * i) / N))
   const soil = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 1, side: THREE.DoubleSide })
-  ;[edge(t => [t, S]), edge(t => [S, -t]), edge(t => [-t, -S]), edge(t => [-S, t])].forEach(p => land.add(new THREE.Mesh(sideGeo(p), soil)))
+  for (const p of [edge(t => [t, S]), edge(t => [S, -t]), edge(t => [-t, -S]), edge(t => [-S, t])]) land.add(new THREE.Mesh(await sideGeo(p), soil))
   const bottom = new THREE.Mesh(new THREE.PlaneGeometry(S * 2, S * 2), new THREE.MeshStandardMaterial({ color: '#3a2e22' }))
   bottom.rotateX(Math.PI / 2); bottom.position.y = BASE; land.add(bottom)
   scene.add(land)
@@ -113,7 +128,7 @@ export async function mountVolcano(canvas) {
       const p = parts[i]
       if (!p) { lp[i * 3 + 1] = -99; continue }
       const x = Math.cos(p.th) * p.r, z = Math.sin(p.th) * p.r
-      lp[i * 3] = x; lp[i * 3 + 1] = height(x, z) + .012; lp[i * 3 + 2] = z
+      lp[i * 3] = x; lp[i * 3 + 1] = heightAt(x, z) + .012; lp[i * 3 + 2] = z
       const cool = Math.min(1, Math.max((p.r - RIM) / 1.2, (p.life - 600) / 300)) // yellow-orange at the rim, dark red when cool
       lc[i * 3] = 1 - cool * .6; lc[i * 3 + 1] = .55 * (1 - cool) + .06; lc[i * 3 + 2] = .1 * (1 - cool)
     }
@@ -146,9 +161,11 @@ export async function mountVolcano(canvas) {
     renderer.render(scene, camera)
   }
   const io = new IntersectionObserver(([e]) => { cancelAnimationFrame(raf); if (e.isIntersecting) frame() }, { threshold: .05 })
+  if (reduced) for (let k = 0; k < 900; k++) { step(k / 60); if (k % 20 === 19) await breathe() } // show the flows already spread
+  try { await (renderer.compileAsync ? renderer.compileAsync(scene, camera) : Promise.resolve(renderer.compile(scene, camera))) } catch { /* compiled on the first frame instead */ }
+  renderer.render(scene, camera)   // the first draw (it uploads everything) happens now, while the canvas is still hidden
+  requestAnimationFrame(() => { canvas.style.opacity = '1' })
   io.observe(canvas)
-  if (reduced) for (let k = 0; k < 900; k++) step(k / 60) // show the flows already spread
-  renderer.render(scene, camera)
 
   return () => {
     io.disconnect(); ro.disconnect(); cancelAnimationFrame(raf)

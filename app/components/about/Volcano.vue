@@ -1,17 +1,14 @@
 <script setup lang="ts">
-// Mayon as a miniature terrain block with lava slowly flowing (see app/lib/volcano.js). three.js loads only when the
-// block comes near. Drag to turn it.
+// Mayon as a miniature terrain block with lava slowly flowing (see app/lib/volcano.js). three.js is already
+// loaded by then (the Game Boy uses it too). Drag to turn it.
 const canvas = ref<HTMLCanvasElement>()
-onMounted(() => {
+onMounted(async () => {   // about.vue releases this section at frame 6, so the block builds itself hidden, a few ms at a time, and fades in
   let dispose: (() => void) | undefined, gone = false
-  const near = new IntersectionObserver(async ([e]) => {
-    if (!e?.isIntersecting || dispose) return
-    near.disconnect()
-    const { mountVolcano } = await import('~/lib/volcano.js')
-    if (!gone) dispose = await mountVolcano(canvas.value!)
-  }, { rootMargin: '500px' })
-  near.observe(canvas.value!)
-  onBeforeUnmount(() => { gone = true; near.disconnect(); dispose?.() })
+  onBeforeUnmount(() => { gone = true; dispose?.() })
+  const { mountVolcano } = await import('~/lib/volcano.js')
+  if (gone) return
+  const d = await mountVolcano(canvas.value!)
+  if (gone) d(); else dispose = d
 })
 </script>
 

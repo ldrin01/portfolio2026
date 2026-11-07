@@ -1,31 +1,33 @@
 <script setup lang="ts">
+import { gameboyWarmTo, GAMEBOY_STAGES } from '~/lib/gameboy-warm'
 // The 3D handheld, a light build (app/lib/gameboy-detail.js): plain shapes with the detail painted on as relief (gameboy-lite.js is the plainer one), and the pixel game on its
 // screen (it boots with DRINWORKS first). Drag to turn it; click A or B to jump. three.js loads only when it comes near, and it
 // stops drawing off screen. A, B and Space work while it is hovered or focused, so the page still scrolls with Space everywhere else.
 // (The carved, much heavier version is still in public/lab/gameboy-3d.js.)
 const host = ref<HTMLDivElement>()
 const active = ref(false)
-const base = useRuntimeConfig().app.baseURL
+const LAB = `${useRuntimeConfig().app.baseURL}lab/`
+
+// This section mounts early (about.vue releases it at frame 4), long before it is on screen. The downloads were spread over the
+// frames by gameboyWarmTo; here we finish whatever is left, then build the model hidden, in small slices, and fade it in.
 onMounted(() => {
   let model: { pause(): void; resume(): void; dispose(): void } | undefined, gone = false
-  const warm = () => {   // fetch the code and assets early, build later
-    import('three'); import('~/lib/gameboy-detail.js')
-    ;['gameboy-wear.js', 'gameboy-game.js', 'gameboy-cart.webp', 'gameboy-cart-zombie.webp', 'gameboy-sticker-cats.webp'].forEach(f => fetch(`${base}lab/${f}`).catch(() => {}))
-  }
-  if ('requestIdleCallback' in window) window.requestIdleCallback(warm, { timeout: 2000 })
-  else setTimeout(warm, 1200)
-  const seen = new IntersectionObserver(([e]) => { if (!model) return; e?.isIntersecting ? model.resume() : model.pause() })
-  const near = new IntersectionObserver(async ([e]) => {
-    if (!e?.isIntersecting || model) return
-    near.disconnect()
+  const prof = location.search.includes('gbprof')
+  const mark = (s: string) => prof && console.log(`MARK ${Math.round(performance.now())}ms ${s}`)
+  const seen = new IntersectionObserver(([e]) => { if (!model) return; mark(e?.isIntersecting ? 'game boy on screen' : 'game boy off screen'); e?.isIntersecting ? model.resume() : model.pause() })
+
+
+  ;(async () => {
+    await gameboyWarmTo(GAMEBOY_STAGES, LAB)
+    if (gone) return
     const { mountGameboyDetail } = await import('~/lib/gameboy-detail.js')
-    const m = await mountGameboyDetail(host.value!, { base: `${base}lab/`, cam: [1.8, 0.8, 4.65], keyActive: () => active.value })
+    const m = await mountGameboyDetail(host.value!, { base: LAB, cam: [1.8, 0.8, 4.65], keyActive: () => active.value })
     if (gone) { m.dispose(); return }
     model = m
+    mark('model built')
     seen.observe(host.value!)
-  }, { rootMargin: '1500px' })
-  near.observe(host.value!)
-  onBeforeUnmount(() => { gone = true; near.disconnect(); seen.disconnect(); model?.dispose() })
+  })()
+  onBeforeUnmount(() => { gone = true; seen.disconnect(); model?.dispose() })
 })
 </script>
 

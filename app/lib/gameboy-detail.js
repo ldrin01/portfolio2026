@@ -10,7 +10,13 @@ export async function mountGameboyDetail(host, opts = {}) {
     import('three'), import('three/examples/jsm/controls/OrbitControls.js'), import('three/examples/jsm/environments/RoomEnvironment.js')
   ])
   const LAB = opts.base || '/lab/'
-  const wearP = window.GBWear ? Promise.resolve() : new Promise((ok, fail) => { const s = document.createElement('script'); s.src = LAB + 'gameboy-wear.js'; s.onload = ok; s.onerror = fail; document.head.appendChild(s) })
+  // files the page already downloaded ahead of time (GameBoy3D.vue) come from memory, anything else from the network
+  const asset = f => (window.__gbAssets && window.__gbAssets[f]) || LAB + f
+  const loadScript = f => new Promise((ok, fail) => {
+    const add = src => { const s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = () => (src !== LAB + f ? add(LAB + f) : fail()); document.head.appendChild(s) }
+    add(asset(f))
+  })
+  const wearP = window.GBWear ? Promise.resolve() : loadScript('gameboy-wear.js')
   wearP.catch(() => {})
 
   // laid out in photo pixels (1166 x 2000) and scaled to world units; the front art uses the Front photo's own 1049 x 1800
@@ -27,14 +33,17 @@ export async function mountGameboyDetail(host, opts = {}) {
   const cv0 = renderer.domElement
   cv0.style.cssText = 'opacity:0;transition:opacity .45s ease'   // hidden until the theme look is applied, so the wrong colours never show
   const reveal = () => requestAnimationFrame(() => { cv0.style.opacity = '1' })
-  const tick = () => new Promise(r => setTimeout(r, 0))            // gives the browser a turn between heavy steps
+  const T = []; let last = performance.now()                       // add ?gbprof to the page URL: the console then lists the longest blocking steps
+  const tick = (n = 'textures') => { T.push([n, Math.round(performance.now() - last)]); return new Promise(r => setTimeout(() => { last = performance.now(); r() }, 0)) }
   host.appendChild(cv0)
   const scene = new THREE.Scene()
   const camera = new THREE.PerspectiveCamera(26, 1 / 1.25, 0.1, 50)
   camera.position.fromArray(opts.cam || [1.8, 0.8, 4.65])
   // a faint room reflection gives the plastics their sheen; the four lights stay fixed while it turns, so the shading moves across it
+  await tick('before: room reflection (PMREM)')
   const pmrem = new THREE.PMREMGenerator(renderer)
   const envRT = pmrem.fromScene(new RoomEnvironment(), 0.04); pmrem.dispose()
+  await tick('room reflection (PMREM)')
   scene.environment = envRT.texture; scene.environmentIntensity = 0.3
   scene.add(new THREE.HemisphereLight(0xffffff, 0x58544e, 0.5))
   const dir = (color, intensity, x, y, z) => { const l = new THREE.DirectionalLight(color, intensity); l.position.set(x, y, z); scene.add(l) }
@@ -44,6 +53,11 @@ export async function mountGameboyDetail(host, opts = {}) {
   const gb = new THREE.Group(); scene.add(gb)
   const textures = []
   const keep = t => { textures.push(t); return t }
+  const pendingLoads = []   // image loads still running, so the build can wait for them before the GPU upload
+  const track = Loader => class extends Loader {
+    load(url, onLoad, ...rest) { let ok; pendingLoads.push(new Promise(r => { ok = r })); return super.load(url, (...a) => { try { onLoad && onLoad(...a) } finally { ok() } }, ...rest) }
+  }
+  const ImageLoader = track(THREE.ImageLoader), TextureLoader = track(THREE.TextureLoader)
   const FRONT_C = '#c4bdad', BACK_C = '#c4b592', INK = '#3a3490'
   const FONT = '"Funnel Display", "Helvetica Neue", Arial, sans-serif'
   try { await Promise.all([document.fonts.load('700 40px "Funnel Display"'), document.fonts.load('400 40px "Funnel Display"')]) } catch (e) { /* the fallback font is fine */ }
@@ -61,20 +75,36 @@ export async function mountGameboyDetail(host, opts = {}) {
 
   // ── relief: paint a height map (grey = flat, darker = lower), turn it into a normal map ──
   // the painted colour and its relief are drawn by the same function (mode 'c' or 'h'), so a groove is always where its shading is
+  let pending = Promise.resolve()   // normal maps are worked out 40 rows at a time, one map after another, so no single step blocks the page
+  const nextTurn = () => new Promise(r => setTimeout(r, 0))
   const normalFrom = (hc, strength) => {
-    const w = hc.width, h = hc.height
-    const soft = document.createElement('canvas'); soft.width = w; soft.height = h
-    const sg = soft.getContext('2d'); sg.filter = 'blur(1.1px)'; sg.drawImage(hc, 0, 0)           // softens the edges so a groove reads as bevelled (a no-op where filters are missing)
-    const src = sg.getImageData(0, 0, w, h).data, out = document.createElement('canvas'); out.width = w; out.height = h
-    const og = out.getContext('2d'), img = og.createImageData(w, h), d = img.data
-    const H = (x, y) => src[(Math.min(h - 1, Math.max(0, y)) * w + Math.min(w - 1, Math.max(0, x))) * 4]
-    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
-      const dx = (H(x + 2, y) - H(x - 2, y)) * strength / 255, dy = (H(x, y + 2) - H(x, y - 2)) * strength / 255
-      const l = Math.hypot(dx, dy, 1), i = (y * w + x) * 4
-      d[i] = (-dx / l * 0.5 + 0.5) * 255; d[i + 1] = (dy / l * 0.5 + 0.5) * 255; d[i + 2] = (1 / l * 0.5 + 0.5) * 255; d[i + 3] = 255
-    }
-    og.putImageData(img, 0, 0)
-    const t = new THREE.CanvasTexture(out); t.anisotropy = 8; return keep(t)
+    const w = hc.width, h = hc.height, BAND = 40, PAD = 6
+    const out = document.createElement('canvas'); out.width = w; out.height = h
+    const og = out.getContext('2d'); og.fillStyle = 'rgb(128,128,255)'; og.fillRect(0, 0, w, h)   // flat until its rows are done
+    const t = new THREE.CanvasTexture(out); t.anisotropy = 8; keep(t)
+    pending = pending.then(async () => {
+      const soft = document.createElement('canvas'); soft.width = w; soft.height = BAND + 2 * PAD
+      const sg = soft.getContext('2d', { willReadFrequently: true }); sg.filter = 'blur(1.1px)'   // softens the edges so a groove reads as bevelled (a no-op where filters are missing)
+      let t0 = performance.now()
+      for (let y0 = 0; y0 < h; y0 += BAND) {
+        const y1 = Math.min(h, y0 + BAND), top = y0 - PAD, sy0 = Math.max(0, top), sy1 = Math.min(h, y1 + PAD)
+        sg.clearRect(0, 0, w, soft.height)
+        sg.drawImage(hc, 0, sy0, w, sy1 - sy0, 0, sy0 - top, w, sy1 - sy0)
+        const r0 = Math.max(0, y0 - 2), r1 = Math.min(h - 1, y1 + 1)
+        const src = sg.getImageData(0, r0 - top, w, r1 - r0 + 1).data
+        const H = (x, y) => src[((Math.min(r1, Math.max(r0, y)) - r0) * w + Math.min(w - 1, Math.max(0, x))) * 4]
+        const img = og.createImageData(w, y1 - y0), d = img.data
+        for (let y = y0; y < y1; y++) for (let x = 0; x < w; x++) {
+          const dx = (H(x + 2, y) - H(x - 2, y)) * strength / 255, dy = (H(x, y + 2) - H(x, y - 2)) * strength / 255
+          const l = Math.hypot(dx, dy, 1), i = ((y - y0) * w + x) * 4
+          d[i] = (-dx / l * 0.5 + 0.5) * 255; d[i + 1] = (dy / l * 0.5 + 0.5) * 255; d[i + 2] = (1 / l * 0.5 + 0.5) * 255; d[i + 3] = 255
+        }
+        og.putImageData(img, 0, y0)
+        if (performance.now() - t0 > 6) { await nextTurn(); t0 = performance.now() }
+      }
+      t.needsUpdate = true
+    }).catch(e => console.warn('normal map', e))
+    return t
   }
   const canvas = (w, h) => { const c = document.createElement('canvas'); c.width = Math.round(w); c.height = Math.round(h); return c }
   // a textured material from one paint function: paint(g, 'c' | 'h', scale)
@@ -159,7 +189,7 @@ export async function mountGameboyDetail(host, opts = {}) {
     plates.front = plate(bt / S, FRONT + 0.0004, relief(BW, BH, 1, 0.5, paint, 3.2, { roughness: 0.66 }), false); plates.frontPaint = paint
   }
 
-  await tick()
+  await tick('before: the screen bezel: a grey plate with the ')
   // the screen bezel: a grey plate with the big round corner at the bottom right, standing BEZEL_H above the face, with the screen window cut through it
   {
     const bezel = new THREE.Shape(), bx0 = 88, bx1 = 960, by0 = 178, by1 = 845, r = 26, R = 118
@@ -188,7 +218,7 @@ export async function mountGameboyDetail(host, opts = {}) {
     abMeshes.led.scale.z = 0.4; abMeshes.led.position.set(wx(152), wy(432), FRONT + BEZEL_H + 0.0026); gb.add(abMeshes.led)
   }
 
-  await tick()
+  await tick('before: ── the back: grip grooves, the battery d')
   // ── the back: grip grooves, the battery door with its screws and finger ridges, and the cartridge slot ──
   // painted as fractions of the body as you LOOK AT THE BACK (fx from the left of that view, fy from the top)
   const CART = { w: 0.7277, h: 0.7277 * 1187 / 1034 }
@@ -239,10 +269,10 @@ export async function mountGameboyDetail(host, opts = {}) {
     const faceMat = cartMats.face = std(0xffffff, 0.55, { alphaTest: 0.5, polygonOffset: true, polygonOffsetFactor: -2 })
     const face_ = new THREE.Mesh(face, faceMat); face_.position.z = -FRONT - 0.0035; cart.add(face_)
     gb.add(cart)
-    new THREE.TextureLoader().load(LAB + 'gameboy-cart.webp', t => { t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; cartMats.day = keep(t); if (!cartMats.old) { faceMat.map = t; faceMat.needsUpdate = true } })
+    new TextureLoader().load(asset('gameboy-cart.webp'), t => { t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; cartMats.day = keep(t); if (!cartMats.old) { faceMat.map = t; faceMat.needsUpdate = true } })
   }
 
-  await tick()
+  await tick('before: ── the sides: a flat plate on each wall,')
   // ── the sides: a flat plate on each wall, painted with its pockets, openings and the grip ridges, with relief ──
   const SK = 1400                                         // plate canvas px per world unit
   const ZH = 0.13, SY0 = -0.7, SY1 = 0.76                 // each plate spans z -ZH..ZH and y SY0..SY1
@@ -313,7 +343,7 @@ export async function mountGameboyDetail(host, opts = {}) {
     const cw = wheel(X(24), -1, 0.376, 0.0755, 0.13, 0.03); wheels.contrast = cw
   }
 
-  await tick()
+  await tick('before: ── the parts you press ──')
   // ── the parts you press ──
   const BASE = FRONT - 0.012                                               // the buttons start just under the face and stand up through the printing
   {
@@ -367,7 +397,7 @@ export async function mountGameboyDetail(host, opts = {}) {
     Object.assign(power, { knob, offX: xa + 0.003 + kw / 2, onX: xb - 0.003 - kw / 2, hits: [hit, label] })
   }
 
-  await tick()
+  await tick('before: ── controls: drag to turn; a slow sway s')
   // ── controls: drag to turn; a slow sway shows the shape until you touch it ──
   const controls = new OrbitControls(camera, renderer.domElement)
   controls.enableZoom = false; controls.enablePan = false; controls.enableDamping = true
@@ -389,7 +419,7 @@ export async function mountGameboyDetail(host, opts = {}) {
 
   // ── the screen: the About page's pixel game on the LCD, and A / B you can click ──
   try {
-    if (!window.GBGame) await new Promise((ok, fail) => { const s = document.createElement('script'); s.src = LAB + 'gameboy-game.js'; s.onload = ok; s.onerror = fail; document.head.appendChild(s) })
+    if (!window.GBGame) await loadScript('gameboy-game.js')
     const game = window.GBGame.create()
     const stex = keep(new THREE.CanvasTexture(game.canvas)); stex.colorSpace = THREE.SRGBColorSpace; stex.magFilter = THREE.LinearFilter; stex.anisotropy = 8
     const { x0, x1, y0, y1 } = screenRect, zL = FRONT + 0.0008
@@ -506,7 +536,7 @@ export async function mountGameboyDetail(host, opts = {}) {
     // the new one's back: the Figma sticker
     const newBack = plate(bb / S, -FRONT - 0.0008, sheetMat(layer(canvas(BW, BH), g => W.figma(g, bm))), true)
 
-    await tick()
+    await tick('before: ── the old ones front and back plates, ')
     // ── the old one's front and back plates, repainted: the broken corner and its cracks, the print rubbed off, the open battery
     //    "Eldrin ♥ Elis" scratched in. Painted with relief like the new ones, and swapped in by the theme ──
     const oldFrontMat = relief(BW, BH, 1, 0.5, (g, mode, s) => {
@@ -523,7 +553,7 @@ export async function mountGameboyDetail(host, opts = {}) {
     const newMats = { front: plates.front.material }
     const dark = []                                   // the meshes only the old one has
 
-    await tick()
+    await tick('before: ── the battery door is gone: a real hole')
     // ── the battery door is gone: a real hole through the back plate and shell, a dark well behind it, four orange KINGEVER AAs
     //    (low-poly, the label unrolled from a photo of the real ones), springs and contacts, rust on one end, the broken latch stub ──
     const BX = f => 0.559 - f * 1.118, BY = f => 0.966 - f * 1.924
@@ -539,7 +569,7 @@ export async function mountGameboyDetail(host, opts = {}) {
       const box = new THREE.Mesh(new THREE.BoxGeometry(W_, H, DEEP), std(0x3b362c, 0.85, { side: THREE.BackSide }))   // seen from inside: walls and a floor, open at the back face
       box.position.set((pk.x0 + pk.x1) / 2, (pk.y0 + pk.y1) / 2, -FRONT + DEEP / 2 - 0.0002); well.add(box)
       const metal = std(0xc9ccd1, 0.32, { metalness: 0.85, flatShading: true }), label = std(0xffffff, 0.42, { flatShading: true })
-      new THREE.ImageLoader().load(LAB + 'gameboy-battery.webp', img => { const t = keep(new THREE.CanvasTexture(W.batteryWrap(img))); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; label.map = t; label.needsUpdate = true })
+      new ImageLoader().load(asset('gameboy-battery.webp'), img => { const t = keep(new THREE.CanvasTexture(W.batteryWrap(img))); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; label.map = t; label.needsUpdate = true })
       const rustCv = canvas(256, 256); W.rust(rustCv.getContext('2d'), 256, 256)
       const rustT = keep(new THREE.CanvasTexture(rustCv)); rustT.colorSpace = THREE.SRGBColorSpace
       const rusty = std(0xffffff, 0.9, { map: rustT, metalness: 0.25, flatShading: true })
@@ -572,7 +602,7 @@ export async function mountGameboyDetail(host, opts = {}) {
       gb.add(well); dark.push(well)
     }
 
-    await tick()
+    await tick('before: the melted spot on the top edge by the c')
     // the melted spot on the top edge by the cartridge slot: a glossy, darker, bubbled patch with relief so the light catches it
     {
       const w = 0.12, d = 0.12
@@ -595,7 +625,7 @@ export async function mountGameboyDetail(host, opts = {}) {
     }
     // the thick puffy sticker on the contrast side: level with the D-pad, straddling the parting line, a little crooked. Two cats
     // with googly eyes, domed in clear epoxy, a little glossy. The flat sheet is pushed up by the height picture, so it really bulges and the light rolls over it
-    new THREE.ImageLoader().load(LAB + 'gameboy-sticker-cats.webp', img => {
+    new ImageLoader().load(asset('gameboy-sticker-cats.webp'), img => {
       const p = W.puffy(img), h = 0.3, w = h * img.naturalWidth / img.naturalHeight, THICK = 0.008
       const hw = p.height.width, hh = p.height.height, hd = p.height.getContext('2d').getImageData(0, 0, hw, hh).data
       const geo = new THREE.PlaneGeometry(w, h, 50, 100), pos = geo.attributes.position, uv = geo.attributes.uv
@@ -606,7 +636,7 @@ export async function mountGameboyDetail(host, opts = {}) {
       m.rotation.set(0, -Math.PI / 2, -0.12); m.position.set(X(24) - 0.0008, wy(1205), 0)   // wy(1205): the D-pad's height; z 0: the parting line
       m.visible = W.worn(); gb.add(m); dark.push(m)
     })
-    await tick()
+    await tick('before: the buttons worn by thumbs: A and B poli')
     // the buttons worn by thumbs: A and B polished and faded in the middle, the D-pad's ridges worn down and shinier, Select and Start
     // rubbed lighter in the centre
     const bw = W.buttonWear(), tx = (c, srgb = true) => { const t = keep(new THREE.CanvasTexture(c)); if (srgb) t.colorSpace = THREE.SRGBColorSpace; return t }
@@ -624,7 +654,7 @@ export async function mountGameboyDetail(host, opts = {}) {
 
     const apply = old => {
       cartMats.old = old   // the old unit has the bootleg SURVIVE EDSA! cart in it, in a dark green shell
-      if (old && !cartMats.zombie) cartMats.zombie = keep(new THREE.TextureLoader().load(LAB + 'gameboy-cart-zombie.webp', t => { t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; if (cartMats.old) { cartMats.face.map = t; cartMats.face.needsUpdate = true } }))
+      if (old && !cartMats.zombie) cartMats.zombie = keep(new TextureLoader().load(asset('gameboy-cart-zombie.webp'), t => { t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; if (cartMats.old) { cartMats.face.map = t; cartMats.face.needsUpdate = true } }))
       const want = old ? cartMats.zombie : cartMats.day
       if (want && want.image) { cartMats.face.map = want; cartMats.face.needsUpdate = true }
       cartMats.body.color.setHex(old ? 0x24302a : 0x8a858c)
@@ -638,10 +668,27 @@ export async function mountGameboyDetail(host, opts = {}) {
       dark.forEach(o => { o.visible = old }); plates.back.visible = backShell.visible = !old
       worn.forEach((m, mesh) => { mesh.material = old ? m : unworn.get(mesh) })
     }
+    // the new unit's grey copies of the painted plates: one plate per turn (each is a per-pixel pass over a big picture).
+    // Light mode needs them now; in dark mode they are made later at idle, so the first switch to light is instant too.
+    const makeFresh = async () => {
+      for (const p of tinted.values()) {
+        if (ac.signal.aborted) return
+        if (!p.fresh) { p.fresh = keep(new THREE.CanvasTexture(W.freshCanvas(p.old.image))); p.fresh.colorSpace = p.old.colorSpace; p.fresh.anisotropy = p.old.anisotropy; await tick('a grey plate copy') }
+      }
+    }
+    await tick('before: apply (the buttons worn block)')
+    if (!W.worn()) await makeFresh()
+    else if (window.requestIdleCallback) window.requestIdleCallback(makeFresh, { timeout: 10000 }); else setTimeout(makeFresh, 4000)
     apply(W.worn()); unwatch = W.watch(apply)
   } catch (e) { console.warn('wear not loaded', e) }
 
-  for (const t of textures) { if (t.image) { renderer.initTexture(t); await tick() } }   // upload textures one per turn, not all on the first frame
+  await tick('apply (theme look)')
+  await Promise.race([Promise.all(pendingLoads), new Promise(r => setTimeout(r, 4000))])   // images still being wrapped
+  await pending                                                                              // normal maps still being worked out
+  last = performance.now()   // waiting above is not blocking, so the next number only counts real work
+  for (const t of textures) { if (t.image) { renderer.initTexture(t); await tick() } }       // upload textures one per turn, not all on the first frame
+  try { await (renderer.compileAsync ? renderer.compileAsync(scene, camera) : Promise.resolve(renderer.compile(scene, camera))) } catch { /* compiled on the first frame instead */ }
+  if (location.search.includes('gbprof')) console.table(T.sort((a, b) => b[1] - a[1]).slice(0, 8))
   renderer.setAnimationLoop(loop)
   reveal()
 
