@@ -81,6 +81,12 @@
 ::view-transition-group(theme-toggle) { animation: none; }
 ::view-transition-old(theme-toggle) { display: none; }
 ::view-transition-new(theme-toggle) { animation: none; }
+/* the fixed header slips up while reading down and eases back (see plugins/header-hide.client.ts): one variable, one ease in and out for every piece */
+@property --hdr-y { syntax: '<length>'; inherits: true; initial-value: 0px; }
+html { transition: --hdr-y .9s cubic-bezier(.65, 0, .35, 1); }
+html[data-header='hidden'] { --hdr-y: -160px; }
+.menu-btn, .logo, .theme-toggle, .search .btn, .search .pill, .topfade { translate: 0 var(--hdr-y); }
+@media (prefers-reduced-motion: reduce) { html { transition: none; } }
 *, *::before, *::after { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
 /* hidden scrollbar (the page still scrolls) */

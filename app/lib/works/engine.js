@@ -60,7 +60,8 @@ const labelOf = (key) => { for (const g of SIDE) for (const it of g.items) if (i
 /* ============ LAYOUT ============ */
 function measure() {                          // cell sizes follow the screen
   if (isMobile()) {                                                    // phones: two big columns, tight gaps
-    CW = Math.max(108, Math.floor((field.clientWidth - PAD) / 2)); FW = CW - 6;
+    const n = field.clientWidth >= 480 ? 3 : 2;   // wider phones / small tablets get 3 columns
+    CW = Math.max(108, Math.floor((field.clientWidth - PAD) / n)); FW = CW - 6;
     const pw = Math.round(Math.min(96, FW * 0.5));
     field.style.setProperty('--pw', pw + 'px'); field.style.setProperty('--ph', Math.round(pw * 1.27) + 'px'); field.style.setProperty('--tp', '10px');
   } else {
@@ -163,7 +164,9 @@ function fitHeight(vis = visibleList()) {
 let fadeUntil = 0, fadeRaf = 0;
 function fadeEdges() {
   const sd = $('.side').getBoundingClientRect();                      // once the side panel stops sticking and lifts away, the toolbar lifts with it
-  $('.toolbar').style.transform = isMobile() ? '' : `translateY(${-Math.max(0, 96 + sd.height - $('#win').getBoundingClientRect().bottom)}px)`;
+  const lift = isMobile() ? 0 : Math.max(0, 96 + sd.height - $('#win').getBoundingClientRect().bottom);
+  $('.toolbar').style.transform = lift ? `translateY(${-lift}px)` : '';
+  const lhd = root.querySelector('.lhead'); if (lhd) lhd.style.transform = lift ? `translateY(${-lift}px)` : '';   // the list header lifts away with the toolbar
   const tb = $('.toolbar').getBoundingClientRect(), sb = $('.statusbar').getBoundingClientRect();
   document.documentElement.style.setProperty('--tbh', Math.round(tb.height) + 'px');
   const lh = view === 'list' ? root.querySelector('.lhead') : null;
@@ -529,12 +532,12 @@ function drawLit(cv, id) {
     trav.push(c);
   }
   const mouse = { x: -99, y: -99 }, sm = { x: 25, y: 25, k: 0 }, t0 = performance.now();
-  let cell = 0, W = 0, last = t0;
+  let cell = 0, W = 0, last = t0, force = true, offCv = null, offDirty = true;   // force: draw once more even when nothing moved (first frame, resize)
   const size = () => {
     const css = cv.clientWidth; if (!css) return;
     cv.style.height = css + 'px';                                     // always a perfect square
     W = Math.round(css * Math.min(devicePixelRatio || 1, 2));
-    cv.width = cv.height = W; cell = W / N;
+    cv.width = cv.height = W; cell = W / N; force = true; offDirty = true;   // resizing clears the canvas
   };
   const tone = (v, flash) => {                                        // light gray ink; more light = brighter gray
     const l = dark ? 42 + v * 50 + flash * 6 : 30 + v * 44 + flash * 8;   // light mode keeps the same shading: top face lightest, shaded sides darker
@@ -565,19 +568,35 @@ function drawLit(cv, id) {
     }
   };
   const H = new Float32Array(N * N), OX = new Float32Array(N * N), OY = new Float32Array(N * N), GR = new Float32Array(N * N);   // hover: per-cell swell + push
+  /* CRT glass: every cell corner is pushed through a barrel curve (the centre swells a little, the edges ease in) */
+  const CRT = 0.07;
+  const wp = (px, py) => { const u = (px / W - 0.5) * 2, v = (py / W - 0.5) * 2, f = 1 + CRT * (1 - (u * u + v * v)); return [(u * f / 2 + 0.5) * W, (v * f / 2 + 0.5) * W]; };
+  const fq = (g, r) => {
+    const a = wp(r[0], r[1]), b = wp(r[0] + r[2], r[1]), c = wp(r[0] + r[2], r[1] + r[3]), d = wp(r[0], r[1] + r[3]);
+    g.beginPath(); g.moveTo(a[0], a[1]); g.lineTo(b[0], b[1]); g.lineTo(c[0], c[1]); g.lineTo(d[0], d[1]); g.closePath(); g.fill();
+  };
   const paint = (now) => {
     if (!W) return;
     const dt = Math.min(0.05, (now - last) / 1000); last = now;
     const t = reduced ? 99 : (now - t0) / 1000;
+    let redraw = force || !st.live; force = false;                     // a still grid is not repainted: only the entrance, a turn, a hover or a resize are
     if (!st.live && t > tEnd) st.live = true;
     step(dt);
-    if (st.dirty) { grid = scene.render(st.yaw, st.pitch); st.dirty = false; }
+    if (st.dirty) { grid = scene.render(st.yaw, st.pitch); st.dirty = false; redraw = true; }
     sm.k += ((mouse.x > -50 ? 1 : 0) - sm.k) * 0.12;                  // hover strength eases in and out
     if (mouse.x > -50) { sm.x += (mouse.x - sm.x) * 0.25; sm.y += (mouse.y - sm.y) * 0.25; }
+    let hot = mouse.x > -50 || sm.k > 0.004;
+    if (!hot) for (let j = 0; j < N * N; j++) if (H[j] >= 0.01) { hot = true; break; }
+    if (!redraw && !hot) return;
     const g = cv.getContext('2d');
     g.clearRect(0, 0, W, W);
-    g.fillStyle = dark ? 'rgba(255,255,255,.02)' : 'rgba(22,22,27,.018)';
-    for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) { const r = rectOf(x, y); g.fillRect(r[0], r[1], r[2], r[3]); }   // off cells
+    if (offDirty) {                                                   // the 2,500 faint off cells never move: drawn once per size, then just stamped
+      offCv = offCv || document.createElement('canvas'); offCv.width = offCv.height = W;
+      const og = offCv.getContext('2d'); og.fillStyle = dark ? 'rgba(255,255,255,.02)' : 'rgba(22,22,27,.018)';
+      for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) { const r = rectOf(x, y); fq(og, r); }
+      offDirty = false;
+    }
+    g.drawImage(offCv, 0, 0);
     const hx = mouse.x > -50 ? Math.floor(mouse.x) : -1, hy = mouse.y > -50 ? Math.floor(mouse.y) : -1;
     OX.fill(0); OY.fill(0); GR.fill(0);
     for (let j = 0; j < N * N; j++) {                                  // the exact cell under the pointer swells; its neighbours ease outward, very slightly
@@ -600,7 +619,7 @@ function drawLit(cv, id) {
       for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
         const v = grid[y * N + x]; if (v < 0.07) continue;
         const [vv, grow, ox, oy] = lift(x, y, v), r = rectOf(x + ox, y + oy, grow);
-        g.fillStyle = tone(vv, 0); g.fillRect(r[0], r[1], r[2], r[3]);
+        g.fillStyle = tone(vv, 0); fq(g, r);
       }
       return;
     }
@@ -618,10 +637,10 @@ function drawLit(cv, id) {
       }
       const flash = Math.max(0, 1 - (h - c.len + 1) * c.step / 0.14); // soft refresh flash on arrival
       const [vv, grow, ox, oy] = lift(c.x, c.y, c.v), r = rectOf(c.x + ox, c.y + oy, grow);
-      g.fillStyle = tone(vv, flash); g.fillRect(r[0], r[1], r[2], r[3]);
+      g.fillStyle = tone(vv, flash); fq(g, r);
     }
     g.fillStyle = tone(1, 0.6);
-    for (const [x, y, a] of heads) { const r = rectOf(x, y); g.globalAlpha = Math.max(0, a); g.fillRect(r[0], r[1], r[2], r[3]); }
+    for (const [x, y, a] of heads) { const r = rectOf(x, y); g.globalAlpha = Math.max(0, a); fq(g, r); }
     g.globalAlpha = 1;
   };
   cancelAnimationFrame(litRaf); if (litRO) litRO.disconnect();
