@@ -5,8 +5,11 @@ const theme = ref<'light' | 'dark'>('light')
 const loaderDone = useState('loaderDone', () => false) // nothing shows over the loader
 const apply = (t: 'light' | 'dark', animate: boolean) => {
   const html = document.documentElement
-  if (animate) { html.classList.add('theme-switching'); setTimeout(() => html.classList.remove('theme-switching'), 500) }
-  html.dataset.theme = t; theme.value = t
+  const set = () => { html.dataset.theme = t; theme.value = t }
+  // a cross-fade of two snapshots (GPU, one cheap frame sequence). Transitioning every element at once was what made the switch lag.
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches
+  if (animate && !reduce && 'startViewTransition' in document) (document as any).startViewTransition(set)
+  else set()
 }
 const toggle = () => {
   const next = theme.value === 'light' ? 'dark' : 'light'
@@ -34,7 +37,7 @@ onMounted(() => {
 .theme-toggle {
   position: fixed; z-index: 1200; top: max(20px, env(safe-area-inset-top)); right: max(calc(var(--gutter) - 8px), env(safe-area-inset-right));
   width: 44px; height: 44px; display: grid; place-items: center; padding: 0; cursor: pointer; color: var(--fg);
-  background: none; border: 0; transition: color .2s; animation: pop .5s .08s cubic-bezier(.3, 1.4, .5, 1) both;
+  background: none; border: 0; transition: color .2s; view-transition-name: theme-toggle; animation: pop .5s .08s cubic-bezier(.3, 1.4, .5, 1) both;
 }
 @keyframes pop { from { opacity: 0; scale: .6; } }
 .theme-toggle:hover { color: var(--accent); }

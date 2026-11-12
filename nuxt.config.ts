@@ -26,8 +26,7 @@ export default defineNuxtConfig({
         { rel: 'icon', href: `${base}favicon-32.png`, type: 'image/png', sizes: '32x32' },
         { rel: 'icon', href: `${base}favicon-192.png`, type: 'image/png', sizes: '192x192' },
         { rel: 'icon', href: `${base}favicon.ico`, sizes: '48x48' },
-        { rel: 'apple-touch-icon', href: `${base}apple-touch-icon.png` },
-        { rel: 'preload', as: 'font', type: 'font/woff2', href: `${base}_nuxt/funnel-display-latin-wght-normal.h7i3A3FI.woff2`, crossorigin: 'anonymous' }
+        { rel: 'apple-touch-icon', href: `${base}apple-touch-icon.png` }
       ],
       // without JS the loader would never leave, so hide it
       noscript: [{ innerHTML: '<style>.loader{display:none!important}</style>' }],

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import fontUrl from '~/assets/fonts/funnel-display-latin-wght-normal.woff2?url' // the build's own hashed address, so the preload can't go stale
+useHead({ link: [{ rel: 'preload', as: 'font', type: 'font/woff2', href: fontUrl, crossorigin: 'anonymous' }] })
 await loadSite() // every component below reads the content through useSite()
 useSiteSeo() // default title, description and share card; pages override them
 

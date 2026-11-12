@@ -75,8 +75,12 @@
   --gloss: linear-gradient(120deg, rgba(255, 255, 255, .55) 0%, rgba(255, 255, 255, 0) 38%, rgba(255, 255, 255, 0) 62%, rgba(255, 255, 255, .18) 100%);
   --fx-opacity: .16;
 }
-/* colours ease over when the theme flips (only while switching, so nothing else animates) */
-html.theme-switching, html.theme-switching * { transition: background-color .45s ease, color .45s ease, border-color .45s ease, fill .45s ease, stroke .45s ease !important; }
+/* theme flip: the browser cross-fades two snapshots (see ThemeToggle); unscoped here because scoped CSS can't reach view-transition pseudos */
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: .35s; }
+/* the icon stays live during the page cross-fade, so its own sun / moon animation still plays */
+::view-transition-group(theme-toggle) { animation: none; }
+::view-transition-old(theme-toggle) { display: none; }
+::view-transition-new(theme-toggle) { animation: none; }
 *, *::before, *::after { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
 /* hidden scrollbar (the page still scrolls) */

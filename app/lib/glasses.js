@@ -1,7 +1,7 @@
 // My eyeglasses in 3D, built from code (no model file), for the footer: they rest on the footer as if on a tabletop,
 // seen from above, and turn toward the pointer. Light world: smoky acetate and real glass; dark world: my second pair,
-// round gold and tortoiseshell (glasses-dark.js). Modelled from my photos (see prototypes/lab/glasses.html and
-// prototypes/lab/glasses-dark.html for the labs with controls).
+// round gold and tortoiseshell (glasses-dark.js). Modelled from my photos (see public/lab/glasses.html and
+// public/lab/glasses-dark.html for the labs with controls).
 // mountGlasses(el) loads three.js on demand and returns a dispose function.
 
 function buildModel(THREE, RoomEnvironment) {
