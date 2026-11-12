@@ -117,7 +117,8 @@ export default defineContentConfig({
       schema: z.object({
         articleCategories: z.array(z.object({ id: z.string(), name: z.string(), heading: z.string(), blurb: z.string() })),
         toolLevels: z.array(z.object({ id: z.string(), name: z.string() })),
-        toolGroups: z.array(z.object({ id: z.string(), name: z.string(), tag: z.string() }))
+        toolGroups: z.array(z.object({ id: z.string(), name: z.string(), tag: z.string() })),
+        workTypes: z.array(z.object({ id: z.string(), name: z.string(), ext: z.string() })) // the Works file types; ext shows after a project's name (.inf)
       })
     }),
     // Search and sharing: page titles and descriptions, the site name and the share image (edited under SEO).
@@ -141,7 +142,7 @@ export default defineContentConfig({
         steps: z.array(z.object({
           title: z.string(),
           blurb: z.string(),
-          icon: z.enum(['brief', 'map', 'research', 'journey']),
+          icon: z.enum(['brief', 'research', 'map', 'design', 'ship']), // the drawings in Process.vue
           outputs: z.array(z.string()) // what the step hands over
         }))
       })
@@ -186,6 +187,36 @@ export default defineContentConfig({
         tooFar: z.object({ title: z.string(), photo: z.string(), alt: z.string(), body: z.array(z.string()) }),
         next: z.object({ title: z.string(), plans: z.array(z.object({ title: z.string(), body: z.string() })) })
       })
+    }),
+    // The Works window (home page and /works): every project is a file. Never a client name (all client work is under NDA).
+    works: defineCollection({
+      type: 'data',
+      source: 'works.json',
+      schema: z.object({
+        heading: z.string(), // above the window on the home page
+        projects: z.array(z.object({
+          title: z.string(), // the file name
+          fileType: z.string(), // a workTypes id
+          role: z.string(),
+          tools: z.string(),
+          fullTitle: z.string(), // the title in the project's own window
+          description: z.string(),
+          tags: z.array(z.string()), // the sidebar filters match these (Informative Website, Web App, Loyalty…)
+          challenge: z.string(),
+          approach: z.string(),
+          features: z.array(z.string()),
+          deliverables: z.array(z.string()),
+          highlights: z.array(z.string()), // "At a glance"
+          id: z.number(), // stable: picks the project's built-in 3D icon and keeps a visitor's arrangement
+          // its own 3D icon (replaces the built-in one): parts written by an AI, checked by app/lib/works/model.js
+          model: z.object({ name: z.string(), file: z.string().optional(), parts: z.array(z.record(z.string(), z.any())) }).optional()
+        }))
+      })
+    }),
+    nda: defineCollection({
+      type: 'data',
+      source: 'nda.json',
+      schema: z.object({ title: z.string(), titleEnd: z.string(), body: z.array(z.string()), backLabel: z.string() })
     }),
     keyboard: defineCollection({
       type: 'data',

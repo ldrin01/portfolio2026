@@ -58,7 +58,8 @@ onBeforeUnmount(() => { near?.disconnect(); window.removeEventListener('scroll',
               <template v-if="s.icon === 'brief'"><path d="M7 3h7l4 4v14H7z" /><path d="M14 3v4h4M10 12h5M10 15.5h5M10 9h2" /></template>
               <template v-else-if="s.icon === 'map'"><circle cx="12" cy="12" r="2.6" /><circle cx="5" cy="6" r="1.8" /><circle cx="19" cy="6" r="1.8" /><circle cx="5" cy="18" r="1.8" /><circle cx="19" cy="18" r="1.8" /><path d="M6.4 7.2l3.6 3M17.6 7.2l-3.6 3M6.4 16.8l3.6-3M17.6 16.8l-3.6-3" /></template>
               <template v-else-if="s.icon === 'research'"><circle cx="10.5" cy="10.5" r="6" /><path d="M15 15l5.5 5.5M8 10.5a2.5 2.5 0 0 1 2.5-2.5" /></template>
-              <template v-else><circle cx="5" cy="18" r="2" /><circle cx="19" cy="6" r="2" /><path d="M7 18c6 0 3-12 10-12" stroke-dasharray="2 2.4" /></template>
+              <template v-else-if="s.icon === 'design'"><rect x="3.5" y="4" width="17" height="12" rx="1.5" /><path d="M8 20h8M12 16v4M7 9h4M7 12h7" /></template>
+              <template v-else><path d="M5 12.5l4.5 4.5L19 7.5" /><path d="M3.5 5.5v13a1 1 0 0 0 1 1h15" opacity=".45" /></template>
             </svg>
           </span>
           <h3>{{ s.title }}</h3>
@@ -97,8 +98,8 @@ h3 { margin-top: 22px; font-size: clamp(22px, 2.2vw, 30px); font-weight: 500; le
 .outs li { font-size: 12px; letter-spacing: .04em; padding: 3px 10px; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); background: var(--surface); transition: border-color .4s, color .4s; }
 .on .outs li { border-color: color-mix(in srgb, var(--accent) 45%, var(--line)); color: var(--fg); }
 /* each step rises in once the line reaches it */
-.step > :not(.node) { opacity: .35; transform: translateY(8px); transition: opacity .6s ease, transform .6s cubic-bezier(.16, .84, .3, 1); }
-.step.on > :not(.node) { opacity: 1; transform: none; }
+.step > :not(.node) { transform: translateY(8px); transition: transform .6s cubic-bezier(.16, .84, .3, 1); }
+.step.on > :not(.node) { transform: none; }
 
 /* tablets and phones: one column, the line runs down the left through the nodes */
 @media (max-width: 860px) {

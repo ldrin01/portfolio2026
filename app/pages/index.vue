@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { profile } = useSite()
+const { profile, works } = useSite()
 
 const loaderDone = useState('loaderDone', () => false)
 usePageSeo('home')
@@ -38,17 +38,25 @@ useHead({
       </div>
     </section>
 
-    <LazyAboutIntro hydrate-on-visible />
-    
-    <FolderStack />
-    
+    <!-- Works: the projects as files in a folder window; the green light opens the full Works page -->
+    <section id="works" class="works">
+      <div class="wrap works-in">
+        <h2 v-lag="0">{{ works.heading }}</h2>
+        <LazyWorksWindow hydrate-on-visible />
+      </div>
+    </section>
+
     <LazyKeyboard hydrate-on-visible />
-    
+
+    <LazyAboutIntro hydrate-on-visible />
+
     <LazyTimeline hydrate-on-visible />
-    
-    <LazyToolkit hydrate-on-visible />
-    
+
     <LazyProcess hydrate-on-visible />
+
+    <FolderStack />
+
+    <LazyToolkit hydrate-on-visible />
 
     <section id="contact" class="contact">
       <div class="wrap contact-in">
@@ -75,6 +83,10 @@ useHead({
 @keyframes rise { from { transform: translateY(110%); } to { transform: none; } }
 @media (prefers-reduced-motion: reduce) { .line-in { transform: none; animation: none !important; } }
 .center { text-align: center; }
+
+/* the Works frame: a heading and the folder window */
+.works-in { max-width: 1240px; }
+.works h2 { margin: 0 0 18px; padding: 0 4px; font-weight: 400; font-size: clamp(32px, 5vw, 56px); line-height: 1; letter-spacing: -.02em; }
 @media (max-width: 600px) { .hero h1 { font-size: 8.2vw; } }
 
 /* last frame: huge two-line headline and the contact email (socials live in the footer) */

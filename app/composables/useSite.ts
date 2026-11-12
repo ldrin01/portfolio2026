@@ -15,12 +15,14 @@ export interface Site {
   footer: Doc<'footer'>
   contact: Doc<'contact'>
   caseStudiesPage: Doc<'caseStudiesPage'>
+  works: Doc<'works'>
+  nda: Doc<'nda'>
 }
 
 export async function loadSite() {
   const site = useState<Site | null>('site', () => null)
   if (!site.value) {
-    const [profile, folder, journey, toolkit, keyboard, process, about, options, seo, header, footer, contact, caseStudiesPage] = await Promise.all([
+    const [profile, folder, journey, toolkit, keyboard, process, about, options, seo, header, footer, contact, caseStudiesPage, works, nda] = await Promise.all([
       queryCollection('profile').first(),
       queryCollection('folder').first(),
       queryCollection('journey').first(),
@@ -33,10 +35,12 @@ export async function loadSite() {
       queryCollection('header').first(),
       queryCollection('footer').first(),
       queryCollection('contact').first(),
-      queryCollection('caseStudiesPage').first()
+      queryCollection('caseStudiesPage').first(),
+      queryCollection('works').first(),
+      queryCollection('nda').first()
     ])
-    if (!profile || !folder || !journey || !toolkit || !keyboard || !process || !about || !options || !seo || !header || !footer || !contact || !caseStudiesPage) throw createError({ statusCode: 500, message: 'Missing content in /content' })
-    site.value = { profile, folder, journey, toolkit, keyboard, process, about, options, seo, header, footer, contact, caseStudiesPage }
+    if (!profile || !folder || !journey || !toolkit || !keyboard || !process || !about || !options || !seo || !header || !footer || !contact || !caseStudiesPage || !works || !nda) throw createError({ statusCode: 500, message: 'Missing content in /content' })
+    site.value = { profile, folder, journey, toolkit, keyboard, process, about, options, seo, header, footer, contact, caseStudiesPage, works, nda }
   }
   return site
 }
@@ -45,6 +49,6 @@ export async function loadSite() {
 export const useSite = () => useState<Site>('site').value
 
 // The display name for an id from one of the choice lists in content/options.json.
-export function optionName(list: 'articleCategories' | 'toolLevels' | 'toolGroups', id: string) {
+export function optionName(list: 'articleCategories' | 'toolLevels' | 'toolGroups' | 'workTypes', id: string) {
   return useSite().options[list].find(o => o.id === id)?.name ?? id
 }

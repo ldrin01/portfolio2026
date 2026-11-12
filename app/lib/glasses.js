@@ -1,6 +1,7 @@
 // My eyeglasses in 3D, built from code (no model file), for the footer: they rest on the footer as if on a tabletop,
-// seen from above, and turn toward the pointer. Light world: smoky acetate and real glass; dark world: an orange line
-// drawing at half resolution. Modelled from my photos (see public/lab/glasses.html for the full lab with controls).
+// seen from above, and turn toward the pointer. Light world: smoky acetate and real glass; dark world: my second pair,
+// round gold and tortoiseshell (glasses-dark.js). Modelled from my photos (see public/lab/glasses.html and
+// public/lab/glasses-dark.html for the labs with controls).
 // mountGlasses(el) loads three.js on demand and returns a dispose function.
 
 function buildModel(THREE, RoomEnvironment) {
@@ -15,7 +16,7 @@ function buildModel(THREE, RoomEnvironment) {
     return pts
   }
   function sweep(c, opts = {}) {
-    const { steps = 64, closed = false, up = V(0, 1, 0), w = 0.3, h = 0.3, w2, h2, r = 0.5, seg = 3, lo = false, taper = 0 } = opts
+    const { steps = 64, closed = false, up = V(0, 1, 0), w = 0.3, h = 0.3, w2, h2, r = 0.5, seg = 3, taper = 0 } = opts
     const ringN = (seg + 1) * 4, pos = [], uvs = [], idx = []
     const n = closed ? steps : steps + 1
     for (let i = 0; i < n; i++) {
@@ -39,15 +40,6 @@ function buildModel(THREE, RoomEnvironment) {
     g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3))
     g.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2))
     g.setIndex(idx); g.computeVertexNormals()
-    if (lo) { // the line drawing: one ring per step and a rail along each corner, no diagonals
-      const seg = []
-      const P = (i, j) => pos.slice((i * ringN + j) * 3, (i * ringN + j) * 3 + 3)
-      for (let i = 0; i < n; i++) for (let j = 0; j < ringN; j++) seg.push(...P(i, j), ...P(i, (j + 1) % ringN))
-      for (let i = 0; i < steps; i++) for (let j = 0; j < ringN; j++) seg.push(...P(i, j), ...P((i + 1) % n, j))
-      g.userData.wire = new THREE.BufferGeometry().setAttribute('position', new THREE.Float32BufferAttribute(seg, 3))
-    }
-    // the dark world draws a simpler twin as lines: square profile, far fewer rings
-    if (!lo) g.userData.lo = sweep(c, { ...opts, steps: Math.max(3, Math.round(steps / 3)), w: w * 1.08, h: h * 1.08, w2: w2 && w2 * 1.08, h2: h2 && h2 * 1.08, seg: 0, lo: true }) // sharp corners just outside the round body, so the solid never hides them
     return g
   }
 
@@ -67,7 +59,7 @@ function buildModel(THREE, RoomEnvironment) {
     return best.clone()
   }
 
-  // ── materials: the light world (physical) and the dark world (orange wireframe) ──
+  // ── materials: the light world (physical) ──
   const LIGHT = {
     frame: new THREE.MeshPhysicalMaterial({ color: 0x4a4f57, roughness: 0.14, metalness: 0, clearcoat: 1, clearcoatRoughness: 0.05, transmission: 0.6, thickness: 0.3, ior: 1.5, attenuationColor: 0x1b1d21, attenuationDistance: 0.22, specularIntensity: 0.9 }), // smoky translucent acetate
     // the same acetate where it is thick (hinge blocks, tips): light travels further through it, so it reads darker
@@ -81,10 +73,6 @@ function buildModel(THREE, RoomEnvironment) {
     lime: new THREE.MeshPhysicalMaterial({ color: 0xc4e346, roughness: 0.35, clearcoat: 0.5 }),
     sleeve: new THREE.MeshPhysicalMaterial({ color: 0xf1efe8, roughness: 0.45, transmission: 0.4, thickness: 0.4 })
   }
-  // dark: every part is an orange line drawing; solid bodies in the background colour hide the lines behind them
-  const ln = (c) => new THREE.LineBasicMaterial({ color: c })
-  const DARK_LINES = { frame: ln(0xff5a2d), thick: ln(0xff5a2d), groove: ln(0x9a2c10), bridge: ln(0xff7a3d), lens: ln(0x6e200c), pad: ln(0xe84a1c), metal: ln(0xc43a14), lime: ln(0xffb070), sleeve: ln(0x9a2c10), print: ln(0) }
-  const OCCLUDE = new THREE.MeshBasicMaterial({ color: 0x0a0605, polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1 })
 
   // ── build, upright: x right, y up, z toward the viewer ──
   const parts = []
@@ -142,9 +130,7 @@ function buildModel(THREE, RoomEnvironment) {
     add(sweep(curve([m, m.clone().add(V(side * 0.12, -0.15, -0.35)), V(side * (GAP + 0.18), m.y - 0.45, -0.62)]), { steps: 10, w: 0.06, h: 0.06, r: 0.5 }), 'metal')
     add(new THREE.BoxGeometry(0.12, 0.16, 0.12).translate(side * (GAP + 0.18), m.y - 0.45, -0.66), 'metal')
     const padAt = (g) => g.scale(0.24, 0.52, 0.1).rotateX(-0.25).rotateY(side * 0.85).translate(side * (GAP - 0.02), m.y - 0.75, -0.78)
-    const pad = padAt(new THREE.SphereGeometry(1, 24, 16))
-    pad.userData.lo = padAt(new THREE.SphereGeometry(1, 8, 5))
-    add(pad, 'pad')
+    add(padAt(new THREE.SphereGeometry(1, 24, 16)), 'pad')
   }
   // the clear silicone sleeve on one temple, just behind the hinge
   add(sweep(curve([V(-(CX + 2.78), EY, -1.0), V(-(CX + 2.86), EY, -2.25)]), { steps: 6, w: 0.4, h: 0.52, r: 0.5 }), 'sleeve')
@@ -154,15 +140,16 @@ function buildModel(THREE, RoomEnvironment) {
     const l = rimNear(-1, -2.35, 1.2), r = rimNear(1, -2.35, 1.2)
     add(sweep(curve([l.clone().add(V(-0.02, 0, 0)), V(-0.5, 1.62, -0.1), V(0, 1.78, -0.15), V(0.5, 1.62, -0.1), r.clone().add(V(0.02, 0, 0))]), { steps: 48, up: V(0, 0, 1), w: 0.36, h: 0.33, r: 0.5, taper: 0.4 }), 'bridge')
   }
-  return { parts, LIGHT, DARK_LINES, OCCLUDE, V }
+  return { parts, LIGHT, V }
 }
 
 export async function mountGlasses(el) {
-  const [THREE, { RoomEnvironment }] = await Promise.all([
+  const [THREE, { RoomEnvironment }, { buildDarkGlasses }] = await Promise.all([
     import('three'),
-    import('three/examples/jsm/environments/RoomEnvironment.js')
+    import('three/examples/jsm/environments/RoomEnvironment.js'),
+    import('./glasses-dark.js')
   ])
-  const { parts, LIGHT, DARK_LINES, OCCLUDE, V } = buildModel(THREE, RoomEnvironment)
+  const { parts, LIGHT, V } = buildModel(THREE, RoomEnvironment)
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches
   const coarse = matchMedia('(pointer: coarse)').matches
 
@@ -203,7 +190,7 @@ export async function mountGlasses(el) {
   const holder = new THREE.Group()
   holder.add(glasses)
   scene.add(holder)
-  const disposables = [env, pmrem, table.geometry, table.material, OCCLUDE, ...Object.values(LIGHT), ...Object.values(DARK_LINES)]
+  const disposables = [env, pmrem, table.geometry, table.material, ...Object.values(LIGHT)]
   const meshes = parts.map(([g, role]) => {
     if (role === 'print') g.userData.mat = new THREE.MeshBasicMaterial({ map: g.userData.tex, transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2, side: THREE.DoubleSide })
     const mesh = new THREE.Mesh(g, role === 'print' ? g.userData.mat : LIGHT[role])
@@ -214,14 +201,6 @@ export async function mountGlasses(el) {
     if (g.userData.mat) disposables.push(g.userData.mat, g.userData.tex)
     return mesh
   })
-  const lines = parts.filter(([, role]) => role !== 'lens' && role !== 'print').map(([g, role]) => {
-    const lg = g.userData.lo?.userData.wire ?? new THREE.EdgesGeometry(g.userData.lo ?? g, 1)
-    const l = new THREE.LineSegments(lg, DARK_LINES[role])
-    l.visible = false
-    glasses.add(l)
-    disposables.push(lg)
-    return l
-  })
 
   // rest them upside down, as in the photos: the brow line on the table, the ear bends pointing up
   glasses.rotation.set(0, 0, Math.PI)
@@ -229,36 +208,43 @@ export async function mountGlasses(el) {
   const box = new THREE.Box3().setFromObject(glasses)
   glasses.position.set(-(box.min.x + box.max.x) / 2, -box.min.y, -(box.min.z + box.max.z) / 2)
   const baseY = glasses.position.y
+
+  // the dark world's pair: already resting on y = 0, centred
+  const dark2 = buildDarkGlasses(THREE)
+  const darkGlasses = dark2.root
+  holder.add(darkGlasses)
+  disposables.push(...dark2.disposables)
   holder.updateMatrixWorld(true)
 
-  // contact shadow, baked once: parts near the table darken it, the closer the darker
-  let contact
-  {
-    const b = new THREE.Box3().setFromObject(glasses), M = 1.2
+  // contact shadow, baked once per pair: parts near the table darken it, the closer the darker
+  function bakeContact(group, list, tone) {
+    const b = new THREE.Box3().setFromObject(group), M = 1.2
     const x0 = b.min.x - M, z0 = b.min.z - M, w = b.max.x - b.min.x + 2 * M, d = b.max.z - b.min.z + 2 * M
     const S = 1024, sx = S / w, sz = S / d
     const cv = document.createElement('canvas'); cv.width = cv.height = S
     const cx = cv.getContext('2d')
     const H = 0.45, p = V(0, 0, 0)
-    meshes.forEach(mesh => {
-      if (['lens', 'print'].includes(mesh.userData.role)) return
+    list.forEach(mesh => {
       const pos = mesh.geometry.attributes.position
       for (let i = 0; i < pos.count; i++) {
         p.fromBufferAttribute(pos, i).applyMatrix4(mesh.matrixWorld)
         if (p.y > H) continue
         const k = 1 - p.y / H, r = (0.07 + p.y * 0.7) * sx, X = (p.x - x0) * sx, Z = (p.z - z0) * sz
         const g = cx.createRadialGradient(X, Z, 0, X, Z, r)
-        g.addColorStop(0, `rgba(30, 24, 16, ${0.1 * k * k * k})`); g.addColorStop(1, 'rgba(30, 24, 16, 0)')
+        g.addColorStop(0, `rgba(${tone}, ${0.1 * k * k * k})`); g.addColorStop(1, `rgba(${tone}, 0)`)
         cx.fillStyle = g; cx.fillRect(X - r, Z - r, r * 2, r * 2)
       }
     })
     const soft = document.createElement('canvas'); soft.width = soft.height = S
     const sc = soft.getContext('2d'); sc.filter = 'blur(3px)'; sc.drawImage(cv, 0, 0)
     const tex = new THREE.CanvasTexture(soft); tex.colorSpace = THREE.SRGBColorSpace
-    contact = new THREE.Mesh(new THREE.PlaneGeometry(w, d).rotateX(-Math.PI / 2).translate(x0 + w / 2, 0.004, z0 + d / 2), new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false }))
+    const contact = new THREE.Mesh(new THREE.PlaneGeometry(w, d).rotateX(-Math.PI / 2).translate(x0 + w / 2, 0.004, z0 + d / 2), new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false }))
     holder.add(contact)
     disposables.push(contact.geometry, contact.material, tex)
+    return contact
   }
+  const contact = bakeContact(glasses, meshes.filter(m => !['lens', 'print'].includes(m.userData.role)), '30, 24, 16')
+  const contactDark = bakeContact(darkGlasses, dark2.meshes.filter(m => !m.userData.see), '0, 0, 0')
 
   // camera: from above and a little in front, looking down on the glasses, framed to fit
   function frame() {
@@ -276,20 +262,16 @@ export async function mountGlasses(el) {
     kick()
   }
 
-  // theme: physical materials in light, the line drawing in dark
+  // theme: the smoky acetate pair in light, the round gold and tortoiseshell pair in dark
   let dark = false
   function applyTheme() {
     dark = document.documentElement.dataset.theme === 'dark'
-    meshes.forEach(mesh => {
-      const role = mesh.userData.role
-      mesh.material = dark ? OCCLUDE : role === 'print' ? mesh.geometry.userData.mat : LIGHT[role]
-      mesh.visible = !(dark && (role === 'lens' || role === 'print'))
-      mesh.castShadow = !dark && role !== 'lens' && role !== 'print'
-    })
-    lines.forEach(l => { l.visible = dark })
-    contact.visible = table.visible = !dark
-    scene.environment = dark ? null : env
-    renderer.setPixelRatio(dark ? 0.5 : Math.min(devicePixelRatio, 2)) // dark: half resolution, shown pixelated
+    glasses.visible = contact.visible = !dark
+    darkGlasses.visible = contactDark.visible = dark
+    table.material.opacity = dark ? 0.45 : 0.12 // the footer is near black in dark: the shadow needs more weight to read
+    scene.environment = env
+    scene.environmentIntensity = dark ? 0.8 : 1
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2))
     frame()
   }
   const themeWatch = new MutationObserver(applyTheme)
@@ -314,7 +296,9 @@ export async function mountGlasses(el) {
       // ease toward the target by elapsed time: smooth at any frame rate, and no overshoot to fight the next move
       follow.yaw += (follow.tx * 0.25 - follow.yaw) * (1 - Math.exp(-dt * 4))
       holder.rotation.y = follow.yaw
-      glasses.position.y = baseY + (Math.sin(t / 900) * 0.5 + 0.5) * 0.06
+      const float = (Math.sin(t / 900) * 0.5 + 0.5) * 0.06
+      glasses.position.y = baseY + float
+      darkGlasses.position.y = float
     }
     renderer.render(scene, camera)
     if (seen && !reduce) raf = requestAnimationFrame(tick) // runs only while the footer is on screen

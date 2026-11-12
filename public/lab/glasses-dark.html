@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Glasses 2 Lab</title>
+<style>
+  :root { --bg: #0a0605; --fg: #e6e9ed; --muted: #a8aaaf; --line: rgba(168, 170, 175, .22); --accent: #ff5a2d; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--fg); font: 14px/1.4 system-ui, sans-serif; overflow: hidden; }
+  #stage { position: fixed; inset: 0; }
+  #stage canvas { display: block; width: 100%; height: 100%; }
+  .ui { position: fixed; left: 16px; top: 16px; display: flex; flex-wrap: wrap; gap: 8px; max-width: calc(100vw - 32px); }
+  .ui button { font: inherit; padding: 8px 14px; color: var(--fg); background: color-mix(in srgb, var(--bg) 80%, transparent); border: 1px solid var(--line); border-radius: 999px; cursor: pointer; }
+  .ui button[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); }
+  .note { position: fixed; left: 16px; bottom: 16px; max-width: 520px; margin: 0; color: var(--muted); font-size: 12px; }
+</style>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<div id="stage"></div>
+<div class="ui">
+  <button id="pose" aria-pressed="true">Upside down</button>
+  <button id="follow" aria-pressed="true">Follow pointer</button>
+  <button id="spin" aria-pressed="false">Turntable</button>
+  <button id="view">Photo angle</button>
+</div>
+<p class="note">Glasses 2, for the dark footer: a gold band round each rim with a rounded tortoiseshell ring inside it, a flat gold bridge, gold wire temples with tortoiseshell tips, curved meniscus lenses, silicone nose pads. Drag to look around.</p>
+
+<script type="module">
+import * as THREE from 'three'
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js'
+
+const V = (x, y, z) => new THREE.Vector3(x, y, z)
+const BG = 0x0a0605
+const curve = (pts, closed = false) => new THREE.CatmullRomCurve3(pts, closed, 'centripetal')
+
+// ── a rounded-rectangle profile swept along a curve ──
+function roundRect(w, h, r, seg) {
+  const pts = [], cs = [[w / 2 - r, h / 2 - r, 0], [-w / 2 + r, h / 2 - r, 90], [-w / 2 + r, -h / 2 + r, 180], [w / 2 - r, -h / 2 + r, 270]]
+  for (const [cx, cy, a0] of cs) for (let s = 0; s <= seg; s++) { const a = ((a0 + (s / seg) * 90) * Math.PI) / 180; pts.push([cx + Math.cos(a) * r, cy + Math.sin(a) * r]) }
+  return pts
+}
+function sweep(c, { steps = 64, closed = false, up = V(0, 1, 0), w = 0.1, h = 0.1, w2, h2, r = 0.5, seg = 4 } = {}) {
+  const ringN = (seg + 1) * 4, pos = [], uvs = [], idx = []
+  const n = closed ? steps : steps + 1
+  for (let i = 0; i < n; i++) {
+    const k = i / steps, p = c.getPointAt(k), t = c.getTangentAt(k)
+    const side = t.clone().cross(up).normalize(), u = side.clone().cross(t).normalize()
+    const ww = w2 == null ? w : w + (w2 - w) * k, hh = h2 == null ? h : h + (h2 - h) * k
+    roundRect(ww, hh, Math.min(ww, hh) * r, seg).forEach(([a, b], j) => { pos.push(...p.clone().addScaledVector(side, a).addScaledVector(u, b).toArray()); uvs.push(j / ringN, k) })
+  }
+  for (let i = 0; i < steps; i++) {
+    const a = i * ringN, b = ((i + 1) % n) * ringN
+    for (let j = 0; j < ringN; j++) { const j2 = (j + 1) % ringN; idx.push(a + j, b + j, b + j2, a + j, b + j2, a + j2) }
+  }
+  const cap = (base, flip, at) => { const ctr = pos.length / 3; const pc = c.getPointAt(at); pos.push(pc.x, pc.y, pc.z); uvs.push(0, 0); for (let j = 0; j < ringN; j++) { const j2 = (j + 1) % ringN; flip ? idx.push(ctr, base + j2, base + j) : idx.push(ctr, base + j, base + j2) } }
+  if (!closed) { cap(0, false, 0); cap(steps * ringN, true, 1) }
+  const g = new THREE.BufferGeometry()
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3))
+  g.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2))
+  g.setIndex(idx); g.computeVertexNormals()
+  return g
+}
+// ── the lens shape: not a true circle. A touch wider than tall, the top flatter, the nose side drawn in a hair ──
+// side: 1 right lens, -1 left; off: distance outward from the lens edge (negative = inside)
+function lensPts(side, off = 0, n = 180) {
+  const pts = []
+  for (let i = 0; i < n; i++) {
+    const t = (i / n) * Math.PI * 2, c = Math.cos(t), s = Math.sin(t)
+    let x = c * 2.36, y = s * 2.24
+    if (s > 0) y *= 1 - 0.06 * s ** 6           // flatter top line
+    if (c * side < 0) x *= 1 - 0.025 * (c * c) * (s > 0 ? 1 : 0.4) // nose side a little drawn in, more toward the top
+    const len = Math.hypot(x, y)
+    pts.push(V(x + (x / len) * off, y + (y / len) * off, 0))
+  }
+  return pts
+}
+// a band around the lens with a rounded-rectangle profile: `w` across the band, `d` front to back, centred at z
+const ring = (side, off, w, d, z = 0, r = 0.45) => sweep(curve(lensPts(side, off).map(p => p.setZ(z)), true), { steps: 200, closed: true, up: V(0, 0, 1), w, h: d, r })
+
+// the lens: a meniscus. The front bulges out (convex), the back curves in (concave), the edge has a little thickness.
+// Both faces follow the outline, so the edge sits level all the way round inside the rim.
+function lensGeom(side, off, { edge = 0.1, front = 0.042, back = 0.028, rings = 32 } = {}) {
+  const out = lensPts(side, off, 128), N = out.length, pos = [], idx = []
+  const face = (sign, k) => { // sign +1 front, -1 back; k: sag per cm²
+    // the dome height depends only on how far in from the edge a point is (f), never on direction, so the
+    // surface is one smooth cap with no crease at the centre
+    const RR = out.reduce((a, p) => a + p.lengthSq(), 0) / N
+    const ctr = pos.length / 3
+    pos.push(0, 0, sign * edge / 2 + k * RR)
+    const base = ctr + 1
+    for (let j = 1; j <= rings; j++) {
+      const f = j / rings
+      for (let i = 0; i < N; i++) {
+        const p = out[i]
+        pos.push(p.x * f, p.y * f, sign * edge / 2 + k * RR * (1 - f * f))
+      }
+    }
+    for (let i = 0; i < N; i++) { const a = base + i, b = base + (i + 1) % N; sign > 0 ? idx.push(ctr, a, b) : idx.push(ctr, b, a) }
+    for (let j = 0; j < rings - 1; j++) for (let i = 0; i < N; i++) {
+      const a = base + j * N + i, b = base + j * N + (i + 1) % N, c = a + N, d = b + N
+      sign > 0 ? idx.push(a, c, d, a, d, b) : idx.push(a, d, c, a, b, d)
+    }
+    return base + (rings - 1) * N // first index of the rim row
+  }
+  const fr = face(1, front), br = face(-1, back)
+  for (let i = 0; i < N; i++) { const i2 = (i + 1) % N; idx.push(fr + i, br + i, br + i2, fr + i, br + i2, fr + i2) } // the edge
+  const g = new THREE.BufferGeometry()
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3))
+  g.setIndex(idx); g.computeVertexNormals()
+  return g
+}
+
+// ── tortoiseshell, painted: a dark brown body with amber and honey patches, stretched along the part ──
+function tortoise({ base, spots, n, seed }) {
+  let s = seed; const rnd = () => ((s = (s * 16807) % 2147483647) / 2147483647)
+  const cv = document.createElement('canvas'); cv.width = 1024; cv.height = 256
+  const cx = cv.getContext('2d')
+  cx.fillStyle = base; cx.fillRect(0, 0, 1024, 256)
+  for (let i = 0; i < n; i++) {
+    const [r, g, b, a] = spots[Math.floor(rnd() * spots.length)]
+    const x = rnd() * 1024, y = rnd() * 256, rx = 12 + rnd() * 70, ry = 6 + rnd() * 26
+    for (const dx of [-1024, 0, 1024]) { // wrap around, so the seam does not show
+      cx.save(); cx.translate(x + dx, y); cx.rotate((rnd() - 0.5) * 0.5); cx.scale(rx, ry)
+      const gr = cx.createRadialGradient(0, 0, 0, 0, 0, 1)
+      gr.addColorStop(0, `rgba(${r},${g},${b},${a})`); gr.addColorStop(0.6, `rgba(${r},${g},${b},${a * 0.5})`); gr.addColorStop(1, `rgba(${r},${g},${b},0)`)
+      cx.fillStyle = gr; cx.beginPath(); cx.arc(0, 0, 1, 0, Math.PI * 2); cx.fill(); cx.restore()
+    }
+  }
+  const tex = new THREE.CanvasTexture(cv)
+  tex.colorSpace = THREE.SRGBColorSpace; tex.wrapS = tex.wrapT = THREE.RepeatWrapping; tex.anisotropy = 8
+  return tex
+}
+const shellTex = tortoise({ base: '#150904', n: 110, seed: 7, spots: [[96, 48, 18, 0.5], [140, 80, 32, 0.35], [60, 28, 10, 0.6], [4, 2, 1, 0.8], [4, 2, 1, 0.8]] })
+shellTex.repeat.set(5, 1)
+const tipTex = tortoise({ base: '#120805', n: 90, seed: 23, spots: [[96, 44, 16, 0.6], [140, 72, 26, 0.4], [4, 2, 1, 0.8]] })
+tipTex.center.set(0.5, 0.5); tipTex.rotation = Math.PI / 2; tipTex.repeat.set(1.2, 0.4)
+
+// ── materials, matched to the photos ──
+const M = {
+  shell: new THREE.MeshPhysicalMaterial({ map: shellTex, roughness: 0.16, clearcoat: 1, clearcoatRoughness: 0.05, specularIntensity: 0.8 }), // rim acetate
+  tip: new THREE.MeshPhysicalMaterial({ map: tipTex, roughness: 0.2, clearcoat: 1, clearcoatRoughness: 0.08 }),                           // temple tips
+  gold: new THREE.MeshPhysicalMaterial({ color: 0xd8b878, metalness: 1, roughness: 0.2 }),                                                 // eye-wire, bridge, temples
+  goldDim: new THREE.MeshPhysicalMaterial({ color: 0xbfa066, metalness: 1, roughness: 0.32 }),                                             // small hardware
+  lens: new THREE.MeshPhysicalMaterial({ color: 0xfffaf0, roughness: 0.02, transmission: 1, thickness: 0.12, ior: 1.55, attenuationColor: 0xf2dfb0, attenuationDistance: 2.5, specularIntensity: 1, envMapIntensity: 1.4 }),
+  pad: new THREE.MeshPhysicalMaterial({ color: 0xeee2a0, roughness: 0.35, transmission: 0.55, thickness: 0.25, ior: 1.42, clearcoat: 0.5 })
+}
+
+// ── measurements, in cm, taken from the photos (wearing pose: x right, y up, z toward the viewer) ──
+const R = 2.3           // lens radius: 46 mm round
+const GAP = 0.77        // half the distance between the rims (bridge ~15 mm)
+const CX = GAP + R + 0.1
+const HY = 0.77         // hinge height: above the lens centre
+const parts = []
+const BEND = 0.085 // the front is not flat: each half angles back from the bridge (about 5°), wrapping toward the face
+let bend = null    // set per side: turns a front part about the bridge end of that half
+const add = (g, m, group = 'front') => { if (bend && group === 'front') bend(g); parts.push({ g, m, group }) }
+const onRim = (s, y, r = R + 0.12) => s * (CX + Math.sqrt(r * r - y * y)) // x on the outer edge at height y (outer side)
+const inRim = (s, y, r = R + 0.12) => s * (CX - Math.sqrt(r * r - y * y))  // x on the nose side
+
+for (const s of [-1, 1]) {
+  const pivot = s * (GAP + 0.2)
+  bend = (g) => g.translate(-pivot, 0, 0).rotateY(s * BEND).translate(pivot, 0, 0)
+  const bent = (p) => p.clone().sub(V(pivot, 0, 0)).applyAxisAngle(V(0, 1, 0), s * BEND).add(V(pivot, 0, 0))
+
+  // rim: a gold band all the way round the outside; inside it a rounded tortoiseshell ring, deeper than the gold,
+  // so it stands proud of the gold at the front and at the back
+  add(ring(s, 0.165, 0.07, 0.17, 0).translate(s * CX, 0, 0), M.gold)
+  add(ring(s, 0.04, 0.22, 0.34, 0, 0.5).translate(s * CX, 0, 0), M.shell)
+  // lens: a clear meniscus with a slight warm cast, its edge seated in the tortoiseshell
+  add(lensGeom(s, -0.04).translate(s * CX, 0, 0), M.lens)
+
+  // endpiece: a small gold block off the outer side, turning back into the hinge
+  const ex = onRim(s, HY)
+  add(sweep(curve([V(ex - s * 0.04, HY, -0.02), V(ex + s * 0.16, HY, -0.12), V(ex + s * 0.22, HY, -0.5)]), { steps: 16, w: 0.22, h: 0.18, r: 0.35, up: V(0, 1, 0) }), M.gold)
+  const bx = ex + s * 0.25
+  add(new THREE.CylinderGeometry(0.085, 0.085, 0.34, 24).translate(bx, HY, -0.48), M.gold)                     // hinge barrel
+  add(new THREE.CylinderGeometry(0.06, 0.06, 0.03, 20).translate(bx, HY + 0.185, -0.48), M.goldDim)            // screw head
+  add(new THREE.CylinderGeometry(0.035, 0.035, 0.05, 12).rotateZ(Math.PI / 2).translate(ex + s * 0.2, HY, -0.25), M.goldDim) // rivet on the side
+
+  // temple: a thin round gold wire running back from the (bent) hinge, with a gentle outward bow and a slight sag
+  const H = bent(V(bx, HY, -0.48))
+  const T0 = V(H.x + s * 0.02, HY, H.z - 0.08), T2 = V(H.x + s * 0.32, HY - 0.03, -9.6)
+  const T1 = V((T0.x + T2.x) / 2 + s * 0.12, HY + 0.05, -5)
+  // a flat gold band, on edge: tall at the hinge, narrowing toward the ear
+  add(sweep(curve([T0, V(T0.x + s * 0.06, HY + 0.02, -2.4), T1, V(T2.x + s * 0.03, HY, -7.6), T2]), { steps: 96, up: V(1, 0, 0), w: 0.32, w2: 0.12, h: 0.055, r: 0.5, seg: 4 }), M.gold, 'temple')
+  // tip: tortoiseshell sleeve over the end of the wire, curving down behind the ear and turning in toward the head,
+  // widening a little at the end
+  const TX = T2.x
+  add(sweep(curve([V(TX - s * 0.005, HY - 0.03, -9.3), V(TX - s * 0.04, HY - 0.06, -11.4), V(TX - s * 0.14, HY - 0.38, -12.8), V(TX - s * 0.32, HY - 1.15, -13.75), V(TX - s * 0.46, HY - 1.72, -14.08)]), { steps: 80, up: V(1, 0, 0), w: 0.22, h: 0.2, w2: 0.36, h2: 0.16, r: 0.5, seg: 5 }), M.tip, 'temple')
+
+  // nose pad: a gold arm from the nose side of the rim, bending back, holding a clear yellowish oval pad
+  const ay = 0.35, ax = inRim(s, ay)
+  const P = V(s * (GAP + 0.32), -0.12, -0.6)
+  add(new THREE.TubeGeometry(curve([V(ax + s * 0.02, ay, -0.06), V(ax - s * 0.14, ay - 0.05, -0.3), V(P.x + s * 0.05, P.y + 0.12, P.z + 0.02)]), 24, 0.028, 10), M.gold)
+  add(new THREE.BoxGeometry(0.1, 0.14, 0.08).translate(P.x + s * 0.04, P.y + 0.1, P.z), M.goldDim) // pad holder
+  add(new THREE.SphereGeometry(1, 32, 20).scale(0.15, 0.56, 0.075).rotateX(-0.15).rotateY(-s * 0.65).translate(P.x - s * 0.05, P.y - 0.05, P.z - 0.06), M.pad)
+}
+
+bend = null
+// bridge: a flat gold strip; it leaves each rim on the nose side, rises, then runs straight across near the top line
+{
+  const y0 = 0.82, x0 = Math.abs(inRim(1, y0, R + 0.15))
+  const pts = [V(-x0, y0, -0.06), V(-x0 + 0.08, y0 + 0.2, -0.06), V(-x0 + 0.12, 1.3, -0.06), V(-x0 + 0.32, 1.46, -0.06), V(0, 1.5, -0.06)]
+  const path = [...pts, ...pts.slice(0, -1).reverse().map(p => V(-p.x, p.y, p.z))]
+  add(sweep(curve(path), { steps: 120, up: V(0, 0, 1), w: 0.1, h: 0.3, r: 0.35 }), M.gold)
+}
+
+// ── scene ──
+const el = document.getElementById('stage')
+const renderer = new THREE.WebGLRenderer({ antialias: true })
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2))
+renderer.toneMapping = THREE.ACESFilmicToneMapping
+renderer.toneMappingExposure = 1.05
+renderer.shadowMap.enabled = true
+renderer.shadowMap.type = THREE.PCFSoftShadowMap
+el.appendChild(renderer.domElement)
+
+const scene = new THREE.Scene()
+scene.background = new THREE.Color(BG)
+scene.fog = new THREE.Fog(BG, 45, 90)
+const pmrem = new THREE.PMREMGenerator(renderer)
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.03).texture
+scene.environmentIntensity = 0.7
+
+const key = new THREE.DirectionalLight(0xfff1de, 2.4)  // warm key from above-left, like the photos
+key.position.set(-7, 16, 9)
+key.castShadow = true
+key.shadow.mapSize.set(2048, 2048)
+key.shadow.bias = -0.0005
+key.shadow.radius = 4
+Object.assign(key.shadow.camera, { left: -14, right: 14, top: 14, bottom: -14, near: 1, far: 60 })
+scene.add(key)
+const back = new THREE.DirectionalLight(0xffe2c0, 1.2)  // a rim light from behind, so the gold and the acetate edges catch
+back.position.set(8, 7, -14)
+scene.add(back)
+
+// the tabletop: a dark surface that catches the shadow, fading into the background
+const table = new THREE.Mesh(new THREE.PlaneGeometry(200, 200).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({ color: 0x0c0806, roughness: 0.9, envMapIntensity: 0.3 }))
+table.receiveShadow = true
+scene.add(table)
+
+const holder = new THREE.Group(), tilt = new THREE.Group(), glasses = new THREE.Group()
+const front = new THREE.Group(), temples = new THREE.Group()
+glasses.add(front, temples); tilt.add(glasses); holder.add(tilt); scene.add(holder)
+for (const { g, m, group } of parts) {
+  const mesh = new THREE.Mesh(g, m)
+  mesh.castShadow = m !== M.lens
+  mesh.receiveShadow = true
+  ;(group === 'temple' ? temples : front).add(mesh)
+}
+
+// rest them on the table. Upside down (as in the photos): the top of the rims on the table, then tipped back until the
+// temples touch too, so the tips curl up. Upright: the rims' bottom and the ends of the tips touch.
+let upside = true, baseY = 0
+function pose() {
+  glasses.rotation.set(0, 0, upside ? Math.PI : 0)
+  tilt.rotation.set(0, 0, 0); glasses.position.set(0, 0, 0); tilt.position.set(0, 0, 0)
+  const lowest = (o) => { holder.updateMatrixWorld(true); return new THREE.Box3().setFromObject(o, true).min.y }
+  // find the tilt where the temples and the rims sit at the same height
+  let lo = -0.6, hi = 0.6
+  for (let i = 0; i < 40; i++) {
+    const mid = (lo + hi) / 2
+    tilt.rotation.x = mid
+    lowest(temples) > lowest(front) ? (hi = mid) : (lo = mid)
+  }
+  holder.updateMatrixWorld(true)
+  const box = new THREE.Box3().setFromObject(tilt, true)
+  tilt.position.set(-(box.min.x + box.max.x) / 2, -box.min.y, -(box.min.z + box.max.z) / 2)
+  baseY = tilt.position.y
+}
+
+const camera = new THREE.PerspectiveCamera(24, 1, 0.1, 300)
+const controls = new OrbitControls(camera, renderer.domElement)
+controls.enableDamping = true
+controls.maxPolarAngle = Math.PI * 0.48
+controls.minDistance = 10; controls.maxDistance = 90
+function photoAngle() {
+  const dir = V(0, 0.62, 0.78).normalize()
+  const vfov = (camera.fov * Math.PI) / 180, hfov = 2 * Math.atan(Math.tan(vfov / 2) * camera.aspect)
+  const dist = Math.max(8.6 / Math.tan(hfov / 2), 8.2 / Math.tan(vfov / 2))
+  const target = V(0, 1, 0)
+  camera.position.copy(target).addScaledVector(dir, dist)
+  controls.target.copy(target)
+  controls.update()
+}
+function resize() {
+  const w = el.clientWidth, h = el.clientHeight
+  renderer.setSize(w, h, false)
+  camera.aspect = w / h
+  camera.updateProjectionMatrix()
+}
+
+// ── motion: an eased turn toward the pointer and a slow float ──
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches
+const state = { tx: 0, yaw: 0, follow: true, spin: false, spinYaw: 0, mouse: false }
+addEventListener('pointermove', (e) => { if (e.pointerType === 'mouse') { state.mouse = true; state.tx = (e.clientX / innerWidth) * 2 - 1 } }, { passive: true })
+let last = 0
+renderer.setAnimationLoop((t) => {
+  const dt = last ? Math.min(0.05, (t - last) / 1000) : 0
+  last = t
+  if (!reduce) {
+    if (!state.mouse) state.tx = Math.sin(t / 2600) * 0.6
+    const want = state.follow ? state.tx * 0.25 : 0
+    state.yaw += (want - state.yaw) * (1 - Math.exp(-dt * 4))
+    if (state.spin) state.spinYaw += dt * 0.5
+    holder.rotation.y = state.spin ? state.spinYaw : state.yaw
+    tilt.position.y = baseY + (Math.sin(t / 900) * 0.5 + 0.5) * 0.05
+  }
+  controls.update()
+  renderer.render(scene, camera)
+})
+
+// ── controls ──
+const toggle = (id, fn) => { const b = document.getElementById(id); b.onclick = () => b.setAttribute('aria-pressed', String(fn())) }
+toggle('pose', () => { upside = !upside; pose(); return upside })
+toggle('follow', () => (state.follow = !state.follow))
+toggle('spin', () => { state.spin = !state.spin; if (!state.spin) state.spinYaw = 0; return state.spin })
+document.getElementById('view').onclick = photoAngle
+
+pose(); resize(); photoAngle()
+new ResizeObserver(() => { resize() }).observe(el)
+</script>
+</body>
+</html>

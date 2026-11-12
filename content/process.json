@@ -12,16 +12,6 @@
       "icon": "brief"
     },
     {
-      "title": "Mind mapping",
-      "blurb": "Everything the product could be on one page, then cut down to what it should be.",
-      "outputs": [
-        "Feature map",
-        "Scope cut",
-        "Priorities"
-      ],
-      "icon": "map"
-    },
-    {
       "title": "UX research",
       "blurb": "Talk to users, study the market, and let evidence settle the arguments.",
       "outputs": [
@@ -32,16 +22,36 @@
       "icon": "research"
     },
     {
-      "title": "User journey",
-      "blurb": "Follow a person from first click to goal and fix every place they stall.",
+      "title": "Mapping & scope",
+      "blurb": "Everything the product could be on one page, then cut down to what it should be.",
       "outputs": [
-        "Journey map",
-        "Pain points",
-        "Wireframes"
+        "Feature map",
+        "User journey",
+        "Scope cut"
       ],
-      "icon": "journey"
+      "icon": "map"
+    },
+    {
+      "title": "Design & prototype",
+      "blurb": "Wireframes to polished UI, tested as a clickable prototype before anyone writes code.",
+      "outputs": [
+        "Wireframes",
+        "UI design",
+        "Prototype"
+      ],
+      "icon": "design"
+    },
+    {
+      "title": "Handover & QA",
+      "blurb": "Specs the developers can build from, then I check the build against the design until it matches.",
+      "outputs": [
+        "Dev handover",
+        "Design QA",
+        "Client review"
+      ],
+      "icon": "ship"
     }
   ],
   "eyebrow": "Design process",
-  "sub": "Four steps, every project. The line fills in as you scroll."
+  "sub": "The same five steps on every project, from first call to launch."
 }

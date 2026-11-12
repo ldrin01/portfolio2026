@@ -1,0 +1,46 @@
+<!doctype html><html lang="en" data-theme="dark"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>3D icons</title>
+<style>
+:root{--bg:#0e0e11;--fg:#e8e8ec;--mut:#8a8a94;--card:#16161a}
+@media(prefers-color-scheme:light){:root{--bg:#f3f3f5;--fg:#16161b;--mut:#6b6b75;--card:#fff}}
+body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.4 system-ui,sans-serif;padding:24px}
+h1{font-size:18px;margin:0 0 4px}p{color:var(--mut);margin:0 0 20px}
+#tg{font:inherit;font-size:13px;color:var(--fg);background:var(--card);border:1px solid var(--mut);border-radius:999px;padding:6px 14px;cursor:pointer;margin:0 0 16px}
+.g{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+.c{background:var(--card);border-radius:12px;padding:12px}
+canvas{width:100%;aspect-ratio:1;display:block;cursor:grab;touch-action:pan-y}
+b{display:block;margin-top:8px;font-size:13px}span{color:var(--mut);font-size:12px}
+</style></head><body>
+<h1>3D icons (plain)</h1><p>One model per project, drawn smooth (no cell grid). Drag a model to turn it. Each is built from simple shapes that say what the project is.</p>
+<button id="tg" type="button">Pixels: off</button>
+<div class="g" id="g"></div>
+<script src="/works-data.js"></script>
+<script>
+const dark=!matchMedia('(prefers-color-scheme: light)').matches, N=240;
+fetch('/motifs.js').then(r=>r.text()).then(t=>{
+  (0,eval)(t.replace('N = 50, RES = 200','N = 240, RES = 480'));   // smooth: same models at high resolution
+  const SM={s:window.motifScene,f:window.motifSceneFromSpec};
+  (0,eval)(t);                                                      // pixel: the real 50x50 engine
+  const PX={s:window.motifScene,f:window.motifSceneFromSpec};
+  let pix=false;const redraws=[];
+  document.getElementById('tg').onclick=e=>{pix=!pix;e.target.textContent='Pixels: '+(pix?'on':'off');redraws.forEach(f=>f())};
+  document.getElementById('g').innerHTML='<div class="c"><canvas width="240" height="240" id="spec"></canvas><b>From JSON: laptop on wooden chair</b><span>models/laptop-chair.json</span></div>'+DATA.map(d=>`<div class="c"><canvas width="${N}" height="${N}" data-id="${d.id}"></canvas><b>${d.id}. ${d.short}</b><span>${EXT[d.ext]}</span></div>`).join('');
+  const specP=fetch('/models/laptop-chair.json').then(r=>r.json());
+  specP.then(sp=>wire(document.getElementById('spec'),k=>(k?PX:SM).f(sp)));
+  document.querySelectorAll('canvas[data-id]').forEach(cv=>{
+    wire(cv,k=>(k?PX:SM).s(+cv.dataset.id))});
+  function wire(cv,mk){
+    const scs=[mk(0),mk(1)];let yaw=scs[0].yaw0,pitch=scs[0].pitch0,drag=false,px=0;const g=cv.getContext('2d'),im=g.createImageData(N,N);
+    const draw=()=>{const sc=scs[pix?1:0],gr=sc.render(yaw,pitch);
+      if(pix){g.clearRect(0,0,N,N);const c=N/50;
+        for(let y=0;y<50;y++)for(let x=0;x<50;x++){const v=gr[y*50+x];if(v<.07)continue;const l=dark?42+v*50:30+v*44;g.fillStyle=`hsl(205 7% ${l}%)`;g.fillRect(x*c+.4,y*c+.4,c-.8,c-.8)}return}
+      for(let i=0;i<N*N;i++){const v=gr[i],o=i*4;if(v<.05){im.data[o+3]=0;continue}
+        const l=(dark?42+v*50:30+v*44)/100;im.data[o]=l*236;im.data[o+1]=l*240;im.data[o+2]=l*246;im.data[o+3]=255}
+      g.putImageData(im,0,0)};
+    redraws.push(draw);draw();
+    cv.onpointerdown=e=>{drag=true;px=e.clientX;cv.setPointerCapture(e.pointerId)};
+    cv.onpointermove=e=>{if(!drag)return;yaw-=(e.clientX-px)*.011;px=e.clientX;draw()};
+    cv.onpointerup=()=>{drag=false;yaw=Math.round(yaw/(Math.PI/4))*Math.PI/4;draw()};
+    cv.ondblclick=()=>{yaw=scs[0].yaw0;draw()};
+  }
+});
+</script></body></html>

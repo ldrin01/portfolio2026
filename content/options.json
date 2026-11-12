@@ -44,5 +44,42 @@
       "name": "Design",
       "tag": ""
     }
+  ],
+  "workTypes": [
+    {
+      "id": "inf",
+      "name": "Informative",
+      "ext": "inf"
+    },
+    {
+      "id": "web",
+      "name": "Web App",
+      "ext": "web"
+    },
+    {
+      "id": "app",
+      "name": "Mobile App",
+      "ext": "app"
+    },
+    {
+      "id": "shp",
+      "name": "E-commerce",
+      "ext": "shp"
+    },
+    {
+      "id": "sys",
+      "name": "System",
+      "ext": "sys"
+    },
+    {
+      "id": "fx",
+      "name": "Interactive",
+      "ext": "fx"
+    },
+    {
+      "id": "3d",
+      "name": "3D Design",
+      "ext": "3d"
+    }
   ]
 }

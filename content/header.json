@@ -3,6 +3,7 @@
   "links": [
     { "label": "Home", "to": "/" },
     { "label": "More about me", "to": "/about" },
+    { "label": "Works", "to": "/works" },
     { "label": "Contact", "to": "/contact" },
     { "label": "Case studies", "to": "/case-studies" }
   ]

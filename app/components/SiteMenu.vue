@@ -187,8 +187,8 @@ onBeforeUnmount(() => { window.removeEventListener('keydown', onKey); cancelAnim
 .small a { display: inline-block; padding: 5px 0; font-size: 15px; color: var(--muted); text-decoration: none; background: linear-gradient(var(--accent), var(--accent)) 0 100% / 0 1px no-repeat; transition: color .2s, background-size .35s cubic-bezier(.2, .8, .2, 1); }
 .small a:hover, .small a:focus-visible { color: var(--fg); background-size: 100% 1px; outline: none; }
 .big a {
-  display: inline-block; padding: .06em 0; text-decoration: none; color: var(--fg);
-  font-family: var(--display); font-weight: 700; font-size: clamp(40px, min(8vw, 11vh), 112px); line-height: 1.04; letter-spacing: -.035em;
+  display: inline-block; padding: 0; text-decoration: none; color: var(--fg);
+  font-family: var(--display); font-weight: 700; font-size: clamp(34px, min(6.6vw, 9vh), 92px); line-height: .98; letter-spacing: -.035em;
   transition: color .3s, -webkit-text-stroke-color .3s, translate .45s cubic-bezier(.2, .8, .2, 1), scale .2s;
 }
 /* entrance: each link drifts in from the left out of a blur, one after another (nothing is masked, so no letter gets cut) */
@@ -204,6 +204,7 @@ onBeforeUnmount(() => { window.removeEventListener('keydown', onKey); cancelAnim
   100% { translate: 0 0; rotate: 0deg; }
 }
 .big:has(a:hover) a:not(:hover) { color: transparent; -webkit-text-stroke: 1.5px color-mix(in srgb, var(--fg) 45%, transparent); }
+.big:has(a:hover) a:not(:hover) .ch { color: transparent; }
 .big a:active { scale: .96; }
 /* the page you are on carries an accent dot */
 .big a.here::after { content: ''; display: inline-block; width: .14em; height: .14em; margin-left: .18em; border-radius: 50%; background: var(--accent); vertical-align: .1em; }

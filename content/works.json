@@ -1,0 +1,736 @@
+{
+  "heading": "Works",
+  "projects": [
+    {
+      "title": "Modular University Websites with Mega Menu",
+      "fileType": "inf",
+      "role": "Lead Designer",
+      "tools": "Figma",
+      "fullTitle": "Prestigious University Websites with Mega Menu and Modular Page System",
+      "description": "Designed a modular, multi-page system with a mega menu for well-established private universities. Every page is built from reusable modules, so the client can keep producing new pages for as long as their content allows, without a rebuild.",
+      "tags": [
+        "Informative Website"
+      ],
+      "challenge": "Several universities needed pages that look consistent but can keep growing without a redesign each time.",
+      "approach": "I broke every page into reusable modules and built a mega menu that holds a deep structure without feeling heavy.",
+      "features": [
+        "Mega menu",
+        "Reusable page modules",
+        "Consistent layouts"
+      ],
+      "deliverables": [
+        "Module library",
+        "Responsive page templates",
+        "Developer handoff"
+      ],
+      "highlights": [
+        "Multiple sites",
+        "1 shared module system"
+      ],
+      "id": 1
+    },
+    {
+      "title": "Multi-Country Banking Website",
+      "fileType": "inf",
+      "role": "Lead Designer",
+      "tools": "Figma",
+      "fullTitle": "Multi-Country Banking Website with Location-Aware Microsites",
+      "description": "Corporate website for a nationally and internationally recognized bank. It detects the visitor's location and loads the matching country microsite, so overseas customers get locally relevant content.",
+      "tags": [
+        "Informative Website"
+      ],
+      "challenge": "One bank, many countries: visitors should land on content that fits where they are, not a generic page.",
+      "approach": "I designed one core structure with country microsites that load by location, so each market feels local.",
+      "features": [
+        "Location-aware microsites",
+        "Shared core structure",
+        "Country-specific content"
+      ],
+      "deliverables": [
+        "Site architecture",
+        "Microsite templates",
+        "Design system"
+      ],
+      "highlights": [
+        "Multi-country",
+        "1 core structure"
+      ],
+      "id": 2
+    },
+    {
+      "title": "Defense Legal Services Website",
+      "fileType": "inf",
+      "role": "Lead Designer",
+      "tools": "Figma",
+      "fullTitle": "Legal Services Website for Defense-Industry Clients (Australia)",
+      "description": "Informative website for an Australian legal practice serving the defense industry. Delivered through an international collaboration on a fast timeline.",
+      "tags": [
+        "Informative Website"
+      ],
+      "challenge": "A serious practice with a tight international schedule and a specialist audience.",
+      "approach": "I kept the design calm and direct and agreed decisions fast with the team across time zones.",
+      "features": [
+        "Clear service pages",
+        "Credibility-first layout",
+        "Fast turnaround"
+      ],
+      "deliverables": [
+        "Page designs",
+        "Responsive layouts",
+        "Handoff files"
+      ],
+      "highlights": [
+        "International team",
+        "Fast timeline"
+      ],
+      "id": 3
+    },
+    {
+      "title": "Job Search Platform",
+      "fileType": "web",
+      "role": "Lead Designer",
+      "tools": "Figma",
+      "fullTitle": "Job Search Platform for Employers and Job Seekers (Australia)",
+      "description": "Australian job platform with informative pages for both employers and job hunters. It has detailed search filters and integrated applications, so finding and applying for a job takes less effort.",
+      "tags": [
+        "Web App",
+        "Informative Website"
+      ],
+      "challenge": "Employers and job seekers want different things from the same platform, and both hate long forms.",
+      "approach": "I separated the two journeys, put powerful filters up front and folded applying into the same flow as searching.",
+      "features": [
+        "Detailed search filters",
+        "Integrated applications",
+        "Employer and seeker pages"
+      ],
+      "deliverables": [
+        "Web app flows",
+        "Search and filter patterns",
+        "Responsive designs"
+      ],
+      "highlights": [
+        "2 audiences",
+        "1 platform"
+      ],
+      "id": 4
+    },
+    {
+      "title": "Luxury Fashion Retail Web and Mobile App",
+      "fileType": "shp",
+      "role": "Lead Designer",
+      "tools": "Figma",
+      "fullTitle": "Luxury Fashion Retail Website and Mobile App with Private Appointments, Staff Chat, Raffles and Auctions",
+      "description": "White-glove web and mobile experience for a luxury fashion and collectibles brand. Customers can book private store visits and chat with staff, and staff can escalate to managers and other branches. Full e-commerce with promos, loyalty, reservations, raffles and auctions.",
+      "tags": [
+        "Informative Website",
+        "Mobile App",
+        "E-commerce",
+        "Loyalty"
+      ],
+      "challenge": "A luxury customer expects personal service, and the app had to feel as attentive as a boutique visit.",
+      "approach": "I built private appointments and staff chat first, then escalation to managers and other branches, with shopping, raffles and auctions around them.",
+      "features": [
+        "Private appointments",
+        "Staff chat with escalation",
+        "Raffles and auctions",
+        "Loyalty"
+      ],
+      "deliverables": [
+        "Web and mobile design",
+        "E-commerce flows",
+        "Design system"
+      ],
+      "highlights": [
+        "Web + mobile app",
+        "Customer and staff sides"
+      ],
+      "id": 5
+    },
+    {
+      "title": "Entrance Exam Review Center Website",
+      "fileType": "inf",
+      "role": "Lead Designer",
+      "tools": "Figma, Photoshop",
+      "fullTitle": "College Entrance Exam Review Center Website",
+      "description": "Information hub for a review center covering admission details, schedules, fees, classes, subjects, books, top students and campus locations.",
+      "tags": [
+        "Informative Website"
+      ],
+      "challenge": "Parents and students come looking for specific facts, and they leave fast if they cannot find them.",
+      "approach": "I put schedules, fees, classes and locations one tap from the start and gave each its own plain page.",
+      "features": [
+        "Schedules and fees",
+        "Subjects and books",
+        "Top students",
+        "Campus locations"
+      ],
+      "deliverables": [
+        "Information architecture",
+        "Page designs",
+        "Responsive layouts"
+      ],
+      "highlights": [
+        "Many campuses",
+        "Information-first"
+      ],
+      "id": 6
+    },
+    {
+      "title": "Gamified Licensure Review App",
+      "fileType": "app",
+      "role": "Lead Designer",
+      "tools": "Figma, Photoshop",
+      "fullTitle": "Gamified Licensure Review App with Tiers, Leaderboards and Mock Exams",
+      "description": "Self-paced review app with video classes, short, long and mock quizzes, tiers, badges and leaderboards. A score multiplier rewards passers but decays with each retry. Questions a learner missed earlier are brought back.",
+      "tags": [
+        "Mobile App"
+      ],
+      "challenge": "Review apps are easy to abandon, so the app had to give learners a reason to come back.",
+      "approach": "I added tiers, badges and leaderboards, a score multiplier that decays with retries, and a way to bring back missed questions.",
+      "features": [
+        "Video classes",
+        "Short, long and mock quizzes",
+        "Tiers and leaderboards",
+        "Missed-question review"
+      ],
+      "deliverables": [
+        "Mobile app design",
+        "Gamification system",
+        "Quiz flows"
+      ],
+      "highlights": [
+        "3 quiz types",
+        "Tiers and badges"
+      ],
+      "id": 7
+    },
+    {
+      "title": "Casual Dining Brand Website",
+      "fileType": "inf",
+      "role": "Lead Designer",
+      "tools": "Figma",
+      "fullTitle": "Casual Dining Brand Website with Detailed Menu and Store Locator",
+      "description": "Philippine site for a brand with international counterpart sites. It has a full menu and a branch locator showing schedules, directions, and each branch's dine-in, take-out and pick-up options as icons and text.",
+      "tags": [
+        "Informative Website",
+        "Store Locator"
+      ],
+      "challenge": "A brand with sister sites abroad still needed a site that feels Filipino and works for people choosing where to eat.",
+      "approach": "I made the menu easy to browse and gave every branch a clear card with hours, directions and what it offers.",
+      "features": [
+        "Full menu",
+        "Branch locator",
+        "Dine-in, take-out and pick-up icons"
+      ],
+      "deliverables": [
+        "Site design",
+        "Locator patterns",
+        "Responsive layouts"
+      ],
+      "highlights": [
+        "Many branches",
+        "Counterpart sites abroad"
+      ],
+      "id": 8
+    },
+    {
+      "title": "Dairy Brand E-commerce Website",
+      "fileType": "shp",
+      "role": "Lead Designer",
+      "tools": "Figma",
+      "fullTitle": "Premium Dairy Brand Website with Full E-commerce, Subscriptions and Distributor Portal",
+      "description": "Website for a rebranded, widely distributed Filipino dairy brand. Full e-commerce with subscriptions, plus a portal for partners and small resellers.",
+      "tags": [
+        "Informative Website",
+        "E-commerce",
+        "Subscription",
+        "Partner Portal"
+      ],
+      "challenge": "A rebrand meant a bigger audience, from everyday shoppers to small resellers, all on one site.",
+      "approach": "I designed a simple shop with subscriptions for regulars and a separate portal for partners and distributors.",
+      "features": [
+        "Full e-commerce",
+        "Subscriptions",
+        "Partner and reseller portal"
+      ],
+      "deliverables": [
+        "Shop design",
+        "Subscription flows",
+        "Portal design"
+      ],
+      "highlights": [
+        "Shop + portal",
+        "Wide distribution"
+      ],
+      "id": 9
+    },
+    {
+      "title": "Nonprofit Giving Website",
+      "fileType": "inf",
+      "role": "Support Designer",
+      "tools": "Figma",
+      "fullTitle": "Nonprofit Child Sponsorship Website with Streamlined Giving Options",
+      "description": "Nonprofit website that makes giving easier for donors who want to contribute, with clear and simple ways to send help.",
+      "tags": [
+        "Informative Website",
+        "Donations"
+      ],
+      "challenge": "People who want to give should not have to think about how.",
+      "approach": "I reduced giving to a few clear options and kept everything else out of the way.",
+      "features": [
+        "Simple giving options",
+        "Clear next steps",
+        "Calm, human tone"
+      ],
+      "deliverables": [
+        "Page designs",
+        "Giving flow",
+        "Responsive layouts"
+      ],
+      "highlights": [
+        "Support role",
+        "Few steps to give"
+      ],
+      "id": 10
+    },
+    {
+      "title": "Pharma Distributor E-commerce Platform",
+      "fileType": "shp",
+      "role": "Lead Designer",
+      "tools": "Figma",
+      "fullTitle": "Pharmaceutical Distributor Platform with Rx Subscriptions, Loyalty and Doctor Incentives",
+      "description": "Web and mobile e-commerce for a pharmaceutical distributor. It supports medicine subscriptions, prescription (Rx) orders, a customer loyalty system and an incentive program for doctors.",
+      "tags": [
+        "Informative Website",
+        "Web App",
+        "Mobile App",
+        "E-commerce",
+        "Subscription",
+        "Loyalty"
+      ],
+      "challenge": "Medicine is ordered by patients and by doctors, and each needs different rules and different trust.",
+      "approach": "I designed subscriptions and Rx ordering for patients, a loyalty system on top, and an incentive programme for doctors.",
+      "features": [
+        "Medicine subscriptions",
+        "Rx orders",
+        "Loyalty system",
+        "Doctor incentive program"
+      ],
+      "deliverables": [
+        "Web and mobile design",
+        "E-commerce flows",
+        "Design system"
+      ],
+      "highlights": [
+        "Web + mobile",
+        "3 user groups"
+      ],
+      "id": 11
+    },
+    {
+      "title": "Wine Brand Website with Personality Quiz",
+      "fileType": "fx",
+      "role": "Lead Designer",
+      "tools": "Figma, Photoshop",
+      "fullTitle": "Imported Wine Brand Website with Animated Storytelling and Personality Quiz",
+      "description": "Highly creative brand website for an imported wine label, with heavy animation and interaction throughout. A personality quiz recommends which wine suits the visitor.",
+      "tags": [
+        "Informative Website",
+        "Interactive"
+      ],
+      "challenge": "A wine label wants a visitor to feel something before they ever read about a bottle.",
+      "approach": "I let animation carry the story and used a short personality quiz to turn the mood into a recommendation.",
+      "features": [
+        "Animated storytelling",
+        "Personality quiz",
+        "Wine recommendation"
+      ],
+      "deliverables": [
+        "Interaction design",
+        "Motion direction",
+        "Responsive design"
+      ],
+      "highlights": [
+        "Heavy animation",
+        "Quiz-based discovery"
+      ],
+      "id": 12
+    },
+    {
+      "title": "Boutique Hotel Websites Under One Brand",
+      "fileType": "inf",
+      "role": "Lead Designer",
+      "tools": "Figma",
+      "fullTitle": "Elegant Boutique Hotel, House and Suite Websites Under One Brand (Germany)",
+      "description": "Three sister websites for a German hospitality brand, built on one shared structure. The design is elegant and modern, showcasing the hotel, houses and suites.",
+      "tags": [
+        "Informative Website"
+      ],
+      "challenge": "Three sister properties needed their own character while staying clearly one brand.",
+      "approach": "I built one shared structure and let each site change its imagery, palette and tone around it.",
+      "features": [
+        "Shared structure",
+        "Per-site character",
+        "Rooms and suites showcase"
+      ],
+      "deliverables": [
+        "3 site designs",
+        "Shared components",
+        "Developer handoff"
+      ],
+      "highlights": [
+        "3 sister sites",
+        "1 shared structure"
+      ],
+      "id": 13
+    },
+    {
+      "title": "Boutique Hotel Group Website",
+      "fileType": "inf",
+      "role": "Support Designer",
+      "tools": "Figma",
+      "fullTitle": "Boutique Hotel Group Website with Classic Map-Inspired Design (UK and Germany)",
+      "description": "Website for a boutique hotel group with properties in the UK and Germany. It has a creative, classic-map visual style and rich assets. Sister brand of a sibling hotel group under the same developer.",
+      "tags": [
+        "Informative Website"
+      ],
+      "challenge": "The group spans two countries and needed to feel classic and a little adventurous at once.",
+      "approach": "I took a map-inspired look, rich with illustration and assets, and supported the lead designer on the build-out.",
+      "features": [
+        "Map-inspired visual style",
+        "Rich assets",
+        "UK and Germany properties"
+      ],
+      "deliverables": [
+        "Page designs",
+        "Asset support",
+        "Responsive layouts"
+      ],
+      "highlights": [
+        "Support role",
+        "2 countries"
+      ],
+      "id": 14
+    },
+    {
+      "title": "Multi-Mall Website with Interactive Directory",
+      "fileType": "fx",
+      "role": "Lead Designer",
+      "tools": "Figma",
+      "fullTitle": "Multi-Mall Retail Website with Cinema Listings and Interactive Mall Directory",
+      "description": "Informative website for the major malls of a large, multi-brand business group. It has cinema listings and informative pages, a creatively presented loyalty section, and the main feature is the interactive mall directory.",
+      "tags": [
+        "Informative Website",
+        "Interactive"
+      ],
+      "challenge": "A mall visitor wants to find a shop or a film in seconds, not scroll through a brochure.",
+      "approach": "I made the interactive directory the heart of the site and kept cinema listings and loyalty one step away.",
+      "features": [
+        "Interactive mall directory",
+        "Cinema listings",
+        "Loyalty section"
+      ],
+      "deliverables": [
+        "Directory interaction",
+        "Site design",
+        "Responsive layouts"
+      ],
+      "highlights": [
+        "Several malls",
+        "1 business group"
+      ],
+      "id": 15
+    },
+    {
+      "title": "Industry Association Website",
+      "fileType": "inf",
+      "role": "Lead Designer",
+      "tools": "Figma",
+      "fullTitle": "Industry Association Website Connecting a National Tech Sector to Global Markets",
+      "description": "Informative website for the national IT and business process management association, which represents the sector internationally. Clean, lightly creative design.",
+      "tags": [
+        "Informative Website"
+      ],
+      "challenge": "An association speaks to its members and to the world, and both need to feel at home.",
+      "approach": "I kept the design clean and lightly creative so the sector's story comes first.",
+      "features": [
+        "Clear sector story",
+        "Member and global audiences",
+        "Light creative touches"
+      ],
+      "deliverables": [
+        "Site design",
+        "Page templates",
+        "Responsive layouts"
+      ],
+      "highlights": [
+        "National body",
+        "International reach"
+      ],
+      "id": 16
+    },
+    {
+      "title": "Nationwide Pawnshop Platform",
+      "fileType": "sys",
+      "role": "Lead Designer",
+      "tools": "Figma",
+      "fullTitle": "Nationwide Pawnshop Platform with Online Appraisal and Multi-Branch Management",
+      "description": "Nationwide pawnshop with online appraisal. The system handles a complex multi-branch structure covering loans, sales and item storage.",
+      "tags": [
+        "Informative Website",
+        "Online Appraisal",
+        "Multi-Branch System"
+      ],
+      "challenge": "A pawnshop network handles loans, sales and storage across many branches, and customers want a fast online estimate.",
+      "approach": "I designed online appraisal for customers and a structured multi-branch system for the staff behind it.",
+      "features": [
+        "Online appraisal",
+        "Multi-branch management",
+        "Loans, sales and storage"
+      ],
+      "deliverables": [
+        "Website",
+        "System design",
+        "Branch workflows"
+      ],
+      "highlights": [
+        "Nationwide branches",
+        "Customer + staff sides"
+      ],
+      "id": 17
+    },
+    {
+      "title": "Author Platform with E-Book Reader",
+      "fileType": "web",
+      "role": "Lead Designer",
+      "tools": "Figma",
+      "fullTitle": "Independent Author Platform with Subscriptions and E-Book Style Reader",
+      "description": "Platform for an independent Philippine writer with an international readership. Readers subscribe to stories and read in an e-book style reader with adjustable fonts, saved pages, book navigation, comments and replies. Includes accounts with subscriptions and dark mode.",
+      "tags": [
+        "Web App"
+      ],
+      "challenge": "Readers should feel like they are holding a book, not scrolling a page.",
+      "approach": "I built an e-book style reader with adjustable fonts, saved pages and book navigation, then added comments, replies and subscriptions.",
+      "features": [
+        "E-book style reader",
+        "Adjustable fonts",
+        "Comments and replies",
+        "Dark mode"
+      ],
+      "deliverables": [
+        "Web app design",
+        "Reader experience",
+        "Subscription flows"
+      ],
+      "highlights": [
+        "International readers",
+        "Subscriptions"
+      ],
+      "id": 18
+    },
+    {
+      "title": "Veterans Pension Assistance Website",
+      "fileType": "inf",
+      "role": "Lead Designer",
+      "tools": "Figma",
+      "fullTitle": "Pension Claims Assistance Website for Military Veterans (US)",
+      "description": "Small informative website for an organization that helps US military veterans collect and claim the pensions they're owed. Templated design made from scratch, built on a modular approach so it can be extended later.",
+      "tags": [
+        "Informative Website"
+      ],
+      "challenge": "Veterans are looking for clarity and trust, and the organisation needed something it could grow.",
+      "approach": "I designed a modular template from scratch so new pages and sections can be added later.",
+      "features": [
+        "Plain, clear pages",
+        "Modular templates",
+        "Easy to extend"
+      ],
+      "deliverables": [
+        "Site design",
+        "Module library",
+        "Responsive layouts"
+      ],
+      "highlights": [
+        "Small site",
+        "Modular base"
+      ],
+      "id": 19
+    },
+    {
+      "title": "On-Demand Courier Apps",
+      "fileType": "app",
+      "role": "Lead Designer",
+      "tools": "Figma",
+      "fullTitle": "On-Demand Courier Apps for Customers and Drivers with Route Tracking and Multi-Point Booking",
+      "description": "Two mobile apps. Drivers log required inputs such as the odometer reading (for fuel consumption), follow a planned route, collect payments and documents, and take progress photos through each trip stage. Customers book couriers with multiple stops, track them on a map, and choose whether the sender or the receiver pays.",
+      "tags": [
+        "Mobile App"
+      ],
+      "challenge": "Drivers have to log a lot during a trip, and customers want to know what is happening at every stop.",
+      "approach": "I split it into two apps: a driver app guided stage by stage, and a customer app for multi-stop booking and live tracking.",
+      "features": [
+        "Multi-stop booking",
+        "Live map tracking",
+        "Driver trip stages",
+        "Sender or receiver pays"
+      ],
+      "deliverables": [
+        "2 mobile apps",
+        "Trip-stage flows",
+        "Responsive designs"
+      ],
+      "highlights": [
+        "2 apps",
+        "Multi-stop trips"
+      ],
+      "id": 20
+    },
+    {
+      "title": "Multi-Brand Hotel Group Website",
+      "fileType": "inf",
+      "role": "Lead Designer",
+      "tools": "Figma",
+      "fullTitle": "Multi-Brand Hotel and Resort Group Website",
+      "description": "Website for a multi-brand hospitality group. The brands came from the client, and I redesigned the experience so development follows UI/UX standards consistently across every brand.",
+      "tags": [
+        "Informative Website"
+      ],
+      "challenge": "Several brands under one group all needed to feel right but follow the same standards.",
+      "approach": "I redesigned the experience around a shared UI/UX base so development stays consistent across brands.",
+      "features": [
+        "Brand-specific looks",
+        "Shared UI/UX standards",
+        "Consistent development"
+      ],
+      "deliverables": [
+        "Redesigned experience",
+        "Shared component set",
+        "Developer guidelines"
+      ],
+      "highlights": [
+        "Multi-brand",
+        "1 shared standard"
+      ],
+      "id": 21
+    },
+    {
+      "title": "Elevated Bakery and Dining Website",
+      "fileType": "shp",
+      "role": "Lead Designer",
+      "tools": "Figma, Photoshop, ChatGPT",
+      "fullTitle": "Elevated Bakery and Dining Brand Website with Loyalty, Pre-Order and Delivery",
+      "description": "Creative informative website for an upscale bakery and all-day dining brand covering cakes, pastry, and breakfast, lunch and dinner menus. Supports pre-order, delivery and dine-in, with a loyalty program as a core goal.",
+      "tags": [
+        "Informative Website",
+        "Loyalty",
+        "Pre-order"
+      ],
+      "challenge": "An upscale bakery has to look as good as its pastry, and still take orders without friction.",
+      "approach": "I designed a warm, editorial look, then made pre-order, delivery and dine-in feel like one calm flow with loyalty built in.",
+      "features": [
+        "Pre-order",
+        "Delivery and dine-in",
+        "Loyalty program",
+        "Menus by time of day"
+      ],
+      "deliverables": [
+        "Site design",
+        "Ordering flows",
+        "Responsive layouts"
+      ],
+      "highlights": [
+        "3 ways to order",
+        "Loyalty as a core goal"
+      ],
+      "id": 22
+    },
+    {
+      "title": "Creative Brand Website with 3D Hero",
+      "fileType": "3d",
+      "role": "Lead Designer",
+      "tools": "Figma, Blender",
+      "fullTitle": "Creative Brand Website with 3D-Designed Hero Section",
+      "description": "Brand website with a 3D hero section. Each object was modeled with deliberate lighting, materials, measurements and motion, then exported as image pieces for front-end developers to implement.",
+      "tags": [
+        "Informative Website",
+        "3D Design"
+      ],
+      "challenge": "The hero needed to feel real and tactile, and front-end developers needed pieces they could actually build.",
+      "approach": "I modeled each object with careful lighting, materials, measurements and motion, then exported image pieces for the build.",
+      "features": [
+        "3D-modeled hero",
+        "Lighting and materials",
+        "Motion-ready pieces"
+      ],
+      "deliverables": [
+        "3D hero objects",
+        "Exported image pieces",
+        "Motion notes"
+      ],
+      "highlights": [
+        "3D design",
+        "Built by front-end team"
+      ],
+      "id": 23
+    },
+    {
+      "title": "Editorial Publishing Platform",
+      "fileType": "sys",
+      "role": "Lead Designer, Lead System Analyst",
+      "tools": "Figma",
+      "fullTitle": "Media Content Platform with Editorial Review and Scheduling Workflow",
+      "description": "Publishing portal with an editorial system where writers, photographers, checkers and vetters submit and review content, then draft, publish or schedule it.",
+      "tags": [
+        "Informative Website",
+        "Ticketing",
+        "Editorial Workflow"
+      ],
+      "challenge": "Many people touch one story, from writing to checking to publishing, and nothing can slip through.",
+      "approach": "I designed the editorial system around each role and a clear path from draft to published or scheduled.",
+      "features": [
+        "Role-based submission and review",
+        "Draft, publish or schedule",
+        "Ticketing"
+      ],
+      "deliverables": [
+        "Portal design",
+        "Editorial workflow",
+        "System analysis"
+      ],
+      "highlights": [
+        "4+ roles",
+        "Design + analysis"
+      ],
+      "id": 24
+    },
+    {
+      "title": "Inventory and Order Management System",
+      "fileType": "sys",
+      "role": "Lead Designer, Support System Analyst",
+      "tools": "Figma",
+      "fullTitle": "Nationwide Inventory and Order Management System for a Manufacturer",
+      "description": "Admin system covering production and stock entry, audits and orders from branches nationwide. It also handles order approval, logistics, sales audits and returns.",
+      "tags": [
+        "Admin System"
+      ],
+      "challenge": "Stock, orders and audits move across branches nationwide, and a mistake in one spot shows up everywhere.",
+      "approach": "I mapped the flows first, then designed screens for entry, approvals, logistics, audits and returns.",
+      "features": [
+        "Production and stock entry",
+        "Order approval",
+        "Logistics",
+        "Sales audits and returns"
+      ],
+      "deliverables": [
+        "Admin system design",
+        "Workflow mapping",
+        "System analysis"
+      ],
+      "highlights": [
+        "Nationwide branches",
+        "Design + analysis"
+      ],
+      "id": 25
+    }
+  ]
+}

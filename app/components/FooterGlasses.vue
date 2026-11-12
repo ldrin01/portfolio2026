@@ -25,5 +25,4 @@ onBeforeUnmount(() => dispose?.())
 <style scoped>
 .glasses { width: min(100%, 560px); aspect-ratio: 1.35 / 1; margin: 0 auto; }
 .glasses :deep(canvas) { display: block; width: 100%; height: 100%; }
-[data-theme="dark"] .glasses :deep(canvas) { image-rendering: pixelated; }
 </style>
