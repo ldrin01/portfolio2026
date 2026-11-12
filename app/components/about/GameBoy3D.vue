@@ -3,7 +3,7 @@ import { gameboyWarmTo, GAMEBOY_STAGES } from '~/lib/gameboy-warm'
 // The 3D handheld, a light build (app/lib/gameboy-detail.js): plain shapes with the detail painted on as relief (gameboy-lite.js is the plainer one), and the pixel game on its
 // screen (it boots with DRINWORKS first). Drag to turn it; click A or B to jump. three.js loads only when it comes near, and it
 // stops drawing off screen. A, B and Space work while it is hovered or focused, so the page still scrolls with Space everywhere else.
-// (The carved, much heavier version is still in public/lab/gameboy-3d.js.)
+// (The carved, much heavier version is still in prototypes/lab/gameboy-3d.js.)
 const host = ref<HTMLDivElement>()
 const active = ref(false)
 const LAB = `${useRuntimeConfig().app.baseURL}lab/`
