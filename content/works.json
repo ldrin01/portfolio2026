@@ -2,34 +2,6 @@
   "heading": "Works",
   "projects": [
     {
-      "title": "Modular University Websites with Mega Menu",
-      "fileType": "inf",
-      "role": "Lead Designer",
-      "tools": "Figma",
-      "fullTitle": "Prestigious University Websites with Mega Menu and Modular Page System",
-      "description": "Designed a modular, multi-page system with a mega menu for well-established private universities. Every page is built from reusable modules, so the client can keep producing new pages for as long as their content allows, without a rebuild.",
-      "tags": [
-        "Informative Website"
-      ],
-      "challenge": "Several universities needed pages that look consistent but can keep growing without a redesign each time.",
-      "approach": "I broke every page into reusable modules and built a mega menu that holds a deep structure without feeling heavy.",
-      "features": [
-        "Mega menu",
-        "Reusable page modules",
-        "Consistent layouts"
-      ],
-      "deliverables": [
-        "Module library",
-        "Responsive page templates",
-        "Developer handoff"
-      ],
-      "highlights": [
-        "Multiple sites",
-        "1 shared module system"
-      ],
-      "id": 1
-    },
-    {
       "title": "Multi-Country Banking Website",
       "fileType": "inf",
       "role": "Lead Designer",
@@ -56,6 +28,34 @@
         "1 core structure"
       ],
       "id": 2
+    },
+    {
+      "title": "Modular University Websites with Mega Menu",
+      "fileType": "inf",
+      "role": "Lead Designer",
+      "tools": "Figma",
+      "fullTitle": "Prestigious University Websites with Mega Menu and Modular Page System",
+      "description": "Designed a modular, multi-page system with a mega menu for well-established private universities. Every page is built from reusable modules, so the client can keep producing new pages for as long as their content allows, without a rebuild.",
+      "tags": [
+        "Informative Website"
+      ],
+      "challenge": "Several universities needed pages that look consistent but can keep growing without a redesign each time.",
+      "approach": "I broke every page into reusable modules and built a mega menu that holds a deep structure without feeling heavy.",
+      "features": [
+        "Mega menu",
+        "Reusable page modules",
+        "Consistent layouts"
+      ],
+      "deliverables": [
+        "Module library",
+        "Responsive page templates",
+        "Developer handoff"
+      ],
+      "highlights": [
+        "Multiple sites",
+        "1 shared module system"
+      ],
+      "id": 1
     },
     {
       "title": "Defense Legal Services Website",

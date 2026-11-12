@@ -1,10 +1,25 @@
 {
   "logo": "DRINWORKS",
   "links": [
-    { "label": "Home", "to": "/" },
-    { "label": "More about me", "to": "/about" },
-    { "label": "Works", "to": "/works" },
-    { "label": "Contact", "to": "/contact" },
-    { "label": "Case studies", "to": "/case-studies" }
+    {
+      "label": "Home",
+      "to": "/"
+    },
+    {
+      "label": "Works",
+      "to": "/works"
+    },
+    {
+      "label": "Case Studies",
+      "to": "/case-studies"
+    },
+    {
+      "label": "More about me",
+      "to": "/about"
+    },
+    {
+      "label": "Contact",
+      "to": "/contact"
+    }
   ]
 }

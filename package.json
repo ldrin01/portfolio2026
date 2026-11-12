@@ -28,6 +28,7 @@
     "vue-router": "^5.4.0"
   },
   "devDependencies": {
+    "@lucide/vue": "^1.72.0",
     "@types/three": "^0.180.0",
     "ckeditor5": "^49.0.1",
     "gh-pages": "^6.3.0",
