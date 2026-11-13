@@ -102,4 +102,3 @@ onBeforeUnmount(() => { gone = true; destroy?.(); destroy = null })
   </div>
 </template>
 
-<style src="~/assets/css/works.css"></style>

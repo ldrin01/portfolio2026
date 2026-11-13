@@ -9,7 +9,7 @@ export default defineNuxtConfig({
   modules: ['@nuxt/content', '@nuxt/image'],
   // the public address, used for the sitemap and canonical links; set NUXT_PUBLIC_SITE_URL when the domain changes
   site: { url: process.env.NUXT_PUBLIC_SITE_URL || 'https://ldrin01.github.io/portfolio2026', name: 'Eldrin Bernardino' },
-  css: ['~/assets/css/main.css'],
+  css: ['~/assets/css/main.css', '~/assets/css/works.css'], // works.css is global (all under .wk) so the Works window is styled in the first paint, not when its lazy chunk loads
   nitro: { preset: 'github_pages' },
   // links fetch their page data on hover/focus, not as soon as they scroll into view (saves ~180 KB per extra page on load)
   experimental: { defaults: { nuxtLink: { prefetchOn: { visibility: false, interaction: true } } } },
