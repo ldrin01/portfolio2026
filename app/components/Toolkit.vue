@@ -22,7 +22,7 @@ let pointer: { x: number; y: number } | null = null
 
 function measure() {
   const sy = window.scrollY
-  tiles = [...(grid.value?.querySelectorAll<HTMLElement>('.logo') ?? [])].map((el, i) => {
+  tiles = [...(grid.value?.querySelectorAll<HTMLElement>('.tk-logo') ?? [])].map((el, i) => {
     const r = el.getBoundingClientRect()
     const old = tiles[i]
     return { el, x: r.left + r.width / 2, y: r.top + sy + r.height / 2, rx: old?.rx ?? 0, ry: old?.ry ?? 0 }
@@ -138,7 +138,7 @@ onBeforeUnmount(() => {
           :style="{ '--c': t.color, '--d': `${(i % 3) * 0.08}s` }"
         >
           <div class="stage" aria-hidden="true">
-            <div class="logo">
+            <div class="tk-logo">
               <svg v-for="l in LAYERS" :key="l" class="layer" :style="{ '--l': l - 1 }" viewBox="0 0 24 24">
                 <use :href="`#tk-${i}`" />
               </svg>
@@ -188,7 +188,7 @@ h2 { font-size: clamp(34px, 5.5vw, 72px); letter-spacing: -.02em; font-weight: 5
 
 /* the 3D logo: outlines stacked in depth, turned by --rx / --ry from the script */
 .stage { width: var(--size); height: var(--size); margin: 0 auto 28px; perspective: 520px; }
-.logo { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; transform: rotateX(var(--rx, 14deg)) rotateY(var(--ry, -22deg)); transition: scale .5s cubic-bezier(.16, .84, .3, 1); }
+.tk-logo { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; transform: rotateX(var(--rx, 14deg)) rotateY(var(--ry, -22deg)); transition: scale .5s cubic-bezier(.16, .84, .3, 1); }
 .layer {
   position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible;
   fill: none; stroke: var(--muted); stroke-width: .22; stroke-linejoin: round;
@@ -199,7 +199,7 @@ h2 { font-size: clamp(34px, 5.5vw, 72px); letter-spacing: -.02em; font-weight: 5
 .layer:first-child { stroke: var(--fg); stroke-width: .3; opacity: 1; }
 
 /* hover (or keyboard focus within): the stack takes the brand color and the face glows */
-.tool:hover .logo { scale: 1.08; }
+.tool:hover .tk-logo { scale: 1.08; }
 .tool:hover .layer { stroke: var(--c); opacity: calc(.9 - var(--l) * .07); }
 .tool:hover .layer:first-child { stroke: var(--fg); fill: color-mix(in srgb, var(--c) 22%, transparent); filter: drop-shadow(0 0 6px var(--c)); }
 /* touch screens have no hover: show the brand color softly instead */
