@@ -8,6 +8,9 @@ const route = useRoute()
 const router = useRouter()
 usePageSeo('case-studies')
 
+// a thumbnail that is missing falls back to the main picture
+const useMain = (e: Event, cover: string) => { const im = e.target as HTMLImageElement; if (!im.src.endsWith(asset(cover)!)) im.src = asset(cover)! }
+
 const all = computed(() => studies.value ?? [])
 const shelves = computed(() => options.articleCategories.filter(c => all.value.some(x => x.shelf === c.id))) // empty categories stay hidden
 const shelfName = (id: string) => options.articleCategories.find(c => c.id === id)?.name ?? id
@@ -94,7 +97,7 @@ onBeforeUnmount(() => cancelAnimationFrame(badge.raf))
         <li v-for="(c, i) in shown" :key="c.path" :style="{ '--d': `${Math.min(i, 8) * 50}ms` }">
           <NuxtLink :to="c.path" class="card" @pointermove="lean" @pointerleave="rest">
             <span class="cover">
-              <img v-if="c.cover" :src="asset(c.cover)" alt="" width="1600" height="900" loading="lazy">
+              <img v-if="c.cover" :src="asset(thumbOf(c))" alt="" width="640" height="360" loading="lazy" @error="useMain($event, c.cover)">
               <span class="read" aria-hidden="true">
                 <svg class="ring" viewBox="0 0 100 100">
                   <path :id="`ring-${i}`" d="M50 50m-37 0a37 37 0 1 1 74 0a37 37 0 1 1-74 0" fill="none" />

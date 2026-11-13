@@ -10,10 +10,10 @@ const loaderDone = useState('loaderDone', () => false)
 const route = useRoute()
 const asset = useAssetUrl()
 
-interface Hit { id: string; title: string; text: string; kind: string; to: string; cover: string }
+interface Hit { id: string; title: string; text: string; kind: string; to: string; cover: string; thumb: string }
 const docs = (): Hit[] => [
-  ...(studies.value ?? []).map(c => ({ id: c.path, title: c.title, text: c.summary, kind: optionName('articleCategories', c.shelf), to: c.path, cover: c.cover })),
-  ...sections.map(s => ({ id: s.to, title: s.label, text: '', kind: 'Page', to: s.to, cover: '' }))
+  ...(studies.value ?? []).map(c => ({ id: c.path, title: c.title, text: c.summary, kind: optionName('articleCategories', c.shelf), to: c.path, cover: c.cover, thumb: thumbOf(c) })),
+  ...sections.map(s => ({ id: s.to, title: s.label, text: '', kind: 'Page', to: s.to, cover: '', thumb: '' }))
 ]
 
 const open = ref(false)
@@ -30,7 +30,7 @@ const results = computed<Hit[]>(() => {
   const q = query.value.trim()
   if (!q) return []
   if (!index) {
-    index = new MiniSearch<Hit>({ fields: ['title', 'text', 'kind'], storeFields: ['title', 'text', 'kind', 'to', 'cover'], searchOptions: { prefix: true, fuzzy: 0.2, boost: { title: 3 } } })
+    index = new MiniSearch<Hit>({ fields: ['title', 'text', 'kind'], storeFields: ['title', 'text', 'kind', 'to', 'cover', 'thumb'], searchOptions: { prefix: true, fuzzy: 0.2, boost: { title: 3 } } })
     index.addAll(docs())
   }
   return index.search(q).slice(0, 6) as unknown as Hit[]
@@ -113,7 +113,7 @@ onBeforeUnmount(() => {
         class="hit" :class="{ on: i === active, 'has-cover': r.cover }" :data-kind="r.kind.toLowerCase()" :style="{ '--i': i }"
         @mouseenter="active = i" @mousedown.prevent="go(r)"
       >
-        <img v-if="r.cover" class="thumb" :src="asset(r.cover)" alt="" width="160" height="90" loading="lazy">
+        <img v-if="r.cover" class="thumb" :src="asset(r.thumb)" alt="" width="160" height="90" loading="lazy">
         <span class="kind">{{ r.kind }}</span>
         <span class="title">{{ r.title }}</span>
         <span v-if="r.text" class="text">{{ r.text }}</span>

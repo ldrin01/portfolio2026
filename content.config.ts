@@ -73,7 +73,8 @@ export default defineContentConfig({
         draft: z.boolean().default(true), // true until the real write-up replaces the stub
         seoTitle: z.string().default(''), // empty: "<title> — <site name>"
         seoDescription: z.string().default(''), // empty: the summary
-        cover: z.string().default('') // a picture path, e.g. /covers/<slug>.webp; empty = no cover
+        cover: z.string().default(''), // a picture path, e.g. /covers/<slug>.webp; empty = no cover
+        thumb: z.string().default('') // optional own thumbnail for cards and search; empty = the automatic <cover>-thumb.webp
       })
     }),
     // Header (logo and menu), footer, and the text of the fixed pages
