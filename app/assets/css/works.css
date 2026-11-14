@@ -158,7 +158,7 @@ html.resizing .wk .file:not(.hidden) { opacity: .35; scale: .94; }
 .wk .ql { --qbar: 56px; width: min(1120px, 100%); max-height: calc(100vh - 192px); max-height: calc(100dvh - 192px); display: flex; flex-direction: column; overflow: hidden; background: var(--win); border-radius: 22px; box-shadow: var(--shadow); scale: .9; translate: 0 22px; transition: scale .55s var(--spring), translate .55s var(--spring); position: relative; transform-origin: 50% 0; }
 .wk .ql.full { border-radius: 22px; }
 .wk .ql-back.open .ql { scale: 1; translate: 0 0; }
-.wk .ql-top { position: absolute; top: 0; left: 0; right: 0; z-index: 3; height: var(--qbar); display: flex; align-items: center; gap: 14px; padding: 0 20px; background: color-mix(in srgb, var(--win) 82%, transparent); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-bottom: 1px solid var(--line); }
+.wk .ql-top { position: absolute; top: 0; left: 0; right: 0; z-index: 3; height: var(--qbar); display: flex; align-items: center; gap: 14px; padding: 0 20px; background: color-mix(in srgb, var(--win) 82%, transparent); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); border-bottom: 1px solid var(--line); }
 .wk .ql-top .lights { padding: 0; }
 .wk .ql-nav { margin-left: auto; display: flex; gap: 4px; }
 .wk .ql-chev { width: 26px; height: 26px; border: 0; border-radius: 50%; background: transparent; color: var(--muted); display: grid; place-items: center; cursor: pointer; transition: background .2s, color .2s, transform .35s var(--spring); }
@@ -245,8 +245,8 @@ html.drawer-open .wk .scrim { opacity: 1; visibility: visible; transition-delay:
 /* filters: a drawer opened by the chevron button */
 .wk .side { position: absolute; z-index: 50; left: 0; top: 0; bottom: 0; width: min(84vw, 320px); margin: 0; padding: 14px 12px 22px; border-radius: 0 24px 24px 0; background: var(--win); overflow-x: hidden; translate: -100% 0; visibility: hidden; box-shadow: none; transition: translate .42s var(--ease), visibility 0s .42s, box-shadow .3s; }
 html.drawer-open .wk .side { translate: 0 0; visibility: visible; box-shadow: 0 0 60px rgba(0, 0, 0, .5); transition-delay: 0s; }
-.wk[data-mode='page'] .side { position: fixed; z-index: 1300; top: 0; bottom: auto; left: 0; height: 100vh; height: 100dvh; max-height: none; margin: 0; padding: 14px 12px 22px; border-radius: 0 24px 24px 0; background: var(--menu); outline: 0; backdrop-filter: none; -webkit-backdrop-filter: none; }
-[data-theme="dark"] .wk .win .side { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+.wk[data-mode='page'] .side { position: fixed; z-index: 1300; top: 0; bottom: auto; left: 0; height: 100vh; height: 100dvh; max-height: none; margin: 0; padding: 14px 12px 22px; border-radius: 0 24px 24px 0; background: var(--menu); outline: 0; -webkit-backdrop-filter: none; backdrop-filter: none; }
+[data-theme="dark"] .wk .win .side { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
 .wk[data-mode='page'] .preview { position: fixed; left: 8px; right: 8px; bottom: 8px; top: auto; }
 .wk[data-mode='page'] .list { overflow-x: auto; -webkit-mask-image: none !important; mask-image: none !important; }
 .wk[data-mode='page'] .lwrap { transform: none; }

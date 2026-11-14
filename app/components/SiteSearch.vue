@@ -216,7 +216,7 @@ svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; 
 .field::-webkit-search-cancel-button { display: none; }
 
 /* once there is a query: everything but the search blurs */
-.veil { position: fixed; inset: 0; z-index: 1240; background: color-mix(in srgb, var(--bg) 35%, transparent); backdrop-filter: blur(14px) saturate(1.1); -webkit-backdrop-filter: blur(14px) saturate(1.1); }
+.veil { position: fixed; inset: 0; z-index: 1240; background: color-mix(in srgb, var(--bg) 35%, transparent); -webkit-backdrop-filter: blur(14px) saturate(1.1); backdrop-filter: blur(14px) saturate(1.1); }
 .veil-enter-active, .veil-leave-active { transition: opacity .35s ease; }
 .veil-enter-from, .veil-leave-to { opacity: 0; }
 
