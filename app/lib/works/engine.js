@@ -55,7 +55,7 @@ const coarse = matchMedia('(pointer: coarse)').matches;
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const els = new Map();
 let canDrag = !coarse && innerWidth >= 700;
-let filter = 'all', sort = 'default', view = 'icons';
+let filter = 'all', sort = 'default', view = 'icons', access = 'all';   // access: all / open (no NDA) / nda
 let selectedId = null, zTop = 30;
 let loose = {}, cur = {}, looseW = 0, looseC = 0;   // width and column count the hand-placed positions were made for
 let CW = 148, FW = 136;                     // cell width, file width
@@ -126,14 +126,14 @@ function refit() {                            // called whenever the arranged vi
 }
 
 function visibleList() {
-  const l = DATA.filter((f) => filter === 'all' || f.tags.includes(filter));
+  const l = DATA.filter((f) => (filter === 'all' || f.tags.includes(filter)) && (access === 'all' || (access === 'nda') === f.nda));
   if (sort !== 'default') {
     const [k, d] = sort.split('-'), sgn = d === 'desc' ? -1 : 1;
     l.sort((a, b) => sgn * KEY[k](a).localeCompare(KEY[k](b)) || a.short.localeCompare(b.short));
   }
   return l;
 }
-const isDefault = () => filter === 'all' && sort === 'default';
+const isDefault = () => filter === 'all' && sort === 'default' && access === 'all';
 const place = (el, p) => { el.style.transform = `translate(${p.x}px, ${p.y}px)`; };
 
 function sync() {
@@ -342,8 +342,7 @@ function initLights() {
   else g.addEventListener('click', () => { if (opts.onOpenPage) opts.onOpenPage(); });
   const q = $('#qlLights');                                           // Quick Look has its own set
   q.innerHTML = lightsHTML();
-  const place = () => { if (isMobile()) $('#qlBack').appendChild(q); else $('.ql-top').prepend(q); };   // on phones the lights float outside the window, over its top-left corner
-  place(); on(mobileMQ, 'change', place);
+  $('.ql-top').prepend(q);                                           // inside the window's top bar, on every screen size
   q.querySelector('.r').id = 'qlClose';
   q.addEventListener('click', (e) => {                               // on phones the small lights enlarge on the first tap here too
     if (isMobile() && !q.classList.contains('expanded')) { e.stopPropagation(); e.preventDefault(); q.classList.add('expanded'); }
@@ -390,6 +389,18 @@ function go(key) {
   if (MODE === 'page' && scrollY > 0) scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' });
   listEl.scrollTo({ top: 0 });
   sync();
+}
+
+/* ============ NDA / OPEN SWITCH: only shown once the works include both kinds ============ */
+function buildAccess() {
+  const box = $('#access');
+  box.hidden = !(DATA.some((f) => f.nda) && DATA.some((f) => !f.nda));
+  box.querySelectorAll('button').forEach((b) => b.addEventListener('click', () => {
+    if (access === b.dataset.acc) return;
+    access = b.dataset.acc;
+    box.querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', x === b));
+    sync();
+  }));
 }
 
 /* ============ SORT (menu + list headers share one state) + CLEAN UP ============ */
@@ -509,52 +520,135 @@ function renderList(vis) {
 const N = 50;
 /* big grid for the Quick Look window: e-ink feel. Off cells are see-through, lit cells are pale gray squares with small gaps; the picture is a per-project motif (motifs.js),
    a faint cool tint, and a quick refresh sweep when the window opens. Same look for every project. */
-let litRaf = 0, litRO = null;
+let litRaf = 0, litRO = null, lastLit = null;   // lastLit: the picture on screen, so stepping to the next project can wipe it away cell by cell
 function drawLit(cv, id) {
   const scene = motifScene(id);                               // a real little 3D model, rendered into the 50x50 grid
   const dark = docEl.dataset.theme !== 'light';
   const SNAP = Math.PI / 4, TILT = 0.21;                              // snap every 45 degrees; tilt up to ~12 degrees
   const st = { yaw: scene.yaw0, pitch: scene.pitch0, vy: 0, vp: 0, target: null, drag: false, live: reduced, dirty: false };
   let grid = scene.render(st.yaw, st.pitch);
+  const prevLit = !reduced && lastLit && lastLit.id !== id ? lastLit : null;
+  lastLit = { grid, id, cells: null };                                // cells: where every cell is right now while the picture is still forming
+  const hsl2rgb = (h, sa, l) => { const a = sa * Math.min(l, 1 - l), f = (n) => { const k = (n + h / 30) % 12; return l - a * Math.max(-1, Math.min(k - 3, 9 - k, 1)); }; return [f(0), f(8), f(4)].map((q) => Math.round(q * 255)); };
+  const grayRgb = (v) => hsl2rgb(205, (dark ? 6 : 8) / 100, (dark ? 42 + v * 50 : 30 + v * 44) / 100);
+  const rgbAt = (g, k) => (g.rgb && g.rgb[k * 4 + 3] ? [g.rgb[k * 4], g.rgb[k * 4 + 1], g.rgb[k * 4 + 2]] : grayRgb(g[k]));
+  // the cells on screen right now: still forming (clicked next again mid-way) = where they are and the colour they have; settled = the picture
+  const src = prevLit ? (prevLit.cells || (() => { const a = []; for (let k = 0; k < N * N; k++) if (prevLit.grid[k] >= 0.07) a.push({ x: k % N, y: (k / N) | 0, c: rgbAt(prevLit.grid, k) }); return a; })()) : null;
+  const outgoing = src;
+  const mixRgb = (a, b, u) => `rgb(${Math.round(a[0] + (b[0] - a[0]) * u)},${Math.round(a[1] + (b[1] - a[1]) * u)},${Math.round(a[2] + (b[2] - a[2]) * u)})`;
   /* entrance: every lit cell is reached by a little light that walks in from a random point (any side, corner or inside), like an ant:
      lights come from everywhere, not from the nearest edge.
      The walk wanders (sideways steps, stalls and bursts) and never goes in a straight line. */
   let seed = id * 2654435761 >>> 0;
   const rnd = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
-  const trav = []; let tEnd = 0;
-  for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
-    const v = grid[y * N + x]; if (v < 0.07) continue;
-    const cl = (n) => Math.max(0, Math.min(N - 1, n)), pick = rnd();
-    let px, py;
-    if (pick < 0.72) {                                        // anywhere along the whole border: any side, any corner, whatever it likes
-      const q = rnd() * 4 * (N - 1), s = Math.floor(q % (N - 1)), side = Math.floor(q / (N - 1));
-      px = side === 0 ? s : side === 1 ? N - 1 : side === 2 ? N - 1 - s : 0;
-      py = side === 0 ? 0 : side === 1 ? s : side === 2 ? N - 1 : N - 1 - s;
-    } else if (pick < 0.86) { px = Math.floor(rnd() * N); py = Math.floor(rnd() * N); }                      // drifts in from somewhere inside the grid
-    else { px = cl(x + Math.round((rnd() - 0.5) * 18)); py = cl(y + Math.round((rnd() - 0.5) * 18)); }        // starts close to home
-    const wob = 0.03 + rnd() * 0.08;                          // only ~10% of moves are extra detours
-    const path = [px, py];
-    for (let n = 0; n < 200 && (px !== x || py !== y); n++) {
-      const ddx = x - px, ddy = y - py, ax = Math.abs(ddx), ay = Math.abs(ddy);
-      let mx = 0, my = 0;
-      if (rnd() < wob) { if (rnd() < 0.5) mx = rnd() < 0.5 ? -1 : 1; else my = rnd() < 0.5 ? -1 : 1; }     // wander
-      else if (rnd() < ax / (ax + ay || 1)) mx = Math.sign(ddx); else my = Math.sign(ddy);                    // head for home
-      px = cl(px + mx); py = cl(py + my);
-      path.push(px, py);
+  let trav = [], tEnd = 0;
+  /* Cells never re-aim while walking. Once a cell has landed it sits on the live model: if turning the model leaves its spot dark, it hops to the
+     nearest free lit spot (occ = which spots are taken). So the model turns for real while the picture is still filling in. */
+  const occ = new Uint8Array(N * N);
+  const nearestFree = (x0, y0) => {                                   // the closest free lit spot: a landed cell never goes far, so nothing looks like it is chasing
+    let best = -1, bd = 1e9;
+    for (let r = 0; r < N; r++) {
+      for (let dy = -r; dy <= r; dy++) for (let dx = -r; dx <= r; dx++) {
+        if (Math.max(Math.abs(dx), Math.abs(dy)) !== r) continue;
+        const x = x0 + dx, y = y0 + dy; if (x < 0 || y < 0 || x >= N || y >= N) continue;
+        const k = y * N + x; if (occ[k] || grid[k] < 0.07) continue;
+        const d = dx * dx + dy * dy; if (d < bd) { bd = d; best = k; }
+      }
+      if (best >= 0 && bd < (r + 1) * (r + 1)) break;
     }
-    if (px !== x || py !== y) path.push(x, y);
-    const hash = ((x * 73856093) ^ (y * 19349663)) >>> 0;
-    const c = { x, y, v, path: Uint8Array.from(path), len: path.length / 2, delay: (hash % 1000) / 1000 * 0.75, step: 0.0072 + rnd() * 0.0075, ph: rnd() * 6.28 };
-    tEnd = Math.max(tEnd, c.delay + (c.len + 2) * c.step + 0.25);
-    trav.push(c);
-  }
-  const mouse = { x: -99, y: -99 }, sm = { x: 25, y: 25, k: 0 }, t0 = performance.now();
-  let cell = 0, W = 0, last = t0, force = true, offCv = null, offDirty = true;   // force: draw once more even when nothing moved (first frame, resize)
+    return best;
+  };
+  const seatWalker = (c) => {
+    if (c.px === undefined) { c.px = c.x; c.py = c.y; }
+    const k = nearestFree(Math.round(c.px), Math.round(c.py));
+    if (k < 0) { c.dead = true; return; }
+    c.seat = k; occ[k] = 1;
+  };
+  /* stepping to another project (outgoing = the picture on screen): the cells on screen walk to the new picture the same way, hop by hop,
+     each to the nearest free cell. If the new picture needs more cells, the extras start somewhere around the middle (a loose area, not the
+     exact centre). If it needs fewer, the spare cells walk toward the middle and vanish. */
+  const hub = () => [Math.max(0, Math.min(N - 1, Math.round(N / 2 - 0.5 + (rnd() - 0.5) * 16))), Math.max(0, Math.min(N - 1, Math.round(N / 2 - 0.5 + (rnd() - 0.5) * 16)))];
+  /* plan(): where every cell goes from where it is right now. Used when the picture starts forming, and again whenever the model is turned
+     while it is still forming (quick: no waiting, the cells are already moving). */
+  const plan = (outgoing, quick) => {
+    trav = []; tEnd = 0; occ.fill(0);
+    const jobs = [];
+    if (outgoing) {
+      const A = outgoing, B = [];
+      for (let k = 0; k < N * N; k++) if (grid[k] >= 0.07) B.push(k);
+      // pairing: cells already on a lit spot of the new picture stay; every other new spot, in random order, takes the nearest unused cell (ring search, cheap even with hundreds of cells)
+      const usedA = new Uint8Array(A.length), pair = new Int32Array(B.length).fill(-1), at = new Array(N * N);
+      A.forEach((a, i) => { const k = Math.max(0, Math.min(N - 1, Math.round(a.y))) * N + Math.max(0, Math.min(N - 1, Math.round(a.x))); (at[k] || (at[k] = [])).push(i); });
+      const todo = [];
+      B.forEach((b, j) => { const l = at[b]; const i = l && l.find((q) => !usedA[q] && !A[q].light && A[q].x === b % N && A[q].y === ((b / N) | 0)); if (i !== undefined) { usedA[i] = 1; pair[j] = i; } else todo.push(j); });
+      for (let n = todo.length - 1; n > 0; n--) { const m = (rnd() * (n + 1)) | 0; [todo[n], todo[m]] = [todo[m], todo[n]]; }
+      let freeA = A.length - usedA.reduce((p, q) => p + q, 0);
+      for (const j of todo) {
+        if (!freeA) break;
+        const bx = B[j] % N, by = (B[j] / N) | 0; let bi = -1, bd = 1e9;
+        for (let r = 0; r < N && !(bi >= 0 && bd < r * r); r++) {
+          for (let dy = -r; dy <= r; dy++) for (let dx = -r; dx <= r; dx++) {
+            if (Math.max(Math.abs(dx), Math.abs(dy)) !== r) continue;
+            const x = bx + dx, y = by + dy; if (x < 0 || y < 0 || x >= N || y >= N) continue;
+            const l = at[y * N + x]; if (!l) continue;
+            for (const q of l) if (!usedA[q] && dx * dx + dy * dy < bd) { bd = dx * dx + dy * dy; bi = q; }
+          }
+        }
+        if (bi >= 0) { usedA[bi] = 1; pair[j] = bi; freeA--; }
+      }
+      const anyColour = () => (A.length ? A[(rnd() * A.length) | 0].c : grayRgb(0.8)), anyTarget = () => (B.length ? rgbAt(grid, B[(rnd() * B.length) | 0]) : grayRgb(0.8));
+      // colours are not matched on purpose: a cell keeps its own colour at the start and drifts to whatever its new place needs, near or far
+      B.forEach((b, j) => jobs.push({ x: b % N, y: (b / N) | 0, v: grid[b], c1: rgbAt(grid, b), ...(pair[j] >= 0 && !A[pair[j]].light && A[pair[j]].x === b % N && A[pair[j]].y === ((b / N) | 0) ? { stay: true, c0: A[pair[j]].c } : pair[j] >= 0 ? { start: [A[pair[j]].x, A[pair[j]].y], c0: A[pair[j]].c, hold: true, light: A[pair[j]].light } : { start: hub(), c0: anyColour() }) }));
+      A.forEach((a, i) => { if (!usedA[i]) { const [tx, ty] = hub(); jobs.push({ x: tx, y: ty, v: 0.5, start: [a.x, a.y], c0: a.c, c1: anyTarget(), hold: true, light: a.light, gone: true }); } });
+    } else for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) { const v = grid[y * N + x]; if (v >= 0.07) jobs.push({ x, y, v, c1: rgbAt(grid, y * N + x) }); }
+    for (const job of jobs) {
+      const { x, y, v } = job;
+      if (job.stay) {                                                 // a cell already on its spot in the new picture just stays lit: nothing leaves, nothing flashes
+        occ[y * N + x] = 1;
+        trav.push({ x, y, v, path: Float32Array.of(x, y), len: 1, delay: -10, step: 0.01, ph: 0, seat: y * N + x, dead: false, reserved: -1, c1: job.c1, sc0: job.c0, sdl: rnd() * 0.6, sdu: 0.5 + rnd() * 0.6 }); const q = trav[trav.length - 1]; tEnd = Math.max(tEnd, q.sdl + q.sdu + 0.1);   // sc0: it keeps the colour it had and drifts to the new one while it stands
+        continue;
+      }
+      const cl = (n) => Math.max(0, Math.min(N - 1, n)), pick = rnd();
+      let px, py;
+      if (job.start) { px = job.start[0]; py = job.start[1]; }
+      else if (pick < 0.72) {                                   // anywhere along the whole border: any side, any corner, whatever it likes
+        const q = rnd() * 4 * (N - 1), s = Math.floor(q % (N - 1)), side = Math.floor(q / (N - 1));
+        px = side === 0 ? s : side === 1 ? N - 1 : side === 2 ? N - 1 - s : 0;
+        py = side === 0 ? 0 : side === 1 ? s : side === 2 ? N - 1 : N - 1 - s;
+      } else if (pick < 0.86) { px = Math.floor(rnd() * N); py = Math.floor(rnd() * N); }                      // drifts in from somewhere inside the grid
+      else { px = cl(x + Math.round((rnd() - 0.5) * 18)); py = cl(y + Math.round((rnd() - 0.5) * 18)); }        // starts close to home
+      const wob = 0.03 + rnd() * 0.08;                          // only ~10% of moves are extra detours
+      if (job.start) { px = cl(Math.round(job.start[0])); py = cl(Math.round(job.start[1])); }
+      const path = job.start && (job.start[0] !== px || job.start[1] !== py) ? [job.start[0], job.start[1], px, py] : [px, py];
+      for (let n = 0; n < 200 && (px !== x || py !== y); n++) {
+        const ddx = x - px, ddy = y - py, ax = Math.abs(ddx), ay = Math.abs(ddy);
+        let mx = 0, my = 0;
+        if (rnd() < wob) { if (rnd() < 0.5) mx = rnd() < 0.5 ? -1 : 1; else my = rnd() < 0.5 ? -1 : 1; }     // wander
+        else if (rnd() < ax / (ax + ay || 1)) mx = Math.sign(ddx); else my = Math.sign(ddy);                    // head for home
+        px = cl(px + mx); py = cl(py + my);
+        path.push(px, py);
+      }
+      if (px !== x || py !== y) path.push(x, y);
+      const hash = ((x * 73856093) ^ (y * 19349663)) >>> 0;
+      const c = { x, y, v, path: Float32Array.from(path), len: path.length / 2, delay: quick || job.light ? rnd() * 0.06 : (hash % 1000) / 1000 * 0.75, step: 0.0072 + rnd() * 0.0075, ph: rnd() * 6.28, hold: job.hold, gone: job.gone, c0: job.c0, c1: job.c1, seat: -1, dead: false, reserved: -1 };
+      tEnd = Math.max(tEnd, c.delay + (c.len + 2) * c.step + 0.25);
+      trav.push(c);
+    }
+  };
+  plan(src, false);
+  const mouse = { x: -99, y: -99 }, sm = { x: 25, y: 25, k: 0 };
+  let t0 = performance.now(), catchUp = 0;
+  let cell = 0, W = 0, last = t0, force = true, offCv = null, offDirty = true;
+  /* e-ink touches: ink bloom (a soft spread around lit cells), a faint panel-edge shade, a quick full refresh flash when a picture arrives,
+     ghosting (a faint remnant where the model was), single cells that re-flash now and then, and a little speckle when left alone */
+  let lc = null, vigCv = null, lastAct = t0, lastFx = 0, twNext = t0 + 1200, specNext = 0;
+  const ghost = new Float32Array(N * N), tw = new Float32Array(N * N), specks = [];   // force: draw once more even when nothing moved (first frame, resize)
   const size = () => {
     const css = cv.clientWidth; if (!css) return;
     cv.style.height = css + 'px';                                     // always a perfect square
     W = Math.round(css * Math.min(devicePixelRatio || 1, 2));
-    cv.width = cv.height = W; cell = W / N; force = true; offDirty = true;   // resizing clears the canvas
+    if (cv.width !== W) cv.width = cv.height = W;                     // setting the size clears the canvas, so only when it really changed
+    cell = W / N; force = true; offDirty = true;
     /* rounded corners that follow the CRT glass: a rounded rectangle in grid space, pushed through the same barrel curve as the cells */
     const RR = 0.1, K = 12, E = 16, arcs = [[RR, RR, Math.PI], [1 - RR, RR, Math.PI * 1.5], [1 - RR, 1 - RR, 0], [RR, 1 - RR, Math.PI / 2]].map(([cx, cy, a0]) => {
       const a = []; for (let i = 0; i <= K; i++) { const t = a0 + i / K * Math.PI / 2; a.push([cx + RR * Math.cos(t), cy + RR * Math.sin(t)]); } return a;
@@ -571,8 +665,8 @@ function drawLit(cv, id) {
     const l = dark ? 42 + v * 50 + flash * 6 : 30 + v * 44 + flash * 8;   // light mode keeps the same shading: top face lightest, shaded sides darker
     return `hsl(205 ${dark ? 6 : 8}% ${l}%)`;
   };
-  const rectOf = (x, y, grow, full) => {                              // full: a coloured cell fills its square (no gap; a hair of overlap hides the seams)
-    const g0 = Math.max(1, Math.round(cell * 0.14)), gp = full ? 0 : g0, ex = (full ? 0.6 : 0) + (grow ? g0 * 0.5 * grow : 0);
+  const rectOf = (x, y, grow) => {                                    // every lit cell, gray or coloured, leaves the same gap as the faint off cells
+    const g0 = Math.max(1, Math.round(cell * 0.14)), gp = g0, ex = grow ? g0 * 0.5 * grow : 0;
     const x0 = Math.round(x * cell), y0 = Math.round(y * cell);
     return [x0 + gp / 2 - ex, y0 + gp / 2 - ex, Math.round((x + 1) * cell) - x0 - gp + ex * 2, Math.round((y + 1) * cell) - y0 - gp + ex * 2];
   };
@@ -611,25 +705,70 @@ function drawLit(cv, id) {
   const paint = (now) => {
     if (!W) return;
     const dt = Math.min(0.05, (now - last) / 1000); last = now;
-    const t = reduced ? 99 : (now - t0) / 1000;
+    let t = reduced ? 99 : (now - t0) / 1000;
     let redraw = force || !st.live; force = false;                     // a still grid is not repainted: only the entrance, a turn, a hover or a resize are
-    if (!st.live && t > tEnd) st.live = true;
+    if (!st.live && t > tEnd) {
+      // landed. If the model was turned meanwhile, the cells make up to two more short walks to fill the spots the turn left empty (only after you let go: while you hold the model it just follows your hand)
+      let off = false; if (!st.drag && catchUp < 1) for (let j = 0; j < N * N; j++) if (grid[j] >= 0.07 && !occ[j]) { off = true; break; }
+      if (off && lastLit.cells) { catchUp++; plan(lastLit.cells, true); t0 = now; t = 0; }
+      else { st.live = true; lastLit.cells = null; }
+    }
     step(dt);
-    if (st.dirty) { grid = scene.render(st.yaw, st.pitch); st.dirty = false; redraw = true; }
+    if (st.live && lastLit.cells) lastLit.cells = null;
+    if (st.dirty) {
+      const prev = grid; grid = scene.render(st.yaw, st.pitch); st.dirty = false; redraw = true; st.dirty0 = true; lastLit = { grid, id, cells: lastLit.cells };
+      if (!reduced) for (let j = 0; j < N * N; j++) if (prev[j] >= 0.07 && grid[j] < 0.07) ghost[j] = Math.max(ghost[j], prev[j]);   // ghosting: where the model just was
+    }
+    if (!st.live && st.dirty0) for (const c of trav) if (c.seat >= 0 && grid[c.seat] < 0.07) { occ[c.seat] = 0; c.seat = -1; }   // the model turned: landed cells whose spot went dark glide to the nearest free lit spot
+    st.dirty0 = false;
+    let ghosting = false, twitching = false;
+    if (!reduced) {
+      const kg = Math.exp(-dt / 0.7), kt = Math.exp(-dt / 0.12);
+      for (let j = 0; j < N * N; j++) {
+        if (ghost[j] > 0.004) { ghost[j] *= kg; ghosting = true; } else ghost[j] = 0;
+        if (tw[j] > 0.02) { tw[j] *= kt; twitching = true; } else tw[j] = 0;
+      }
+      if (st.live && now > twNext) {                                   // now and then two cells refresh on their own
+        twNext = now + 900 + Math.random() * 1100;
+        for (let n = 0; n < 2; n++) for (let tries = 0; tries < 24; tries++) { const j = (Math.random() * N * N) | 0; if (grid[j] >= 0.07) { tw[j] = 1; break; } }
+      }
+    }
+    const idle = st.live && !st.drag && !reduced && now - lastAct > 4000;
+    if (idle && now > specNext) {                                       // left alone: faint speckle drifts through the empty cells
+      specNext = now + 650;
+      for (let n = 0; n < 12; n++) { const j = (Math.random() * N * N) | 0; if (grid[j] < 0.07) specks.push({ j, born: now }); }
+    }
+    while (specks.length && now - specks[0].born > 1500) specks.shift();
+    const fl = !reduced && !outgoing && t < 0.16 ? Math.sin(Math.PI * t / 0.16) : 0;   // the full refresh: one fast flash across the whole panel, only when the window opens (stepping between projects just wipes cell by cell)
+    const wiping = false;
     sm.k += ((mouse.x > -50 ? 1 : 0) - sm.k) * 0.12;                  // hover strength eases in and out
     if (mouse.x > -50) { sm.x += (mouse.x - sm.x) * 0.25; sm.y += (mouse.y - sm.y) * 0.25; }
     let hot = mouse.x > -50 || sm.k > 0.004;
     if (!hot) for (let j = 0; j < N * N; j++) if (H[j] >= 0.01) { hot = true; break; }
-    if (!redraw && !hot) return;
+    const loud = redraw || hot || ghosting || fl > 0 || wiping;
+    if (!loud && !twitching && !specks.length) return;
+    if (!loud && now - lastFx < 50) return;                           // only a twitch or speckle to show: ~20 frames a second is plenty
+    lastFx = now;
     const g = cv.getContext('2d');
     g.clearRect(0, 0, W, W);
     if (offDirty) {                                                   // the 2,500 faint off cells never move: drawn once per size, then just stamped
       offCv = offCv || document.createElement('canvas'); offCv.width = offCv.height = W;
-      const og = offCv.getContext('2d'); og.fillStyle = dark ? 'rgba(255,255,255,.02)' : 'rgba(22,22,27,.034)';
+      const og = offCv.getContext('2d'); og.fillStyle = dark ? 'rgba(255,255,255,.045)' : 'rgba(22,22,27,.034)';
       for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) { const r = rectOf(x, y); fq(og, r); }
+      vigCv = vigCv || document.createElement('canvas'); vigCv.width = vigCv.height = W;
+      const vg = vigCv.getContext('2d'), gr = vg.createRadialGradient(W / 2, W / 2, W * 0.32, W / 2, W / 2, W * 0.74);
+      gr.addColorStop(0, 'rgba(0,0,0,0)'); gr.addColorStop(1, dark ? 'rgba(0,0,0,.16)' : 'rgba(22,22,27,.06)');
+      vg.fillStyle = gr; vg.fillRect(0, 0, W, W);
       offDirty = false;
     }
     g.drawImage(offCv, 0, 0);
+    for (const sp of specks) {
+      const a = 0.08 * Math.sin(Math.PI * Math.min(1, (now - sp.born) / 1500));
+      g.fillStyle = dark ? `rgba(255,255,255,${a})` : `rgba(22,22,27,${a * 1.4})`; fq(g, rectOf(sp.j % N, (sp.j / N) | 0));
+    }
+    if (!lc) lc = document.createElement('canvas');
+    if (lc.width !== W) lc.width = lc.height = W;
+    const lg = lc.getContext('2d'); lg.clearRect(0, 0, W, W);        // the picture is drawn here first, so its ink can bloom
     const hx = mouse.x > -50 ? Math.floor(mouse.x) : -1, hy = mouse.y > -50 ? Math.floor(mouse.y) : -1;
     OX.fill(0); OY.fill(0); GR.fill(0);
     for (let j = 0; j < N * N; j++) {                                  // the exact cell under the pointer swells; its neighbours ease outward, very slightly
@@ -648,36 +787,67 @@ function drawLit(cv, id) {
       const i = y * N + x, g = GR[i];
       return [Math.min(1, v + H[i] * 0.16), g, OX[i], OY[i]];
     };
+    for (let k = 0; k < N * N; k++) {                                 // ghosting: a faint remnant where the model was a moment ago
+      if (ghost[k] <= 0.01) continue;
+      lg.globalAlpha = Math.min(0.2, ghost[k] * 0.2); lg.fillStyle = tone(0.8, 0); fq(lg, rectOf(k % N, (k / N) | 0));
+    }
+    lg.globalAlpha = 1;
     if (st.live) {                                                    // live model: every cell shows the current view
       for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
         const v = grid[y * N + x]; if (v < 0.07) continue;
-        const [vv, grow, ox, oy] = lift(x, y, v), col = colorOf(x, y, v, vv, 0), r = rectOf(x + ox, y + oy, grow, !!col);
-        g.fillStyle = col || tone(vv, 0); fq(g, r);
+        const [vv, grow, ox, oy] = lift(x, y, v), tf = tw[y * N + x] * 2, col = colorOf(x, y, v, vv, tf), r = rectOf(x + ox, y + oy, grow);
+        lg.fillStyle = col || tone(vv, tf); fq(lg, r);
       }
-      return;
-    }
-    const heads = [];
+    } else {
+    const heads = [], cur = [];                                       // cur: where every cell is this frame and what colour it has, so a click on next mid-way starts from here
     for (const c of trav) {
       let h = (t - c.delay) / c.step;
-      if (h < 0) continue;
+      if (h < 0) {
+        if (c.hold) { lg.fillStyle = `rgb(${c.c0})`; fq(lg, rectOf(c.path[0], c.path[1])); cur.push({ x: c.path[0], y: c.path[1], c: c.c0 }); }   // not its turn yet: still where the last picture had it, in its colour
+        continue;
+      }
       if (h < c.len - 1) {                                            // still walking: glides cell to cell, each hop eased in and out
         for (let k = 0; k < 3; k++) {
           const hh = h - k * 0.9; if (hh < 0) break;
           const p = Math.floor(hh), f = hh - p, e = f * f * (3 - 2 * f), p2 = Math.min(p + 1, c.len - 1);
-          heads.push([c.path[p * 2] + (c.path[p2 * 2] - c.path[p * 2]) * e, c.path[p * 2 + 1] + (c.path[p2 * 2 + 1] - c.path[p * 2 + 1]) * e, 0.6 - k * 0.2]);
+          const px = c.path[p * 2] + (c.path[p2 * 2] - c.path[p * 2]) * e, py = c.path[p * 2 + 1] + (c.path[p2 * 2 + 1] - c.path[p * 2 + 1]) * e;
+          const u = Math.min(1, hh / Math.max(1, c.len - 1)), rgbv = c.c0 ? [0, 1, 2].map((q) => c.c0[q] + (c.c1[q] - c.c0[q]) * u * u * (3 - 2 * u)) : null;   // the colour changes a little with every hop
+          heads.push([px, py, c.c0 ? [1, 0.55, 0.3][k] : 0.6 - k * 0.2, rgbv ? mixRgb(rgbv, rgbv, 0) : null]);
+          if (k === 0) cur.push({ x: px, y: py, c: rgbv ? rgbv.map(Math.round) : c.c1 });
         }
         continue;
       }
-      const flash = Math.max(0, 1 - (h - c.len + 1) * c.step / 0.14); // soft refresh flash on arrival
-      const [vv, grow, ox, oy] = lift(c.x, c.y, c.v), col = colorOf(c.x, c.y, c.v, vv, flash), r = rectOf(c.x + ox, c.y + oy, grow, !!col);
-      g.fillStyle = col || tone(vv, flash); fq(g, r);
+      if (c.gone) continue;                                           // a spare cell has reached the middle: it vanishes
+      if (c.seat < 0 && !c.dead) seatWalker(c);                       // landed: takes its spot on the live model
+      if (c.dead) continue;
+      if (c.px === undefined) { c.px = c.seat % N; c.py = (c.seat / N) | 0; }
+      const sx = c.seat % N, sy = (c.seat / N) | 0, flash = Math.max(0, 1 - (h - c.len + 1) * c.step / 0.14); // soft refresh flash on arrival
+      c.px += (sx - c.px) * 0.4; c.py += (sy - c.py) * 0.4;           // a hop to a new spot is a quick glide
+      const lv = grid[c.seat], [vv, grow, ox, oy] = lift(sx, sy, lv), r = rectOf(c.px + ox, c.py + oy, grow);
+      let col = '';
+      if (c.sc0) { const u = (t - c.sdl) / c.sdu; if (u < 1) col = mixRgb(c.sc0, rgbAt(grid, c.seat), u <= 0 ? 0 : u * u * (3 - 2 * u)); }   // a cell that did not move: its colour changes gradually, never at once
+      if (!col) col = colorOf(sx, sy, lv, vv, flash);
+      lg.fillStyle = col || tone(vv, flash); fq(lg, r);
+      cur.push({ x: c.px, y: c.py, c: c.c1 });
     }
-    g.fillStyle = tone(1, 0.6);
-    for (const [x, y, a] of heads) { const r = rectOf(x, y); g.globalAlpha = Math.max(0, a); fq(g, r); }
+    lastLit.cells = cur;
+    for (const [x, y, a, col] of heads) { lg.fillStyle = col || tone(1, 0.6); const r = rectOf(x, y); lg.globalAlpha = Math.max(0, a); fq(lg, r); }
+    lg.globalAlpha = 1;
+    }
+    if ('filter' in g) {                                              // ink bloom: the same picture again, blurred and faint, underneath
+      g.save(); g.filter = `blur(${Math.max(2, cell * 0.8)}px)`; g.globalAlpha = dark ? 0.2 : 0.14; g.drawImage(lc, 0, 0); g.restore();
+    }
+    g.drawImage(lc, 0, 0);
+    if (vigCv) g.drawImage(vigCv, 0, 0);                              // the panel's edges sit a touch darker
+    if (fl > 0) {                                                     // full refresh: every cell flashes once, fast
+      g.fillStyle = dark ? `rgba(255,255,255,${fl * 0.5})` : `rgba(22,22,27,${fl * 0.55})`;
+      for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) fq(g, rectOf(x, y));
+    }
     g.globalAlpha = 1;
   };
   cancelAnimationFrame(litRaf); if (litRO) litRO.disconnect();
   size();
+  if (!reduced) paint(performance.now());                            // draw the first frame now, so the canvas is never empty for a frame between two projects
   const loop = (now) => { paint(now); litRaf = requestAnimationFrame(loop); };
   if (reduced) { st.live = true; paint(performance.now()); }
   litRO = new ResizeObserver(() => { size(); if (reduced) paint(performance.now()); }); litRO.observe(cv);
@@ -686,10 +856,12 @@ function drawLit(cv, id) {
   let px = 0, py = 0, vel = 0, lt = 0;
   cv.onpointerdown = (e) => {
     if (e.button) return;
-    st.drag = true; st.live = true; st.target = null; st.vy = 0; st.vp = 0; px = e.clientX; py = e.clientY; vel = 0; lt = performance.now();
+    lastAct = performance.now();
+    st.drag = true; st.target = null; st.vy = 0; st.vp = 0; px = e.clientX; py = e.clientY; vel = 0; lt = performance.now();
     cv.setPointerCapture(e.pointerId); cv.classList.add('grabbing');
   };
   cv.onpointermove = (e) => {
+    lastAct = performance.now();
     const r = cv.getBoundingClientRect(); mouse.x = (e.clientX - r.left) / r.width * N; mouse.y = (e.clientY - r.top) / r.height * N;
     if (!st.drag) return;
     const dx = e.clientX - px, dy = e.clientY - py, now = performance.now(), dtm = Math.max(1, now - lt) / 1000;
@@ -712,7 +884,7 @@ function drawLit(cv, id) {
 function stopLit() { cancelAnimationFrame(litRaf); if (litRO) litRO.disconnect(); }
 
 /* ============ QUICK LOOK (placeholder for the detail page) ============ */
-let lastFocus = null, qlId = null;
+let lastFocus = null, qlId = null, extraTok = 0;
 function renderExtra(f) {                                              // small notes on faint cards under the description
   const x = EXTRA[f.id], box = $('#qlExtra'); if (!x) { box.innerHTML = ''; return; }
   const li = (a) => a.map((s) => `<li>${esc(s)}</li>`).join('');
@@ -743,7 +915,9 @@ function openQL(f) {
   $('#qlRole').textContent = f.role;
   $('#qlTool').textContent = f.tool;
   mountRedact($('#qlClient'));
-  renderExtra(f);
+  $('#qlClient').closest('div').style.display = f.nda ? '' : 'none';   // open work: no client to hide
+  if (wasOpen) { const tok = ++extraTok; setTimeout(() => { if (tok === extraTok && qlId === f.id) { renderExtra(f); fitQL(); } }, 90); }   // stepping: the cards below wait a moment so the canvas starts moving at once
+  else { extraTok++; renderExtra(f); }
   $('#qlBack').classList.add('open');
   docEl.classList.add('ql-lock');
   $('.ql-body').scrollTop = 0;
@@ -771,7 +945,7 @@ on(window, 'keydown', (e) => {
   else if (e.key === 'ArrowLeft') { e.preventDefault(); stepQL(-1); }
 });
 function closeQL() {
-  stopLit();
+  stopLit(); lastLit = null;
   docEl.classList.remove('ql-lock');
   $('#qlBack').classList.remove('open');
   if (lastFocus && lastFocus.focus) lastFocus.focus();
@@ -813,6 +987,7 @@ function init() {
   buildMenu();
   syncMobile();
   canvas.classList.toggle('can-drag', canDrag);
+  buildAccess();
   go(validKey(opts.initial && opts.initial.filter));
   $('#win').classList.add('ready');
   if (opts.initial && opts.initial.open) setTimeout(() => showView({ open: opts.initial.open }), 60);

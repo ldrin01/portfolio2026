@@ -13,7 +13,7 @@ const types = options.workTypes
 const extOf = (id: string) => types.find(t => t.id === id)?.ext || id
 const data = {
   EXT: Object.fromEntries(types.map(t => [t.ext || t.id, t.name])),
-  DATA: works.projects.map(p => ({ id: p.id, ext: extOf(p.fileType), short: p.title, discreet: p.fullTitle || p.title, tags: p.tags, role: p.role, tool: p.tools, snippet: p.description, model: p.model })),
+  DATA: works.projects.map(p => ({ id: p.id, ext: extOf(p.fileType), short: p.title, discreet: p.fullTitle || p.title, nda: p.nda !== false, tags: p.tags, role: p.role, tool: p.tools, snippet: p.description, model: p.model })),
   EXTRA: Object.fromEntries(works.projects.filter(p => p.challenge || p.approach || p.features.length || p.deliverables.length || p.highlights.length)
     .map(p => [p.id, { c: p.challenge, a: p.approach, f: p.features, d: p.deliverables, g: p.highlights }]))
 }
@@ -54,6 +54,12 @@ onBeforeUnmount(() => { gone = true; destroy?.(); destroy = null })
             <button id="filterBtn" class="pill icon" type="button" aria-haspopup="dialog" aria-expanded="false" aria-label="Show Works filters"><svg viewBox="0 0 12 12"><path d="M4.5 2.5L8 6l-3.5 3.5" /></svg></button>
             <h3 id="title" class="title"><span id="titleText">All Works</span></h3>
             <div class="spacer" />
+
+            <div id="access" class="seg acc" role="group" aria-label="Show works" hidden>
+              <button type="button" data-acc="all" aria-pressed="true">All</button>
+              <button type="button" data-acc="open" aria-pressed="false">Open</button>
+              <button type="button" data-acc="nda" aria-pressed="false">NDA</button>
+            </div>
 
             <div class="seg" role="group" aria-label="View">
               <button id="vIcons" type="button" aria-pressed="true" aria-label="Icon view"><svg viewBox="0 0 16 16"><rect x="2" y="2" width="5" height="5" rx="1.2" /><rect x="9" y="2" width="5" height="5" rx="1.2" /><rect x="2" y="9" width="5" height="5" rx="1.2" /><rect x="9" y="9" width="5" height="5" rx="1.2" /></svg></button>

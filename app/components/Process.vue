@@ -1,10 +1,13 @@
 <script setup lang="ts">
 // How I work: four steps on one line that fills in as you scroll. Each node lights up as the line reaches it,
 // and each step lists what it hands over. Desktop runs left to right; phones run top to bottom.
+// On desktop the section holds still for a while (like the keyboard): the line fills with the scroll while the frame stays put,
+// with a short beat before the first step and another after the last, then it lets go and the page carries on.
 const { process } = useSite()
 
 const root = ref<HTMLElement | null>(null)
 const list = ref<HTMLElement | null>(null)
+const track = ref<HTMLElement | null>(null)
 const progress = ref(0) // 0..1 along the line
 const reached = ref(0) // how many nodes the filled line has reached
 const span = ref({ start: 0, len: 0 }) // the line runs from the first node's centre to the last's, in px along the list
@@ -25,8 +28,11 @@ const update = () => {
   progress.value = down
     // the tip of the line follows a point 60% down the screen, so it is always drawing where you are reading
     ? Math.min(1, Math.max(0, (vh * 0.6 - r.top - start) / Math.max(1, len)))
-    // starts when the list's top reaches 80% of the screen, done when its bottom passes 55%
-    : Math.min(1, Math.max(0, (vh * 0.8 - r.top) / (r.height + vh * 0.25)))
+    // held in place: a beat of stillness first (first 14% of the hold), the line fills through the middle, then a beat with everything lit (last 12%)
+    : (() => {
+      const t = track.value?.getBoundingClientRect(), hold = Math.max(1, (t?.height ?? 0) - vh)
+      return t ? Math.min(1, Math.max(0, (-t.top / hold - 0.14) / 0.74)) : 0
+    })()
   const tip = progress.value * len
   reached.value = progress.value > 0 ? centres.filter(c => c - start <= tip + 1).length : 0
 }
@@ -46,7 +52,7 @@ onBeforeUnmount(() => { near?.disconnect(); window.removeEventListener('scroll',
 
 <template>
   <section id="process" ref="root">
-    <div class="wrap">
+    <div ref="track" class="track"><div class="pin"><div class="wrap">
       <h2 v-lag="1">{{ process.heading }}</h2>
       <p v-lag="2" class="sub">{{ process.sub }}</p>
 
@@ -69,11 +75,15 @@ onBeforeUnmount(() => { near?.disconnect(); window.removeEventListener('scroll',
           </ul>
         </li>
       </ol>
-    </div>
+    </div></div></div>
   </section>
 </template>
 
 <style scoped>
+/* desktop: the track is taller than the screen and the frame sticks inside it until the line is done */
+#process { min-height: 0; padding: 0; }
+.track { height: calc(100svh + 130svh); }
+.pin { position: sticky; top: 0; height: 100svh; display: flex; flex-direction: column; justify-content: center; padding: clamp(88px, 10vw, 120px) 0 clamp(32px, 6vw, 64px); }
 h2 { font-size: clamp(34px, 5.5vw, 72px); letter-spacing: -.02em; font-weight: 500; }
 .sub { margin: 12px 0 clamp(40px, 7vw, 88px); color: var(--muted); max-width: 46ch; }
 
@@ -103,6 +113,9 @@ h3 { margin-top: 22px; font-size: clamp(22px, 2.2vw, 30px); font-weight: 500; le
 
 /* tablets and phones: one column, the line runs down the left through the nodes */
 @media (max-width: 860px) {
+  #process { padding: 72px 0 40px; }
+  .track { height: auto; }
+  .pin { position: static; height: auto; padding: 0; }
   .steps { --node: 48px; grid-template-columns: 1fr; gap: 40px; }
   .line { top: var(--a); left: calc(var(--node) / 2 - 1px); width: 2px; height: var(--len); } /* ends at the last node, not the last step's text */
   .fill { transform-origin: top; transform: scaleY(var(--p)); }
@@ -112,6 +125,7 @@ h3 { margin-top: 22px; font-size: clamp(22px, 2.2vw, 30px); font-weight: 500; le
   h3 { margin-top: 10px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .node, .outs li, .step > :not(.node) { transition: none; }
+  .node, .outs li, .step > :not(.node) { transition: none; }  .track { height: auto; }
+  .pin { position: static; height: auto; padding: clamp(88px, 10vw, 120px) 0 clamp(32px, 6vw, 64px); }
 }
 </style>

@@ -198,6 +198,7 @@ export default defineContentConfig({
         projects: z.array(z.object({
           title: z.string(), // the file name
           fileType: z.string(), // a workTypes id
+          nda: z.boolean().default(true), // under NDA: the client is hidden and the project shows under the NDA filter. Off = open work
           role: z.string(),
           tools: z.string(),
           fullTitle: z.string(), // the title in the project's own window
