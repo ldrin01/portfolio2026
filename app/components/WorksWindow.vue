@@ -4,7 +4,7 @@
 // The window's behaviour lives in app/lib/works/engine.js, loaded in the browser only; this file is just its markup.
 const props = withDefaults(defineProps<{ mode?: 'window' | 'page' }>(), { mode: 'window' })
 const root = ref<HTMLElement | null>(null)
-let destroy: (() => void) | null = null
+let destroy: ((() => void) & { show: (q: { filter?: string; open?: number | string }) => void }) | null = null
 let gone = false
 
 // the projects from content/works.json, in the shape the engine reads (the file type's ending, e.g. "inf", is its key)
@@ -18,23 +18,35 @@ const data = {
     .map(p => [p.id, { c: p.challenge, a: p.approach, f: p.features, d: p.deliverables, g: p.highlights }]))
 }
 
+// on the /works page the filter lives in the address (?f=Web App) and ?open=<id> opens that project's window, so a link or a search result can land on either
+const page = props.mode === 'page'
+const route = useRoute()
+const router = useRouter()
+const one = (v: unknown) => (typeof v === 'string' && v ? v : undefined)
+const fromUrl = () => ({ filter: one(route.query.f) ?? 'all', open: one(route.query.open) })
+function consumeOpen() { if (route.query.open) router.replace({ query: { ...route.query, open: undefined } }) }
+
 onMounted(async () => {
   const { mountWorks } = await import('~/lib/works/engine')
   if (gone || !root.value) return
   destroy = mountWorks(root.value, {
     mode: props.mode,
     data,
+    initial: page ? fromUrl() : undefined,
+    onFilter: page ? (key: string) => { if ((one(route.query.f) ?? 'all') !== key) router.replace({ query: key === 'all' ? {} : { f: key } }) } : undefined,
     onOpenPage: () => navigateTo('/works'), // green light on the home page's window
     nextSection: () => root.value?.closest('section')?.nextElementSibling ?? null // red light: on to the next frame
   })
+  if (page) setTimeout(consumeOpen, 400)
 })
+if (page) watch(() => route.query, () => { if (destroy) { destroy.show(fromUrl()); consumeOpen() } })
 onBeforeUnmount(() => { gone = true; destroy?.(); destroy = null })
 </script>
 
 <template>
   <div ref="root" class="wk" :data-mode="mode">
     <div id="win" class="win" role="region" aria-label="Works" data-view="icons">
-      <aside id="side" class="side" />
+      <aside id="side" class="side" data-lenis-prevent />
 
       <div class="main">
         <div class="stage">

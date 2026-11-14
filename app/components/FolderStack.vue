@@ -237,7 +237,7 @@ onMounted(() => {
 .open .paper:is(:hover, :focus-visible) { transition-duration: .45s; transform: translateY(calc(var(--push) * (1 - var(--k)) - var(--rise) * var(--k) + var(--lift, -52px))) translateZ(calc((var(--gap) + var(--away)) * -1 * var(--k))) rotate(var(--tilt, 1.2deg)); }
 .open .paper { cursor: grab; }
 .open .paper.drag { cursor: grabbing; transition-duration: .3s; }
-.label { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 28px; min-width: 0; }
+.label { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; min-width: 0; } /* the category sits on top of the title */
 .num { font-size: 12px; letter-spacing: .2em; text-transform: uppercase; opacity: .6; }
 .title { font-size: clamp(22px, 3.2vw, 42px); font-weight: 500; letter-spacing: -.01em; line-height: 1.1; transition: color .2s; }
 .paper:hover .title, .paper:focus-visible .title { color: var(--accent); }
@@ -267,7 +267,7 @@ onMounted(() => {
   .work .wrap { padding: 0 var(--gutter); }
   .folder { --gap: 30px; --tabh: 26px; --away: 220px; --rise: 90px; aspect-ratio: 1.3; }
   .paper { padding: 10px 14px; gap: 12px; }
-  .label { gap: 0 12px; }
+  .label { gap: 4px; }
   .title { font-size: 20px; }
   .more .title { font-size: 13px; }
   .num { font-size: 10px; }

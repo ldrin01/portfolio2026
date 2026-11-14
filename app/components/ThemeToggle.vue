@@ -54,7 +54,5 @@ svg { width: 26px; height: 26px; overflow: visible; transition: transform .6s cu
 .light .core { r: 4.5px; }
 .light .bite { cx: 26px; cy: -2px; }
 .light .rays { opacity: 1; transform: none; }
-/* dark: the moon moves in pixel steps */
-[data-theme="dark"] svg, [data-theme="dark"] .core, [data-theme="dark"] .bite { transition-timing-function: steps(5); }
 @media (prefers-reduced-motion: reduce) { .theme-toggle { animation: none; } svg, .core, .bite, .rays { transition: none; } }
 </style>

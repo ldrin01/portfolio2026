@@ -160,8 +160,7 @@ onBeforeUnmount(() => { window.removeEventListener('keydown', onKey); cancelAnim
 .open .bars i:nth-child(1) { transform: translateY(4.75px) rotate(45deg); }
 .open .bars i:nth-child(2) { transform: translateY(-4.75px) rotate(-45deg); width: 30px; }
 /* dark world: square ends, and everything moves in hard steps like pixels */
-[data-theme="dark"] .menu-btn, [data-theme="dark"] .logo { animation-timing-function: steps(4); }
-[data-theme="dark"] .bars i { border-radius: 0; transition-timing-function: steps(4); }
+[data-theme="dark"] .bars i { border-radius: 0; }
 @media (prefers-reduced-motion: reduce) { .menu-btn, .logo { animation: none; } .bars i { transition: none; } }
 
 /* ── the sheets ── */

@@ -27,7 +27,7 @@
 /* sorting only nudges the rows; the full pop is for a new list */
 @keyframes wk-titlein { from { opacity: 0; translate: 0 8px; filter: blur(4px); } }
 /* ---------- the window ---------- */
-.wk .win { position: relative; display: grid; grid-template-columns: 224px 1fr; grid-template-rows: minmax(0, 1fr); height: clamp(520px, 74vh, 700px); background: var(--win); border-radius: 22px; box-shadow: var(--shadow); overflow: hidden; animation: wk-pop .6s var(--spring) both; }
+.wk .win { position: relative; display: grid; grid-template-columns: 272px 1fr; grid-template-rows: minmax(0, 1fr); height: clamp(520px, 74vh, 700px); background: var(--win); border-radius: 22px; box-shadow: var(--shadow); overflow: hidden; animation: wk-pop .6s var(--spring) both; }
 .wk .side { margin: 10px; padding: 14px 10px 12px; border-radius: 16px; background: var(--side); overflow-y: auto; scrollbar-width: none; display: flex; flex-direction: column; }
 .wk .side::-webkit-scrollbar { display: none; }
 .wk .brand { padding: 2px 6px 16px; }
@@ -199,7 +199,7 @@ html.resizing .wk .file:not(.hidden) { opacity: .35; scale: .94; }
 .wk .nda:hover { color: var(--accent); border-color: var(--accent); transform: scale(1.06); }
 .wk .scrim { position: absolute; inset: 0; z-index: 40; background: rgba(0, 0, 0, .5); backdrop-filter: blur(3px); opacity: 0; visibility: hidden; transition: opacity .3s, visibility 0s .3s; }
 /* ---------- page variant: the window is the content of a normal page; the site chrome comes from works-site.css ---------- */
-.wk[data-mode='page'] .win { height: auto; overflow: visible; grid-template-rows: auto; grid-template-columns: 224px minmax(0, 1fr); border-radius: 0; box-shadow: none; background: none; outline: 0; animation: none; }
+.wk[data-mode='page'] .win { height: auto; overflow: visible; grid-template-rows: auto; grid-template-columns: 272px minmax(0, 1fr); border-radius: 0; box-shadow: none; background: none; outline: 0; animation: none; }
 /* no frame: the page itself scrolls through every project */
 .wk[data-mode='page'] .main { display: flex; flex-direction: column; min-height: 0; min-width: 0; padding-top: 0; }
 /* stretches to the left panel's height, so a short list keeps the status bar at the panel's bottom end */

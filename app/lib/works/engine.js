@@ -24,6 +24,14 @@ const SIDE = [
   { head: 'Tags', items: [
     ['Loyalty', 'Loyalty', '#ff5a2d'], ['Subscription', 'Subscription', '#2f6fdb'], ['Pre-order', 'Pre-order', '#3a9d5d'] ] }
 ];
+// every other tag the projects carry gets its own filter too (most used first), so a link or a search can land on any of them
+const TAG_DOTS = ['#d9a321', '#8a5cd0', '#17a2a2', '#d6477a', '#7a8b99', '#c46a2a', '#5aa02c'];
+function addTagFilters() {
+  const known = new Set(SIDE.flatMap((g) => g.items.map((it) => it[1])));
+  const n = new Map();
+  DATA.forEach((f) => f.tags.forEach((t) => { if (!known.has(t)) n.set(t, (n.get(t) || 0) + 1); }));
+  [...n].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).forEach(([t], i) => SIDE[1].items.push([t, t, TAG_DOTS[i % TAG_DOTS.length]]));
+}
 const SORTS = [['default', 'As arranged'], ['name-asc', 'A–Z'], ['name-desc', 'Z–A']];
 const COLS = [['name', 'Name'], ['type', 'Type'], ['role', 'Role'], ['tool', 'Tools']];
 const KEY = { name: (f) => f.short, type: (f) => EXT[f.ext], role: (f) => f.role, tool: (f) => f.tool };
@@ -362,9 +370,18 @@ function buildSide() {
     });
   });
 }
+const validKey = (k) => (k && SIDE.some((g) => g.items.some((it) => it[1] === k)) ? k : 'all');
+// the page's URL (?f= filter, ?open= project) drives the window: used on load and whenever the address changes while you are already here
+function showView(q = {}) {
+  if (dead) return;
+  if ('filter' in q) { const k = validKey(q.filter); if (k !== filter) go(k); }
+  const f = q.open != null && DATA.find((d) => d.id === +q.open);
+  if (f) openQL(f);
+}
 function go(key) {
   const changed = key !== filter;
   filter = key;
+  if (changed && opts.onFilter) opts.onFilter(key);
   root.querySelectorAll('.side-item').forEach((b) => b.setAttribute('aria-current', b.dataset.key === key ? 'true' : 'false'));
   const tt = $('#titleText');
   tt.textContent = labelOf(key);
@@ -791,12 +808,14 @@ function init() {
   build();
   measure();                                                // now that files exist, size the cell to the tallest label
   loose = loadLoose();
+  addTagFilters();
   buildSide();
   buildMenu();
   syncMobile();
   canvas.classList.toggle('can-drag', canDrag);
-  go('all');
+  go(validKey(opts.initial && opts.initial.filter));
   $('#win').classList.add('ready');
+  if (opts.initial && opts.initial.open) setTimeout(() => showView({ open: opts.initial.open }), 60);
   on(window, 'resize', () => {
     if (!reduced) docEl.classList.add('resizing');                  // files pause and dim while the size is still changing...
     clearTimeout(resizeT);
@@ -815,7 +834,7 @@ function init() {
 init();
 
 /* ============ TEAR DOWN (leaving the page) ============ */
-return function destroy() {
+function destroy() {
   dead = true;
   offs.forEach((f) => f());
   cancelAnimationFrame(fadeRaf); stopLit();
@@ -824,7 +843,9 @@ return function destroy() {
   docEl.classList.remove('ql-lock', 'drawer-open', 'resizing');
   docEl.style.removeProperty('--tbh');
   if (litRO) litRO.disconnect();
-};
+}
+destroy.show = showView;
+return destroy;
 
 
 }

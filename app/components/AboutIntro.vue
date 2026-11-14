@@ -104,7 +104,7 @@ onBeforeUnmount(() => {
 </template>
 
 <style scoped>
-.about { padding: clamp(80px, 14vh, 160px) 0; }
+.about { padding: clamp(80px, 14vh, 160px) 0; overflow-x: clip; } /* the rows wait 40vw to the right before they slide in; without this they widen the whole page */
 .grid { max-width: 1400px; display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: clamp(32px, 6vw, 96px); align-items: start; }
 
 /* the title: huge, on the left, staying on screen while the text goes by */
