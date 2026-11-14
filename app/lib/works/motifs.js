@@ -12,7 +12,7 @@ const _motifs = (function () {
   var NORM = 0.89;                                                          // light on a top face at the default view = full tone
 
   function Scene() {
-    var S = { polys: [], spheres: [], gid: 1 };
+    var S = { polys: [], spheres: [], gid: 1, pal: [] };
     S.newGroup = function () { return S.gid++; };
     S.poly = function (pts, n, m, g, tone, decal) { S.polys.push({ p: pts, n: n, m: m == null ? 1 : m, g: g || S.gid++, t: tone == null ? null : tone, d: !!decal }); };
     function norm(v) { var l = Math.hypot(v[0], v[1], v[2]) || 1; return [v[0] / l, v[1] / l, v[2] / l]; }
@@ -132,10 +132,11 @@ const _motifs = (function () {
     4: function (s) { // job search: 3D user icon + magnifier
       s.sphere(0, 0, 9.4, 3.1, 1);
       s.sphere(0, 0, 0, 6.2, 0.92, { clip: [0, 0, 1] });
-      s.torus([3.6, 7.2, 6.6], [1, 0, 0], [0, 0, 1], 3.5, 0.6, 0, 6.2832, 1, 26);
+      s.torus([3.6, 7.2, 6.6], [1, 0, 0], [0, 0, 1], 3.5, 0.85, 0, 6.2832, 1, 36);
       var d = []; for (var i = 0; i < 20; i++) d.push([3.6 + 3.2 * Math.cos(i / 20 * 6.2832), 7.2, 6.6 + 3.2 * Math.sin(i / 20 * 6.2832)]);
       s.poly(d, [0, 1, 0], 1, null, 0.3, true);
-      s.tube([3.6 + 2.5, 7.2, 6.6 - 2.5], [3.6 + 6.6, 7.2, 6.6 - 6.6], 0.7, 0.7, 0.62, { seg: 8, cap0: true });
+      s.poly(d.slice().reverse(), [0, -1, 0], 1, null, 0.3, true);       // glass seen from the back too (one-sided it vanished and left an empty hoop)
+      s.tube([3.6 + 2.5, 7.2, 6.6 - 2.5], [3.6 + 6.6, 7.2, 6.6 - 6.6], 0.85, 0.85, 0.62, { seg: 8, cap0: true });
     },
     5: function (s) { // luxury fashion: structured monogram handbag (the vibe of a classic maison bag, no brand marks)
       var a0 = 5.8, b0 = 3.4, a1 = 4.8, b1 = 2.7, h = 7.4;
@@ -319,13 +320,13 @@ const _motifs = (function () {
   var E2 = 0.05;
 
   /* ---------- renderer ---------- */
-  var zb = new Float32Array(RES * RES), tb = new Float32Array(RES * RES), ib = new Int32Array(RES * RES), seam = new Uint8Array(RES * RES);
+  var zb = new Float32Array(RES * RES), tb = new Float32Array(RES * RES), ib = new Int32Array(RES * RES), ci = new Int32Array(RES * RES), seam = new Uint8Array(RES * RES);
 
   /* a project's own model, as JSON (checked and cleaned by readModel in model.js): the same shapes the built-in icons use */
   function fromModel(S, model) {
     var D = Math.PI / 180;
     (model.parts || []).forEach(function (p) {
-      var m = p.shade == null ? 1 : p.shade;
+      var m = p.shade == null ? 1 : p.shade, np0 = S.polys.length, ns0 = S.spheres.length;
       if (p.type === 'box') {                                              // pos = centre, optional turn around the up axis
         var c = p.pos, w = p.size[0] / 2, d = p.size[1] / 2, z0 = c[2] - p.size[2] / 2, z1 = c[2] + p.size[2] / 2;
         var t = (p.turn || 0) * D, ct = Math.cos(t), st = Math.sin(t);
@@ -346,6 +347,12 @@ const _motifs = (function () {
         S.torus(p.pos, U, V, p.R, p.r, a0, a0 + (p.arc || 360) * D, m, Math.max(8, Math.round(22 * (p.arc || 360) / 360)));
       } else if (p.type === 'extrude') {
         S.extrude(p.points, p.plane || 'xy', p.at || 0, p.h, m);
+      }
+      if (p.color) {                                                       // real colour: every poly / sphere this part made points at it
+        S.pal.push([parseInt(p.color.slice(1, 3), 16), parseInt(p.color.slice(3, 5), 16), parseInt(p.color.slice(5, 7), 16)]);
+        var k, id = S.pal.length;
+        for (k = np0; k < S.polys.length; k++) S.polys[k].col = id;
+        for (k = ns0; k < S.spheres.length; k++) S.spheres[k].col = id;
       }
     });
   }
@@ -377,9 +384,9 @@ const _motifs = (function () {
 
   function render(s, yaw, pitch) {
     var cy = Math.cos(yaw), sy = Math.sin(yaw), cp = Math.cos(pitch), sp = Math.sin(pitch), R = RES, half = R / 2, SC = s.sc;
-    zb.fill(1e9); tb.fill(0); ib.fill(0);
+    zb.fill(1e9); tb.fill(0); ib.fill(0); ci.fill(0);
     var proj = function (x, y, z) { x -= s.ox; y -= s.oy; var x1 = x * cy - y * sy, y1 = x * sy + y * cy; return [half + x1 * SC, half + (y1 * sp - z * cp - s.cy0) * SC, -(y1 * cp + z * sp)]; };
-    var tri = function (a, b, c, tone, id, bias) {
+    var tri = function (a, b, c, tone, id, bias, col) {
       var minx = Math.max(0, Math.floor(Math.min(a[0], b[0], c[0]))), maxx = Math.min(R - 1, Math.ceil(Math.max(a[0], b[0], c[0])));
       var miny = Math.max(0, Math.floor(Math.min(a[1], b[1], c[1]))), maxy = Math.min(R - 1, Math.ceil(Math.max(a[1], b[1], c[1])));
       var den = (b[1] - c[1]) * (a[0] - c[0]) + (c[0] - b[0]) * (a[1] - c[1]); if (Math.abs(den) < 1e-9) return;
@@ -387,7 +394,7 @@ const _motifs = (function () {
         var px = x + 0.5, py = y + 0.5, w0 = ((b[1] - c[1]) * (px - c[0]) + (c[0] - b[0]) * (py - c[1])) / den, w1 = ((c[1] - a[1]) * (px - c[0]) + (a[0] - c[0]) * (py - c[1])) / den, w2 = 1 - w0 - w1;
         if (w0 < -1e-6 || w1 < -1e-6 || w2 < -1e-6) continue;
         var d = w0 * a[2] + w1 * b[2] + w2 * c[2] + bias, i = y * R + x;
-        if (d < zb[i]) { zb[i] = d; tb[i] = tone; ib[i] = id; }
+        if (d < zb[i]) { zb[i] = d; tb[i] = tone; ib[i] = id; ci[i] = col; }
       }
     };
     s.polys.forEach(function (p) {
@@ -397,7 +404,7 @@ const _motifs = (function () {
       var pts = p.p.map(function (q) { return proj(q[0], q[1], q[2]); }), cx = 0, cyy = 0, cd = 0;
       pts.forEach(function (q) { cx += q[0]; cyy += q[1]; cd += q[2]; }); var ctr = [cx / pts.length, cyy / pts.length, cd / pts.length];
       var id = p.d ? -p.g : p.g, bias = p.d ? -0.06 : 0;
-      for (var i = 0; i < pts.length; i++) tri(ctr, pts[i], pts[(i + 1) % pts.length], tone, id, bias);
+      for (var i = 0; i < pts.length; i++) tri(ctr, pts[i], pts[(i + 1) % pts.length], tone, id, bias, p.col || 0);
     });
     s.spheres.forEach(function (q) {                                                  // shaded impostor spheres
       var c = proj(q.c[0], q.c[1], q.c[2]), r = q.r * SC, o = q.o;
@@ -413,7 +420,7 @@ const _motifs = (function () {
           var dl = Math.abs(((lon + 0.2618) % 0.5236 + 0.5236) % 0.5236 - 0.2618), dt = Math.abs(((lat + 0.2618) % 0.5236 + 0.5236) % 0.5236 - 0.2618);
           if (dl * Math.cos(lat) < 0.05 || dt < 0.05) tone = 0.06;
         }
-        var i = y * R + x, dep = c[2] - dz * q.r; if (dep < zb[i]) { zb[i] = dep; tb[i] = tone; ib[i] = q.g; }
+        var i = y * R + x, dep = c[2] - dz * q.r; if (dep < zb[i]) { zb[i] = dep; tb[i] = tone; ib[i] = q.g; ci[i] = q.col || 0; }
       }
     });
     // thin dark seams between different solid faces (decals and the background are left alone)
@@ -423,11 +430,25 @@ const _motifs = (function () {
       if (a > 0 && ((l > 0 && l !== a) || (u > 0 && u !== a))) seam[i] = 1;
     }
     for (y = 1; y < R; y++) for (x = 1; x < R; x++) { var j = y * R + x; if (seam[j] || seam[j - 1] || seam[j - R]) { if (ib[j] > 0) tb[j] = 0; } }
-    var out = new Float32Array(N * N), inv = 1 / (BLK * BLK);
+    var out = new Float32Array(N * N), inv = 1 / (BLK * BLK), pal = s.pal, rgb = pal.length ? new Float32Array(N * N * 4) : null;
     for (y = 0; y < N; y++) for (x = 0; x < N; x++) {
-      var sum = 0; for (var by = 0; by < BLK; by++) for (var bx = 0; bx < BLK; bx++) sum += tb[(y * BLK + by) * R + x * BLK + bx];
-      out[y * N + x] = sum * inv;
+      var sum = 0, cov = 0;
+      for (var by = 0; by < BLK; by++) for (var bx = 0; bx < BLK; bx++) { var q = (y * BLK + by) * R + x * BLK + bx; sum += tb[q]; if (zb[q] < 1e8) cov++; }
+      var v = sum * inv;
+      out[y * N + x] = (cov >= BLK * BLK / 2 && v < 0.12) ? 0.12 : v;
+      if (rgb && cov) {                                                  // colour of the cell = average of its covered pixels (colour x light; plain parts stay gray)
+        var rr = 0, gg = 0, bb = 0, nc = 0;
+        for (var cy2 = 0; cy2 < BLK; cy2++) for (var cx2 = 0; cx2 < BLK; cx2++) {
+          var q2 = (y * BLK + cy2) * R + x * BLK + cx2; if (zb[q2] >= 1e8) continue;
+          var cc = ci[q2], tt = Math.min(1, tb[q2]);
+          if (cc) { var bc = pal[cc - 1], kk = 0.4 + 0.6 * tt; rr += bc[0] * kk; gg += bc[1] * kk; bb += bc[2] * kk; nc++; }
+          else { var gv = 60 + tt * 170; rr += gv; gg += gv; bb += gv; }
+        }
+        var j4 = (y * N + x) * 4;
+        rgb[j4] = rr / cov; rgb[j4 + 1] = gg / cov; rgb[j4 + 2] = bb / cov; rgb[j4 + 3] = nc ? 1 : 0;
+      }     // a mostly-solid cell the seams darkened to ~0 stays lit (dark), not a white hole
     }
+    out.rgb = rgb;                                                      // null for a gray model
     return out;
   }
 

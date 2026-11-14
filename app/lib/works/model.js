@@ -52,6 +52,18 @@ RULES
 - It must look right from every side, not only from the front.
 - Numbers only: no comments, no extra fields, no trailing commas.`;
 
+/* The colour version of the prompt: the same model, plus a real colour on every part. Gray stays the default (NDA work shows no colour). */
+export const MODEL_PROMPT_COLOR = MODEL_PROMPT
+  .replace(/"shade": 1 \}/g, '"shade": 1, "color": "#c8553d" }')
+  .replace(/Use it to separate key areas \(a screen, tyres, a door\), never for\n  colour\./, 'Use it only to darken a part a little.')
+  .replace('\nRULES', `- color: the part's real colour as "#rrggbb", read from the reference picture.
+  Give EVERY part a colour. Flat, true-to-life values with no gradients.
+  Reuse the same few colours (4 to 6 in total) so the icon stays clean. Give
+  the plain colour of the surface, not a lit or shaded one: the site adds the
+  light and shadow itself.
+
+RULES`);
+
 // the file name a model is kept under: "coffee-mug.json" (from the uploaded file, or made from the model's name)
 export function modelFileName(name, fallback = 'model') {
   const base = String(name ?? '').replace(/\.json$/i, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
@@ -123,6 +135,11 @@ export function readModel(input) {
       }
       if (need('at', (v) => v == null || isNum(v), 'must be a number')) out.at = r3(p.at ?? 0);
       size('h');
+    }
+    if (p.color != null) {                                               // optional real colour, "#rrggbb" (or #rgb)
+      const m = typeof p.color === 'string' && /^#?([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(p.color.trim());
+      if (!m) problems.push(`${at}: "color" must look like "#c8553d".`);
+      else { let h = m[1].toLowerCase(); if (h.length === 3) h = h.replace(/./g, '$&$&'); out.color = '#' + h; }
     }
     if (p.shade != null) {
       if (!isNum(p.shade)) problems.push(`${at}: "shade" must be a number from 0.4 to 1.`);

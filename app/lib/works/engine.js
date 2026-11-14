@@ -538,15 +538,31 @@ function drawLit(cv, id) {
     cv.style.height = css + 'px';                                     // always a perfect square
     W = Math.round(css * Math.min(devicePixelRatio || 1, 2));
     cv.width = cv.height = W; cell = W / N; force = true; offDirty = true;   // resizing clears the canvas
+    /* rounded corners that follow the CRT glass: a rounded rectangle in grid space, pushed through the same barrel curve as the cells */
+    const RR = 0.1, K = 12, E = 16, arcs = [[RR, RR, Math.PI], [1 - RR, RR, Math.PI * 1.5], [1 - RR, 1 - RR, 0], [RR, 1 - RR, Math.PI / 2]].map(([cx, cy, a0]) => {
+      const a = []; for (let i = 0; i <= K; i++) { const t = a0 + i / K * Math.PI / 2; a.push([cx + RR * Math.cos(t), cy + RR * Math.sin(t)]); } return a;
+    });
+    const poly = [];
+    arcs.forEach((a, i) => {
+      poly.push(...a);
+      const p = a[K], q = arcs[(i + 1) % 4][0];
+      for (let k = 1; k < E; k++) poly.push([p[0] + (q[0] - p[0]) * k / E, p[1] + (q[1] - p[1]) * k / E]);   // straight sides, sampled so they bow with the glass
+    });
+    cv.style.clipPath = 'polygon(' + poly.map(([x, y]) => { const w = wp(x * W, y * W); return (w[0] / W * 100).toFixed(2) + '% ' + (w[1] / W * 100).toFixed(2) + '%'; }).join(',') + ')';
   };
   const tone = (v, flash) => {                                        // light gray ink; more light = brighter gray
     const l = dark ? 42 + v * 50 + flash * 6 : 30 + v * 44 + flash * 8;   // light mode keeps the same shading: top face lightest, shaded sides darker
     return `hsl(205 ${dark ? 6 : 8}% ${l}%)`;
   };
-  const rectOf = (x, y, grow) => {
-    const gp = Math.max(1, Math.round(cell * 0.14)), ex = grow ? gp * 0.5 * grow : 0;
+  const rectOf = (x, y, grow, full) => {                              // full: a coloured cell fills its square (no gap; a hair of overlap hides the seams)
+    const g0 = Math.max(1, Math.round(cell * 0.14)), gp = full ? 0 : g0, ex = (full ? 0.6 : 0) + (grow ? g0 * 0.5 * grow : 0);
     const x0 = Math.round(x * cell), y0 = Math.round(y * cell);
     return [x0 + gp / 2 - ex, y0 + gp / 2 - ex, Math.round((x + 1) * cell) - x0 - gp + ex * 2, Math.round((y + 1) * cell) - y0 - gp + ex * 2];
+  };
+  const colorOf = (x, y, v, vv, flash) => {                           // a coloured model: the cell's own colour, lifted a little by hover / flash; '' for a gray cell
+    const rgb = grid.rgb, j = (y * N + x) * 4; if (!rgb || !rgb[j + 3]) return '';
+    const up = (vv - v) * 140 + flash * 40, c = (k) => Math.round(Math.max(0, Math.min(255, rgb[j + k] + up)));
+    return `rgb(${c(0)},${c(1)},${c(2)})`;
   };
   const snapTo = (a) => Math.round(a / SNAP) * SNAP;
   const step = (dt) => {                                              // inertia, soft snap to the nearest 45 degrees, tilt springs back
@@ -592,7 +608,7 @@ function drawLit(cv, id) {
     g.clearRect(0, 0, W, W);
     if (offDirty) {                                                   // the 2,500 faint off cells never move: drawn once per size, then just stamped
       offCv = offCv || document.createElement('canvas'); offCv.width = offCv.height = W;
-      const og = offCv.getContext('2d'); og.fillStyle = dark ? 'rgba(255,255,255,.02)' : 'rgba(22,22,27,.018)';
+      const og = offCv.getContext('2d'); og.fillStyle = dark ? 'rgba(255,255,255,.02)' : 'rgba(22,22,27,.034)';
       for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) { const r = rectOf(x, y); fq(og, r); }
       offDirty = false;
     }
@@ -618,8 +634,8 @@ function drawLit(cv, id) {
     if (st.live) {                                                    // live model: every cell shows the current view
       for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
         const v = grid[y * N + x]; if (v < 0.07) continue;
-        const [vv, grow, ox, oy] = lift(x, y, v), r = rectOf(x + ox, y + oy, grow);
-        g.fillStyle = tone(vv, 0); fq(g, r);
+        const [vv, grow, ox, oy] = lift(x, y, v), col = colorOf(x, y, v, vv, 0), r = rectOf(x + ox, y + oy, grow, !!col);
+        g.fillStyle = col || tone(vv, 0); fq(g, r);
       }
       return;
     }
@@ -636,8 +652,8 @@ function drawLit(cv, id) {
         continue;
       }
       const flash = Math.max(0, 1 - (h - c.len + 1) * c.step / 0.14); // soft refresh flash on arrival
-      const [vv, grow, ox, oy] = lift(c.x, c.y, c.v), r = rectOf(c.x + ox, c.y + oy, grow);
-      g.fillStyle = tone(vv, flash); fq(g, r);
+      const [vv, grow, ox, oy] = lift(c.x, c.y, c.v), col = colorOf(c.x, c.y, c.v, vv, flash), r = rectOf(c.x + ox, c.y + oy, grow, !!col);
+      g.fillStyle = col || tone(vv, flash); fq(g, r);
     }
     g.fillStyle = tone(1, 0.6);
     for (const [x, y, a] of heads) { const r = rectOf(x, y); g.globalAlpha = Math.max(0, a); fq(g, r); }

@@ -172,7 +172,13 @@ onBeforeUnmount(() => { window.removeEventListener('keydown', onKey); cancelAnim
 .sheet {
   display: flex; flex-direction: column; justify-content: safe center; align-items: flex-start; overflow-y: auto; overscroll-behavior: contain; background: var(--bg) var(--bg-image);
   padding: 96px var(--gutter) 48px calc(max(calc(var(--gutter) - 8px), env(safe-area-inset-left)) + 56px);
+  --sb-edge: 4px; --sb-top: 76px; --sb-bottom: 24px; transition: --sb-a .7s ease;
 }
+.sheet[data-scrolling] { --sb-a: 1; transition-duration: .15s; }
+.sheet::-webkit-scrollbar { width: calc(var(--sb-edge) * 2 + 6px); background: transparent; }
+.sheet::-webkit-scrollbar-track { background: transparent; margin-top: calc(var(--sb-top) + var(--sb-edge)); margin-bottom: var(--sb-bottom); }
+.sheet::-webkit-scrollbar-thumb { background: color-mix(in srgb, var(--line) calc(var(--sb-a) * 100%), transparent); background-clip: padding-box; border: var(--sb-edge) solid transparent; border-radius: 999px; }
+.sheet::-webkit-scrollbar-thumb:hover, .sheet::-webkit-scrollbar-thumb:active { background: var(--muted); background-clip: padding-box; }
 /* phones: the links sit halfway between the page's edge and the logo (they were a full logo-width in) */
 @media (max-width: 700px) {
   .sheet { padding-left: calc(max(var(--gutter), env(safe-area-inset-left)) + 24px); }

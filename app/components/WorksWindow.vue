@@ -76,7 +76,7 @@ onBeforeUnmount(() => { gone = true; destroy?.(); destroy = null })
           <div id="qlName" class="ql-name" />
           <div class="ql-nav"><button id="qlPrev" class="ql-chev" type="button" aria-label="Previous project"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M7.5 2.5L4 6l3.5 3.5" /></svg></button><button id="qlNext" class="ql-chev" type="button" aria-label="Next project"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M4.5 2.5L8 6 4.5 9.5" /></svg></button></div>
         </div>
-        <div class="ql-body">
+        <div class="ql-body sb-inset">
           <div class="ql-main">
             <div class="ql-left">
               <h3 id="qlTitle" />

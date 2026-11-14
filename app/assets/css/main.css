@@ -128,6 +128,18 @@ section > .wrap { width: 100%; }
 }
 /* dark has no blur and no shadows: glass becomes flat, pictures become pixels */
 [data-theme="dark"] * { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+/* the header is the one glass that stays in dark: pages scroll under it */
+[data-theme="dark"] .wk .ql-top { -webkit-backdrop-filter: blur(14px) !important; backdrop-filter: blur(14px) !important; }
+/* inset scrollbar: use on any scroller that runs under a bar or into a rounded corner.
+   --sb-top = the bar's height, --sb-bottom = the corner's radius; the thumb sits --sb-edge from the right edge */
+@property --sb-a { syntax: '<number>'; inherits: true; initial-value: 0; }
+.sb-inset { --sb-edge: 4px; --sb-top: 0px; --sb-bottom: 18px; transition: --sb-a .7s ease; }
+.sb-inset[data-scrolling] { --sb-a: 1; transition-duration: .15s; }
+.sb-inset::-webkit-scrollbar { width: calc(var(--sb-edge) * 2 + 6px); background: transparent; }
+.sb-inset::-webkit-scrollbar-track { background: transparent; margin-top: calc(var(--sb-top) + var(--sb-edge)); margin-bottom: var(--sb-bottom); }
+.sb-inset::-webkit-scrollbar-thumb { background: color-mix(in srgb, var(--line) calc(var(--sb-a) * 100%), transparent); background-clip: padding-box; border: var(--sb-edge) solid transparent; border-radius: 999px; }
+/* hidden when idle: shows while scrolling (data-scrolling, see plugins/scrollbar-idle.client.ts) and while the thumb is hovered or dragged */
+.sb-inset::-webkit-scrollbar-thumb:hover, .sb-inset::-webkit-scrollbar-thumb:active { background: var(--muted); background-clip: padding-box; }
 [data-theme="dark"] img { image-rendering: pixelated; }
 
 /* the room for the footer's glasses is the footer's own margin-top (SiteFooter.vue), so no page can override it */
