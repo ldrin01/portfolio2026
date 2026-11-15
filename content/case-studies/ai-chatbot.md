@@ -3,96 +3,96 @@ title: "AI Chatbot"
 shelf: work
 summary: "Designing a support chatbot: what it answers, how it admits what it doesn't know, and when it hands over to a person."
 order: 4
-draft: true
+draft: false
 seoTitle: ""
 seoDescription: ""
 cover: "/covers/ai-chatbot.webp"
 ---
 
-Over the past couple of years, "can we add an AI chatbot?" has become a standard line in client briefs. I hear it from education, hospitality, financial services and retail clients. The request is almost always framed as a feature. In practice, a support chatbot is a service design problem with a chat window on top.
+**Role:** Senior UI/UX Designer\
+**Focus:** Support chatbots: scope, conversation design and the handover to a person\
+**Under NDA:** Client work is described by industry only, no names
 
-This piece covers how I design one: what it should answer, how it behaves when it's wrong, and the handover to a human, which is the part that matters most.
+"Can we add an AI chatbot?" is now a normal line in a project brief. It is usually asked as if it were one feature. It is closer to a service design problem with a chat window on top.
 
-## Context
+This piece is about three decisions that matter most: what the bot should answer, how it behaves when it is wrong, and how it hands over to a human.
 
-Most clients who ask for a chatbot have the same pain. Their support team answers the same questions every day: opening hours, requirements, pricing, booking changes, "where is my order." They want those answered instantly, at any hour, without hiring more people.
+## Clients want the easy questions answered fast
 
-That's a fair goal. The risk is that the chatbot becomes a wall between customers and the company. Gartner's 2024 survey of 5,728 customers found that 64% would prefer companies didn't use AI for customer service, and 53% would consider switching to a competitor if they found out a company was going to. The top concern was that AI would make it harder to reach a person.
+Most support teams answer the same questions every day: opening hours, requirements, prices, booking changes, "where is my order." Businesses want those answered at any hour without hiring more people.
 
-So the brief I write back is different from the one I receive. It isn't "add a chatbot." It's "answer the easy questions faster, and make the hard ones easier to get to a human."
+That is a fair goal. The risk is that the bot becomes a wall between the customer and the company. Gartner surveyed 5,728 customers in late 2023. 64% said they would prefer that companies did not use AI for customer service, and 53% would consider switching to a competitor if they found out a company was going to. The most common worry, at 60%, was that it would get harder to reach a person ([Gartner](https://www.gartner.com/en/newsroom/press-releases/2024-07-09-gartner-survey-finds-64-percent-of-customers-would-prefer-that-companies-didnt-use-ai-for-customer-service)).
 
-> People don't hate chatbots. They hate being stuck with one.
+So the brief is better written as "answer the easy questions faster, and make the hard ones easier to bring to a human."
 
-## The problem
+> A chatbot is fine until the customer cannot reach a person.
 
-Nielsen Norman Group's research on chatbots puts the core issue plainly: bots do fine when users follow the expected path, and struggle as soon as people deviate, skip steps or phrase things in unexpected ways. Recovery is often poor, so users end up starting over. The same research found that people saw bots as less helpful than humans, but faster, because there's no queue.
+## Bots break when people go off the path
 
-Large language models make the bot better at understanding messy phrasing, but they add a new failure mode: confident answers that are wrong. Google's People + AI Guidebook calls this out directly. Users judge errors against their expectations, and the stakes vary a lot. A wrong answer about a café's opening hours is annoying. A wrong answer about a loan requirement or a hotel cancellation policy can cost someone money.
+Nielsen Norman Group's research found that chatbots work smoothly when users follow the expected path, and run into trouble when people step off it ([Nielsen Norman Group](https://www.nngroup.com/articles/chatbots/)). Users also tend to see a bot as less helpful than a person, though it can feel quick because there is no queue.
 
-## Designing the scope first
+Large language models handle messy phrasing better. They add a different problem: answers that sound sure and are wrong. Google's People + AI Guidebook says the stakes of an error change with the situation ([Google PAIR](https://pair.withgoogle.com/chapter/errors-failing/)). A wrong opening time for a café is annoying. A wrong loan requirement or hotel cancellation rule can cost someone money.
 
-Before any chat UI, I run a scoping exercise with the client and their support team. We sort real questions into three buckets:
+## Set the scope before any chat screen
 
-- **Answer.** Common, low-risk questions with a clear source of truth: hours, locations, requirements, how-to steps, order status.
-- **Assist.** Questions where the bot can collect details and prepare the case, but a person decides: refunds, complaints, account changes.
-- **Hand over immediately.** Anything sensitive, emotional or high-stakes: payment disputes, legal or medical topics, safety issues, or anyone who just says "agent."
+A good start is to sit with the client and their support team and sort real questions into three groups:
 
-That third list is the most important design artefact in the project. It's what stops the bot from improvising in areas where it shouldn't. NN/g's guidance points the same way: limit scope to simple, well-defined tasks, and say clearly what the bot can do.
+1. **Answer.** Common, low-risk questions with one clear source of truth: hours, locations, requirements, how-to steps, order status.
+2. **Assist.** The bot collects details and prepares the case, and a person decides: refunds, complaints, account changes.
+3. **Hand over right away.** Payment disputes, legal or medical topics, safety issues, anything emotional, and anyone who types "agent."
 
-## Designing the conversation
+The third list matters most. It stops the bot from guessing in areas where it should not. It also keeps the scope to simple, well-defined tasks, which is what the NN/g research points to.
 
-With the scope agreed, the conversation design follows a few rules I keep coming back to.
+## Rules for the conversation
 
-**Say it's a bot, and say what it does.** The opening message names the assistant as automated and lists a few things it can help with, as tappable suggestions. NN/g found that when users knew they were talking to a bot, they wrote more directly and in simpler terms, which actually worked better.
+- **Say it is a bot, and say what it does.** The first message names the assistant as automated and shows a few tappable examples. NN/g's guidance is to be upfront that the user is talking to a bot.
+- **Offer buttons and free text.** Suggested replies help people who do not know what to ask. Free text helps people who do. A button must look and act like a button.
+- **Remember what people said.** Asking for an order number twice loses trust fast. If the booking reference came three messages ago, the bot should use it.
+- **Admit when it does not know.** "I'm not sure about that one" plus a next step beats a confident guess.
+- **Show the source.** For answers from policies or help articles, link the original page. People can check it, and the client can spot old content.
 
-**Offer buttons and free text.** Suggested replies help people who don't know what to ask. Free text helps people who do. Every button has to look and behave like a button.
+## The handover is where most bots fail
 
-**Remember what people already said.** Asking for an order number twice is the fastest way to lose trust. If someone gave their booking reference three messages ago, the bot uses it.
+Nobody should have to fight the bot to reach a person. In practice that means:
 
-**Admit when it doesn't know.** "I'm not sure about that one" with a next step is better than a confident guess. PAIR recommends explaining limitations specifically, suggesting alternatives and making it easy for users to take back control.
+- A "Talk to a person" option in the chat header at all times, not hidden behind three failed tries.
+- Automatic handover after repeated "I didn't understand" replies, after negative sentiment, on anything from the hand-over list, or when the user asks.
+- No starting over. The agent gets the whole conversation and the details the bot collected.
+- Honest wait times. If no agent is online, the bot says so, shows the support hours, and offers a callback, email or ticket so the request does not vanish.
 
-**Show the source.** For answers drawn from policies or help articles, I link the original page. It lets people check the answer, and it gives the client a way to spot outdated content.
+The agent's side needs design too. A short summary card at the top of the handed-over chat (topic, details collected, what the bot already tried) saves the agent from reading the whole thread. It saves the customer from repeating themselves.
 
-## Designing the handover
+## Plan for the failures
 
-This is where I spend the most time, because it's where most chatbots fail.
+Every chatbot gets things wrong, so those states deserve as much care as the happy path.
 
-The rule is simple: a person should never have to fight the bot to reach a human. In practice, that means:
+- A "Was this helpful?" control on answers, with a quick reason when the answer is no. It feeds the content team, not only the model.
+- A fallback message that offers a rephrase, related topics and a human.
+- Polite replies for off-topic or abusive messages, in the brand voice, without explaining how the system works.
 
-- **A visible "Talk to a person" option** in the chat header at all times, not hidden behind three failed attempts.
-- **Automatic handover triggers:** repeated "I didn't understand" responses, negative sentiment, anything on the hand-over list, or a direct request.
-- **No starting over.** The agent receives the full conversation and any details the bot collected. Gartner's recommendation is the same: tell customers when they'll be connected to a person, and let the agent pick up where the bot left off.
-- **Honest wait expectations.** If no agent is online, say so, give the support hours and offer a callback, email or ticket, so the request doesn't disappear.
-
-I design the agent's side too. A short summary card at the top of the handed-over chat (topic, details collected, what the bot already tried) saves the agent from reading the whole thread, and saves the customer from repeating themselves.
-
-## Designing for failure
-
-Every chatbot will get things wrong, so I design those states as deliberately as the happy path:
-
-- A "Was this helpful?" control on answers, with a quick reason when someone says no. This feeds the content team, not just the model.
-- A clear fallback message that offers rephrasing, related topics and a human.
-- Guardrail responses for off-topic or abusive messages that stay polite, keep the brand voice and don't over-explain how the system works. PAIR describes this as making failure "safe and boring."
-
-Microsoft's guidelines for human-AI interaction are organised the same way: what to do on first contact, during the interaction, when the AI is wrong, and over time. That framing is a useful checklist in design reviews.
+Microsoft's guidelines for human-AI interaction are grouped by stage: at the start, during the interaction, when the AI is wrong, and over time ([Microsoft HAX Toolkit](https://www.microsoft.com/en-us/haxtoolkit/ai-guidelines/)). They work well as a checklist in a design review.
 
 ## Trade-offs
 
-- **Coverage vs. trust.** A bot that tries to answer everything will answer some things badly. A narrower bot that hands over well usually earns more trust.
-- **Personality vs. clarity.** A friendly, branded voice is good, but it should never get in the way of a clear answer. If the bot has a personality, it has to stay consistent, including in error messages.
-- **Deflection vs. resolution.** It's tempting to measure success by how many chats never reached an agent. I push clients to measure resolved questions instead, because a deflected but unresolved customer just comes back angrier, or doesn't come back.
+| Choice | What it gives | What it costs |
+| --- | --- | --- |
+| Wide coverage | Fewer questions reach a person | Some answers will be bad |
+| Narrow coverage with a good handover | More trust | More chats go to the team |
+| Strong personality | A friendly brand voice | Risk of hiding a clear answer |
 
-## What I'd do next
+The narrow bot that hands over well is usually the safer choice. If the bot has a personality, it should stay the same in error messages too. It is also better to measure resolved questions than chats that never reached an agent. A customer who was deflected and not helped comes back angrier, or does not come back.
 
-- **Review real transcripts weekly in the first months.** The questions people actually ask are always different from the ones in the kickoff spreadsheet.
-- **Treat the knowledge base as part of the product.** Most bad answers trace back to outdated or missing help content, so the content workflow needs an owner.
-- **Test the handover with real support staff,** not just the customer side. If the agent experience is clumsy, the whole thing falls apart at the most important moment.
+## Keep it healthy after launch
 
-A good support chatbot isn't the one that never hands over. It's the one that knows exactly when to.
+- **Read real transcripts every week in the first months.** The questions people ask are never quite the ones in the kickoff spreadsheet.
+- **Treat the knowledge base as part of the product.** Most bad answers come from old or missing help content, so someone has to own it.
+- **Test the handover with real support staff.** If the agent side is clumsy, it breaks at the most important moment.
+
+A good support chatbot knows when to hand over.
 
 ## Sources
 
 - Nielsen Norman Group, The User Experience of Chatbots: https://www.nngroup.com/articles/chatbots/
-- Gartner survey on AI in customer service (July 2024), as reported by Insurance-Canada.ca: https://insurance-canada.ca/2024/07/15/gartner-survey-ai-for-customer-service/
+- Gartner, Survey Finds 64% of Customers Would Prefer That Companies Didn't Use AI For Customer Service (July 2024): https://www.gartner.com/en/newsroom/press-releases/2024-07-09-gartner-survey-finds-64-percent-of-customers-would-prefer-that-companies-didnt-use-ai-for-customer-service
 - Google People + AI Guidebook, Errors and Graceful Failure: https://pair.withgoogle.com/chapter/errors-failing/
 - Microsoft HAX Toolkit, Guidelines for Human-AI Interaction: https://www.microsoft.com/en-us/haxtoolkit/ai-guidelines/

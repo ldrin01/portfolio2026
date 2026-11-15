@@ -1,75 +1,79 @@
 ---
 title: "Nothing Slips Through"
 shelf: work
-summary: "A news publishing portal where writers, photographers, checkers and vetters all touch one story. I designed the editorial workflow and analyzed the system behind it."
+summary: "A news publishing portal where writers, photographers, checkers and vetters all touch one story. I designed the editorial workflow and the ticketing behind it."
 order: 21
-draft: true
+draft: false
 seoTitle: ""
 seoDescription: ""
 cover: "/covers/editorial-workflow-system.webp"
 ---
 
-| | |
-| --- | --- |
-| **Industry** | Media: news publishing |
-| **My role** | Lead Designer and Lead System Analyst |
-| **Scope** | Publishing portal, editorial workflow, ticketing, system analysis |
-| **Tools** | Figma |
-| **Team** | TODO: size and roles |
-| **Timeline** | TODO: months and phases (the project may still be in progress) |
+**Role:** Lead Designer and Lead System Analyst\
+**Work:** Publishing portal for a news agency, with an editorial review and scheduling workflow and article ticketing (in progress)\
+**Under NDA:** Media industry only, no client names
 
-## The problem
+A news story passes through many hands before a reader sees it. A writer submits it. A photographer adds images. A checker verifies the facts. A vetter reviews it. Then someone decides if it goes live now, stays a draft or waits for a set time.
 
-A single news story passes through many hands. A writer submits it. A photographer adds images. A checker verifies the facts. A vetter reviews it. Then someone decides whether it is published now, saved as a draft or scheduled for later.
+This project is still in progress, so this piece is about the thinking behind it and not about results. Most of the work so far is not pages. It is the rules that decide who does what, and when.
 
-If the process isn't clear, stories get stuck, get published too early or get changed after approval. The system had to make the path obvious for every role.
+## Where stories get lost
 
-## My role
+When the path is not clear, the same things go wrong in any newsroom:
 
-This project was both design and analysis. As Lead Designer and Lead System Analyst, I defined the roles, the steps and the rules, and then designed the screens for each. TODO: add what that looked like in practice, for example meetings with editors, or documents you wrote.
+- A story sits in someone's queue and nobody knows.
+- A story goes live before the checker has seen it.
+- A story is edited after it was approved.
+- A request for a photo or a correction lives in a chat message, and then it is forgotten.
 
-## Process
+None of these are people problems. They are what happens when the system does not say whose turn it is. That is why the roles and steps came first, and the screens came later.
 
-1. **List the roles and what each can do.** Writers, photographers, checkers and vetters all see the same story but with different permissions.
-2. **Map the story's life.** From draft to submitted, reviewed, approved, then published or scheduled. Each state has one owner at a time.
-3. **Design each role's workspace.** Each person sees their own queue first, not a list of everything.
-4. **Add ticketing.** Requests and issues are tracked so nothing depends on a chat message or someone's memory.
+## How it was approached
 
-TODO: add a review with editors or the client, and what changed because of it.
+This was both design and analysis. As the designer and the system analyst, the rules were part of the design from the start. The order was:
 
-## Key decisions
+1. **List the roles and what each can do.** Writers, photographers, checkers and vetters all work on the same story, but they need different permissions.
+2. **Map the life of a story.** Draft, submitted, reviewed, approved, then published or scheduled. Every state has one clear owner.
+3. **Design a workspace for each role.** Each person lands on their own queue first, not a list of everything.
+4. **Add ticketing.** Requests and issues are tracked in the system, so nothing depends on a chat message or someone's memory.
 
-### 1. Design around the role, not the story
+## Decisions and what they cost
 
-A story has one record, but each role needs a different view of it. A checker needs the claims. A photographer needs the captions. I designed each workspace around what that person does, instead of one big editor everyone shares.
+### Design around the role
 
-**Trade-off:** more screens to design and build. The gain is that each person sees only what they need to act on.
+A story is one record, but each role looks at it for a different reason. A checker needs the claims. A photographer needs the captions and image slots. One big editor that everyone shares would show all of it to all of them.
 
-### 2. One owner at a time
+> A shared editor is easy to build. A workspace that shows each person only what they can act on is easier to use.
 
-At every stage, the story belongs to one role. Nobody has to guess whose turn it is.
+The cost is more screens to design, build and test. It is worth it, because it keeps every person focused on their own job.
 
-### 3. Publish, draft or schedule as a deliberate final step
+### One owner at a time
 
-The last action in the flow is a clear choice, not a hidden toggle. For a newsroom, publishing by accident is a serious mistake, so the final step is explicit.
+At each stage the story belongs to one role. That is the rule that answers "whose turn is it?" without anyone sending a message. The cost is that handing a story back needs a clear action and a reason, so sending back is a real step and not an exception.
 
-TODO: add the real story, such as what the editors argued about, what the analysis revealed that surprised you, or what you changed after seeing the workflow on paper.
+### Make the last step deliberate
 
-## Outcome
+Publish, save as draft and schedule are the final choices. For a newsroom, going live by accident is a serious mistake. So the final step is a clear, explicit choice with the three options side by side, and not a toggle hidden in a settings panel.
 
-- Delivered the design for a role-based editorial system with submission, review, approval and scheduling
-- TODO: status. Is it live or in progress? Which parts are built?
-- TODO: any real feedback from the editors or the team
+### Tickets for anything outside the flow
 
-## What I'd do differently
+Some things do not fit the normal path: a photo request, a fact in doubt, a correction after publishing. A ticket gives each of these an owner, a status and a history. The cost is a little more admin for staff, so tickets have to be quick to open from the story itself.
 
-TODO: your answer. Prompts: What would you simplify? Did doing both design and analysis help or slow you down?
+## Comparing the options
 
-## Why this project matters to me
+| Choice | What it gives | What it costs |
+| --- | --- | --- |
+| One shared editor | Less to build | Every role sees everything |
+| A workspace per role | Clear, focused screens | More screens to design and maintain |
+| Chat for requests | No new tool to learn | Requests get lost |
+| Tickets in the system | A trail for every request | A few extra clicks |
 
-Most of my work is visible: pages, apps, interactions. This one was mostly invisible. The work was in the rules that make a team's day run without confusion. I like that it's part design and part systems thinking, and it's the kind of project where my background in information systems pays off.
+## How to judge it once it is in use
 
-## Sources
+Two signals show whether it works: how often stories wait without an owner, and whether anything changes after approval without a record. Those are the two things the design is built to prevent.
 
-- Laws of UX, "Hick's Law": https://lawsofux.com/hicks-law/
-- Laws of UX, "Jakob's Law": https://lawsofux.com/jakobs-law/
+## Why this kind of project matters
+
+Most design work is visible: pages, apps, interactions. This kind is mostly invisible. The work is in the rules that let a team get through its day without confusion. A background in information systems helps here, because it makes it easier to think about the process and the screen together.
+
+If people always know whose turn it is, most of the screen design gets simpler.

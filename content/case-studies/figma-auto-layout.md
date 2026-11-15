@@ -3,90 +3,84 @@ title: "Figma Auto Layout"
 shelf: craft
 summary: "How I set up auto layout so frames resize themselves, and why it's the first thing I check when a file starts falling apart."
 order: 7
-draft: true
+draft: false
 seoTitle: ""
 seoDescription: ""
 cover: "/covers/figma-auto-layout.webp"
 ---
 
-If you've ever changed one word in a button label and then spent ten minutes nudging every element around it, you already know why auto layout matters. It's the feature I lean on most in Figma, and it's the first thing I check when I open a file from someone else on the team.
+Auto layout is one of the Figma features I rely on most, and it is the first thing worth checking when you open a file from someone else.
 
-Figma describes auto layout as the way to arrange objects inside a frame so their positions update as you add, remove or reorder them. That's accurate, but the way I think about it is simpler. Auto layout turns a drawing into a set of rules. Once the rules are right, the design keeps itself tidy.
+Figma describes it as a way to arrange objects inside a frame so their positions update as you add, remove or reorder them ([Figma](https://help.figma.com/hc/articles/31289464393751)). A simple way to think about it is turning a drawing into a set of rules. Once the rules are right, the design stays tidy by itself.
 
-## Why it matters on agency work
+## Content changes, so the layout has to cope
 
-Most of my projects are websites and apps for clients in very different industries: hotels, universities, banks, restaurant chains, a trucking company with separate user and driver apps. The content changes constantly. A hotel adds a new room type. A university renames a program and the title doubles in length. A bank's legal team rewrites a disclaimer the day before a review.
+Websites and apps for different industries share one problem: the content keeps changing. A hotel adds a room type. A university renames a program and the title gets twice as long. A legal team rewrites a disclaimer the day before a review.
 
-Without auto layout, every one of those changes is manual cleanup. With it, I edit the text and the card, the section and the page adjust. That's time I get back for actual design decisions.
+Without auto layout, each change means manual cleanup. With it, you edit the text and the card, the section and the page adjust. That time goes back into design decisions.
 
-There's a handoff reason too. Auto layout maps closely to how developers build layouts in CSS. Gap, padding, direction and alignment are concepts our front-end team already uses. When my frames behave like flexbox, the build matches the design more closely and there are fewer "why is this 13px here?" conversations.
+It also helps at handoff. Auto layout is close to how developers build layouts in CSS. Gap, padding, direction and alignment are words a front-end team already uses. When frames behave like flexbox, the build matches the design more closely and there are fewer "why is this 13px here?" questions.
 
-## The properties I actually use
+## The properties that do most of the work
 
-As of 2026, an auto layout frame in Figma has three flows:
+An auto layout frame has three flows:
 
-- **Vertical**: stacks children on the y-axis. Lists, feeds, form fields, page sections.
-- **Horizontal**: places children on the x-axis. Button rows, nav bars, icon plus label pairs.
-- **Grid**: columns and rows, with children that can span multiple cells. Galleries and bento-style layouts.
+- **Vertical** stacks children on the y-axis: lists, feeds, form fields, page sections.
+- **Horizontal** places children on the x-axis: button rows, nav bars, icon and label pairs.
+- **Grid** gives columns and rows, and children can span cells. It suits galleries and bento layouts.
 
-Horizontal and vertical flows can also **wrap**, which moves children to a new row or column when they run out of space. That's what I use for tag and chip groups.
+Horizontal and vertical flows can also **wrap**. Children move to a new row when space runs out, which suits tag and chip groups.
 
-Inside each flow, these are the controls that do most of the work:
+Inside each flow, a few controls matter most:
 
-1. **Gap**: either a fixed number or **Auto**. Auto has three options, Between, Around and Evenly, which match CSS `space-between`, `space-around` and `space-evenly`.
-2. **Padding**: uniform, per axis or per side.
-3. **Resizing**: each child can be **Hug contents**, **Fill container** or **Fixed**. Hug shrinks or grows around the content. Fill takes up whatever space the parent gives it.
-4. **Min and max width/height**: the underrated one. A card can fill its container but never stretch past a readable width, and a button can hug its label but never get narrower than a tap target.
-5. **Ignore auto layout**: what used to be called absolute position. The layer stays in the frame but leaves the flow, so I can pin a badge to a corner or float a close icon.
+1. **Gap** is a fixed number or **Auto**. Auto spreads the children out across the frame, like CSS `space-between`.
+2. **Padding** can be uniform, per axis or per side.
+3. **Resizing** is set on each child: **Hug contents**, **Fill container** or **Fixed**. Hug wraps around the content. Fill takes the space the parent gives it.
+4. **Min and max width or height** is the one people skip. A card can fill its container but stop at a readable width. A button can hug its label but never get smaller than a tap target.
+5. **Ignore auto layout** keeps a layer in the frame but takes it out of the flow. It is useful for pinning a badge to a corner or placing a close icon.
 
-Smaller settings worth knowing: text baseline alignment (press `B` in the alignment box), whether strokes are included in layout, and canvas stacking order when children overlap.
+Two smaller settings are worth knowing: whether strokes count in the layout, and the stacking order when children overlap.
 
-## How I build a component with it
+## Building a component from the inside out
 
-I build from the inside out. Take a simple product card for a retail site:
+Take a product card for a retail site.
 
-1. Text first. Title and price go in a vertical auto layout with a small gap. The title is set to fill width so long names wrap instead of pushing the card wider.
-2. The text block and an add-to-cart button go into another vertical frame with padding. That's the card body.
-3. The image and the body go into the outer card frame. Image set to fill width, fixed aspect.
-4. The card itself is set to fill container, with a min and max width.
+1. Start with text. Title and price go in a vertical auto layout with a small gap. The title fills the width, so a long name wraps and does not stretch the card.
+2. Put the text block and the add-to-cart button in another vertical frame with padding. This is the card body.
+3. Put the image and the body in the outer card frame. The image fills the width and keeps a fixed aspect ratio.
+4. Set the card to fill its container, with a min and max width.
 
-Then I stress test it. I paste in the longest product name I can find, delete the price, swap the image for a tall one and drag the frame narrow and wide. If anything breaks, the rule is wrong, not the content.
+Then stress test it. Paste in the longest product name you can find, delete the price, swap in a tall image, and drag the frame narrow and wide. If something breaks, the rule is wrong. The content is fine.
 
 > If a layout only works with the placeholder text, it doesn't work.
 
-## Common mistakes I see (and made)
+## Mistakes that show up often
 
-**Wrapping everything in one giant frame.** People select a whole screen and hit `Shift+A`. Figma will do it, but you get one flat stack that's hard to control. Nest small frames inside bigger ones, each with one job.
+- **One giant frame.** Selecting a whole screen and pressing `Shift+A` works, but you get one flat stack that is hard to control. Nest small frames inside bigger ones, each with one job.
+- **Mixing up hug and fill.** If a parent hugs and its child fills, neither knows who sets the size. Decide which layer owns the width, then build outward from there.
+- **Spacer rectangles.** An invisible 24px box between two elements means the gap or padding is not set up. It also confuses developers reading the layer tree.
+- **Hiding layers to keep space.** Hidden layers leave the flow. Setting opacity to 0% holds the space, but usually the gap needs another look.
+- **Strokes.** If spacing looks slightly off in nested frames, check whether each frame includes strokes in the layout. The setting is per frame.
+- **Detaching instances to reorder things.** You can't reorder children inside an instance. If you keep needing to, the main component needs a different structure, or a slot.
 
-**Mixing up hug and fill.** If a parent hugs and its child fills, neither knows who sets the size. Decide which layer owns the width and work out from there.
+## A short checklist for reviewing a file
 
-**Using spacer rectangles.** An invisible 24px rectangle between two elements is a sign the gap or padding isn't set up. It also confuses developers reading the layer tree.
+When reviewing a teammate's file, a few questions catch most problems:
 
-**Hiding layers to "keep" space.** In auto layout, hidden layers are removed from the flow. If you really need the space held, setting opacity to 0% keeps it, but most of the time the better fix is to rethink the gap.
+- Can the frame be resized without anything overlapping?
+- Does spacing come from gap and padding, and not from manual positioning?
+- Do the values come from the spacing scale, ideally bound to variables?
+- Do the frames have real names, like `card/body`, and not `Frame 427`?
 
-**Forgetting about strokes.** If spacing looks slightly off in nested frames, check whether each frame includes or excludes strokes from layout. The setting is per frame.
+For teaching, handing someone a component that breaks when the content changes and asking them to fix it works better than explaining every property first. Fixing something sticks better than reading a list of settings.
 
-**Detaching instances to reorder things.** You can't reorder children inside an instance. If you keep needing to, the main component needs a different structure, or a slot.
+## It sits under the rest of the Figma work
 
-## How it plays out with the team
+Components only work well when they are built on solid auto layout. Variables only pay off when gap and padding are bound to spacing tokens. Prototypes feel more real when frames reflow as the content changes.
 
-As Assistant Creative Director, part of my job is reviewing files from junior designers before they go to a client or to dev. My auto layout checklist is short:
-
-- Can I resize the frame and nothing overlaps?
-- Is spacing coming from gap and padding, not from manual positioning?
-- Do spacing values come from our spacing scale, ideally bound to variables?
-- Are names on the frames meaningful (`card/body`, not `Frame 427`)?
-
-When I mentor someone, I don't explain every property up front. I give them a component that breaks when the content changes and ask them to fix it. Learning auto layout by repairing something sticks much better than reading a list of settings.
-
-## Where it connects to everything else
-
-Auto layout is the base layer for the rest of my Figma craft. Components only work well when they're built on solid auto layout. Variables only pay off when gap and padding are actually bound to spacing tokens. And prototypes feel more real when frames reflow as content changes.
-
-If I could only teach one Figma feature to someone new on the team, it would be this one.
+If you could teach one Figma feature to someone new on the team, this would be a strong pick.
 
 ## Sources
 
 - Figma Learn, "Guide to auto layout": https://help.figma.com/hc/articles/31289464393751
 - Figma Learn, "Explore auto layout properties": https://help.figma.com/hc/en-us/articles/360040451373
-- Figma Best Practices, "Components, styles, and shared libraries": https://www.figma.com/best-practices/components-styles-and-shared-libraries/

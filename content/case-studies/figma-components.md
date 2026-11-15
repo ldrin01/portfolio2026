@@ -3,94 +3,87 @@ title: "Figma Components"
 shelf: craft
 summary: "How I build components and variants that stay flexible as a product grows, without turning the library into a maze."
 order: 8
-draft: true
+draft: false
 seoTitle: ""
 seoDescription: ""
 cover: "/covers/figma-components.webp"
 ---
 
-Components are where a design file stops being a set of pictures and starts being a system. Figma defines them as elements you can reuse across your designs. Edit the main component and every instance updates.
+Figma describes [components](https://help.figma.com/hc/en-us/articles/5579474826519) as elements you can reuse across your designs. Edit the main component and every instance updates. That part is easy.
 
-That part is easy. The hard part is building components that the rest of the team can actually use without detaching them, and that still make sense six months later when the client asks for a new feature. This is how I approach it.
+The hard part is building components that the rest of the team can use without detaching them. They also need to still make sense six months later, when the client asks for a new feature.
 
-## Why I care so much about this
+## Why a good library matters
 
-At an agency, I'm rarely designing one product for years. I'm designing a hotel booking site, then a university portal, then a mobile app for a review center, sometimes in the same quarter. Each one needs its own component set, and each one gets handed to developers and often to other designers on the team.
+At an agency the products change a lot: hotels, universities, an exam review center app. Each one needs its own component set, and each one gets handed to developers and to other designers.
 
-A good component library means a junior designer can build a new page that looks right on the first try. A bad one means every page is slightly different, and QA turns into a hunt for inconsistent buttons.
+A good library means a new designer can build a page that looks right on the first try. A bad one means every page is a little different, and QA becomes a hunt for buttons that don't match.
 
 ## Start small, then nest
 
-Figma's own best practices recommend building small "atom" components and nesting them inside larger ones, so a shared change only happens once. I follow that closely:
+Small "atom" components nested inside bigger ones mean a shared change happens once. A simple build order:
 
-1. **Base pieces first**: icon, avatar, badge, input field, button.
-2. **Composed pieces next**: a search bar is an input plus a button. A list item is an avatar, text and a badge.
-3. **Patterns last**: cards, navigation, modals, table rows.
+1. **Base pieces:** icon, avatar, badge, input field, button.
+2. **Composed pieces:** a search bar is an input plus a button. A list item is an avatar, text and a badge.
+3. **Patterns:** cards, navigation, modals, table rows.
 
-Every component is built on auto layout, so it resizes with its content. If a component only looks right at one width, it's not done.
+Everything uses auto layout, so it resizes with its content. If a component only looks right at one width, it is not finished.
 
-I also turn repeated elements into components early, even at wireframe stage. If a card shows up on three screens, it becomes a component before I make the fourth.
+It also helps to turn repeated elements into components early, even in wireframes. If a card shows up on three screens, it should be a component before the fourth is drawn.
 
-## Choosing the right property
+## Pick the right property
 
-As of 2026, Figma has five types of component property, and picking the right one is most of the skill:
+Figma has five kinds of component property. Choosing between them is most of the skill.
 
-- **Variant**: for things that change the form of the component. State (default, hover, pressed, disabled), size, type.
-- **Boolean**: for showing or hiding a layer. Booleans only control visibility.
-- **Instance swap**: for nested instances people can swap, like the icon inside a button.
-- **Text**: for text content people can edit straight from the properties panel.
-- **Slot**: for flexible areas where people can add and arrange their own content inside an instance without detaching it.
+| Property | Use it for |
+| --- | --- |
+| **Variant** | Things that change the form: state, size, type |
+| **Boolean** | Showing or hiding a layer. It only controls visibility |
+| **Instance swap** | A nested instance people can replace, like the icon in a button |
+| **Text** | Text people can edit from the properties panel |
+| **Slot** | A flexible area where people add their own content without detaching |
 
-The rule I give the team is the same one in Figma's docs: use a boolean for an optional element instead of making a variant for every combination. A button with or without an icon is one boolean, not double the variants.
+A boolean is the right tool for an optional element, instead of a variant for every combination. A button with or without an icon is one boolean. It does not double the variants.
 
-Figma also recommends separate variant properties for separate changes, like `Type` and `Size`, instead of one property that changes several things at once. That keeps the variant grid readable and makes it obvious which combinations exist.
+It also helps to keep one variant property per kind of change, like `Type` and `Size`, instead of one property that changes several things. The variant grid stays readable, and it is clear which combinations exist.
 
-> Every variant you add is a variant someone has to maintain. Add properties for real differences, not for every screen you've drawn.
+> Every variant is something someone has to maintain. Add a property for a real difference, not for every screen you have drawn.
 
-## Slots changed how I build containers
+## Slots for flexible containers
 
-Before slots, flexible components were a workaround. You'd make a card with a placeholder instance and hope people swapped it correctly, or they'd just detach it.
+Before slots, a flexible component was a workaround. You made a card with a placeholder instance and hoped people swapped it correctly. Often they just detached it.
 
-Slots let me define an open area inside a component, such as a modal body or the content area of a card, where designers can add and arrange whatever they need. A few details from Figma's docs that matter in practice:
+A [slot](https://help.figma.com/hc/en-us/articles/38231200344599) is an open area inside a component, like a modal body or the content area of a card. Designers can add layers straight into the slot on an instance and arrange them as they need, and slots can be published to libraries with the rest of the component. Preferred instances can be set so the slot suggests the right components first. They are a hint, and the designer is not locked to them.
 
-- You can convert an existing frame in a main component into a slot.
-- You can set a **minimum and maximum layer count**. These are guidance, not hard limits. Going over shows a warning, but the designer can keep working.
-- You can set **preferred instances** so the slot suggests the right components first, and optionally restrict it to only those.
-- You can't change a slot's position, auto layout flow or constraints from an instance. That's set in the main component.
-- Removing a slot property from the main component resets modified instances, which can delete content people added. I treat that as a breaking change.
-
-For repeating content, like a list of form fields or menu items, a slot is now usually cleaner than a variant for "3 items", "4 items" and "5 items".
+For repeating content, like a list of form fields or menu items, a slot is usually cleaner than separate variants for 3, 4 and 5 items.
 
 ## Make the library easy to use
 
-A component is only as good as the person using it can understand it. Things I do every time:
+A component is only as good as the next person's ability to understand it. A short checklist:
 
-- **Expose nested instances**, so people can change a nested button's properties from the top-level instance without deep-selecting.
-- **Set preferred instances** on swap properties, so the icon picker shows the icon set, not the whole library.
-- **Write descriptions.** They show up as tooltips in the assets panel and help people pick between similar components.
-- **Name text layers consistently** across related components, so text overrides carry over when someone swaps instances.
-- **Hide internal pieces.** Prefixing a component with `_` or `.` keeps it out of the published library.
-- **Organize by page and frame.** Pages become top-level groups, frames become subgroups.
+- **Expose nested instances,** so people can change a nested button from the top-level instance.
+- **Set preferred instances** on swap properties. The icon picker then shows the icon set, not the whole library.
+- **Write descriptions.** They help people pick between similar components.
+- **Name text layers the same way** across related components. Text overrides then carry over when someone swaps an instance.
+- **Hide internal pieces.** A `_` or `.` prefix keeps a component out of the published library.
 
 ## Common mistakes
 
-**The variant explosion.** A button with five types, three sizes, four states and an icon toggle built as pure variants is 120 frames. Most of that should be booleans and instance swaps.
+**The variant explosion.** A button with five types, three sizes, four states and an icon toggle, built only as variants, is 120 frames. Most of that should be booleans and instance swaps.
 
-**Detaching as a habit.** When designers detach often, it's feedback about the component, not the designer. I ask what they needed and fix the main component.
+**Detaching as a habit.** When designers detach often, the component is giving feedback. The better move is to ask what they needed and fix the main component.
 
-**Building for the mockup, not the product.** A component that only handles the copy on today's screen will break the moment real content comes in. Test with long text, missing images and empty states.
+**Building for the mockup.** A component that only handles today's copy breaks when real content arrives. Test with long text, missing images and empty states.
 
-**No owner.** On every project, one person owns the library. Changes go through them. Otherwise two designers fix the same thing two different ways.
+**No owner.** Each library should have one person who owns it, and changes go through that person. Otherwise two designers fix the same thing in two different ways.
 
-## How it plays out on projects
+## What good looks like at handoff
 
-On a typical agency engagement, the component library starts small in wireframes and gets richer through UI design. By handoff, developers should be able to look at a screen, see which components and properties are used, and map them to their own components.
+On a typical project the library starts small in wireframes and gets richer through UI design. By handoff, a developer should be able to look at a screen, see which components and properties it uses, and match them to their own components.
 
-That's also where I see the payoff of all the setup. When a client asks for a new page late in a project, the team can assemble it from existing pieces instead of designing from scratch, and it already matches everything else.
+That is where the setup pays off. When a new page is requested late in a project, the team can build it from existing pieces, and it already matches the rest.
 
 ## Sources
 
 - Figma Learn, "Explore component properties": https://help.figma.com/hc/en-us/articles/5579474826519
-- Figma Learn, "Create and use variants": https://help.figma.com/hc/en-us/articles/39636737843735
 - Figma Learn, "Use slots to build flexible components in Figma": https://help.figma.com/hc/en-us/articles/38231200344599
-- Figma Best Practices, "Components, styles, and shared libraries": https://www.figma.com/best-practices/components-styles-and-shared-libraries/

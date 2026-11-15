@@ -3,90 +3,90 @@ title: "The Mega Menu of Academics"
 shelf: work
 summary: "Making a university's hundreds of programs findable from one menu, and backing it up with a program finder that works on a phone."
 order: 2
-draft: true
+draft: false
 seoTitle: ""
 seoDescription: ""
 cover: "/covers/the-mega-menu-of-academics.webp"
 ---
 
-University websites are some of the hardest navigation problems I've worked on. A university is really dozens of organizations under one name: colleges, departments, graduate schools, admissions, research centers, student services and alumni offices. All of them want a spot in the top menu. I've designed websites for two universities, and in both cases the main question was the same: how does a 17-year-old on a phone find the program they want?
+**Role:** Senior UI/UX Designer\
+**Work:** Websites for two universities, including the main academic navigation and program finder\
+**Under NDA:** Education, no client names or figures
 
-## Context: what students actually come for
+University websites are some of the hardest navigation problems there are. A university is really dozens of organizations under one name: colleges, departments, graduate schools, admissions, research centers, student services and alumni offices. All of them want a spot in the top menu. On both university projects the main question was the same. How does a 17-year-old on a phone find the program they want?
 
-Nielsen Norman Group has studied university websites for years. Their University Websites report collects 152 design guidelines from testing with high school students, transfer students, master's applicants and parents in several countries ([Nielsen Norman Group](https://www.nngroup.com/reports/university/)). One finding keeps coming up in discussions of that research: almost half of prospective students (48%) didn't realize a university offered the program they were looking for, even when it did ([Elliance, citing NN/g](https://aha.elliance.com/2024/06/27/academic-program-finders-best-practices-and-examples/)).
+## The program is the product
 
-That one hit home. The program is the product. If students can't find it, nothing else on the site matters.
+Nielsen Norman Group has studied university websites for years. Their University Websites report collects 152 design guidelines from usability research with high school students, transfer students, master's applicants and parents, in several countries ([Nielsen Norman Group](https://www.nngroup.com/reports/university/)). Elliance, writing about program finders, reports that almost half of prospective students (48%) did not realize a university offered the program they wanted, even when it did ([Elliance](https://aha.elliance.com/2024/06/27/academic-program-finders-best-practices-and-examples/)).
 
-## The problem: an org chart disguised as a menu
+That number changes how you look at the whole site. If students cannot find the program, nothing else on the page matters.
 
-When I started, the academic navigation followed the internal structure:
+## Most academic menus are an org chart
 
-- Top level: colleges, named the way the university names them internally.
-- Second level: departments.
-- Third level, if you got that far: the actual degree programs.
+The usual academic navigation follows the internal structure:
 
-This makes sense to staff. It doesn't make sense to a senior high student who knows they want "something with computers" and has no idea whether that lives under engineering, science or business. Some programs also sat in two places, which made people wonder whether they were different programs.
+1. Top level: colleges, named the way the university names them.
+2. Second level: departments.
+3. Third level, if the visitor gets that far: the degree programs.
 
-The existing dropdowns were long single columns that ran past the bottom of the screen. Hover menus opened and closed as the mouse moved across the bar. On mobile, it was a nested accordion three levels deep.
+This makes sense to staff. It does not make sense to a senior high student who knows they want "something with computers" and has no idea if that sits under engineering, science or business. A program listed under two colleges also makes people wonder if they are two different programs.
 
-> Students don't browse a university by its org chart. They browse by "what do I want to study, and can I get in?"
+> Students do not browse a university by its org chart. They browse by what they want to study and whether they can get in.
 
-## The design approach
+## Why a mega menu fits
 
-### Why a mega menu
+A mega menu suits this problem. NN/g says mega menus work well on large sites because users can "see rather than try to remember" their options, and the panel has room for grouping ([Nielsen Norman Group](https://www.nngroup.com/articles/mega-menus-work-well/)). A badly organized one is just a bigger mess. NN/g's examples of mega menus gone wrong include unclear structure, decorative images with no real content, and an organizing principle users cannot see ([Nielsen Norman Group](https://www.nngroup.com/articles/mega-menus-gone-wrong/)).
 
-A mega menu fits this problem. Nielsen Norman Group's guidance is that mega menus work well for large sites because users can "see rather than try to remember" their options, and the panel gives room for grouping and richer content ([Nielsen Norman Group](https://www.nngroup.com/articles/mega-menus-work-well/)). The catch is that a badly organized mega menu is just a bigger mess. NN/g's own critique of poor mega menus points to unclear structure, decorative images instead of real choices, and an organizing principle users can't see ([Nielsen Norman Group](https://www.nngroup.com/articles/mega-menus-gone-wrong/)).
+So the panel is the easy part. The structure under it is the real work.
 
-So the menu was the easy part. The structure underneath it was the real work.
+## How to structure it
 
-### Restructuring by how students think
-
-I worked through grouping exercises with the university team, testing the groupings against the way students describe what they want to study, then grouped programs by field of study instead of by college. The academic panel became:
+A good approach is to group programs by field of study, not by college, and to test the groups against the words students use when they describe what they want.
 
 - **Fields of study** in plain words, like Business and Accountancy, Computing and IT, Health Sciences, Engineering, Education, and Arts and Communication.
 - **Level** as a clear split: undergraduate, graduate and short courses.
 - **One prominent link** to "View all programs", which opens the full program finder.
 
-Colleges still exist, but they moved to their own "Colleges" item and to each program page. That kept the staff view without forcing it on students.
+Colleges still get their own menu item and appear on each program page. Staff keep their view, and students do not have to start from it.
 
-I also followed a few NN/g rules strictly:
+A few rules help:
 
-- **Each program appears once.** No duplicates across groups.
-- **Labels start with the most useful word.** "Nursing" rather than "Bachelor of Science in Nursing" in the menu, with the full degree name on the page.
-- **No decorative imagery.** One small feature slot for admissions deadlines, because that's something students actually look for.
+- Each program appears once, with no duplicates across groups.
+- Labels start with the most useful word. The menu says "Nursing", and the page carries the full degree name.
+- No decorative imagery. A small slot for admissions deadlines is fine, because students look for that.
 
-### Getting the hover right
+### Hover timing
 
-Small timing details make a mega menu feel calm instead of twitchy. NN/g recommends waiting about half a second before opening a hover menu and keeping it open briefly after the pointer leaves ([Nielsen Norman Group](https://www.nngroup.com/articles/mega-menus-work-well/)). I wrote these timings into the dev handover with a note about diagonal mouse movement, so the panel doesn't snap shut when someone moves toward a link. Click and keyboard access also open the panel, so it's not hover-only.
+Small timing details make a mega menu feel calm. NN/g recommends waiting half a second before a hover menu opens and keeping it open until the pointer has been outside it for half a second. It also notes that the best versions keep the panel open while the pointer moves diagonally toward it ([Nielsen Norman Group](https://www.nngroup.com/articles/mega-menus-work-well/)). These timings belong in the dev handover. Click and keyboard should open the panel too, so it does not depend on hover.
 
-### Careful with audience menus
+### Audience links
 
-Universities love "For Students / For Parents / For Alumni" navigation. NN/g warns that audience-based navigation confuses people who fit several groups or aren't sure which one they belong to, and recommends it mainly as secondary navigation ([Nielsen Norman Group](https://www.nngroup.com/articles/audience-based-navigation/)). We kept audience links in a small utility bar at the top and kept the main menu task-based: Academics, Admissions, Campus Life, Research, About.
+Universities like "For Students / For Parents / For Alumni" navigation. NN/g warns that it confuses people who belong to several groups or to none, and suggests using it as secondary navigation ([Nielsen Norman Group](https://www.nngroup.com/articles/audience-based-navigation/)). A cleaner split puts audience links in a small utility bar and keeps the main menu task-based: Academics, Admissions, Campus Life, Research, About.
 
-### Mobile: the menu isn't enough
+## On a phone, the finder does the work
 
-A mega menu doesn't translate to a phone. On mobile, I designed the Academics item to open a short list of fields, each leading to a filtered view of the program finder rather than another nested level.
+A mega menu does not carry over to a phone. On mobile, the Academics item can open a short list of fields, and each one leads to a filtered view of the program finder instead of another nested level.
 
-The program finder did the heavy lifting. Following common program-finder best practices, it offered A–Z order, logical groupings and filters for field, level, college and format, plus keyword search ([Elliance](https://aha.elliance.com/2024/06/27/academic-program-finders-best-practices-and-examples/)). Search was visible at the top, not hidden inside the menu.
+The finder itself follows common best practice. Elliance recommends A to Z ordering, logical groupings by field of study, school, degree type or format, and filters on the same lines ([Elliance](https://aha.elliance.com/2024/06/27/academic-program-finders-best-practices-and-examples/)). A keyword search box at the top of the page helps too.
 
 ## Trade-offs
 
-- **Politics versus findability.** Every college wanted top-level visibility. Grouping by field meant some colleges lost their spot in the main bar. Walking stakeholders through the site as a student, step by step, did more than any argument I could make.
-- **Completeness versus scannability.** Listing every program in the panel was tempting but unreadable. We showed fields and top programs, and trusted "View all programs" for the rest.
-- **Content upkeep.** A finder only works if program data stays accurate. We designed simple CMS fields so staff could update programs without touching the menu.
+| Choice | What it gives | What it costs |
+| --- | --- | --- |
+| Group by field, not college | Students find programs faster | Some colleges lose their spot in the main bar |
+| Show fields and top programs | A panel people can scan | The full list lives one click away |
+| A program finder | Complete, filterable results | Program data has to stay accurate |
 
-## What came out of it
+The college question is a political one. Every college wants top-level visibility. Teams usually get further by walking stakeholders through the site as a student would, step by step. For upkeep, simple CMS fields let staff update programs without touching the menu.
 
-I can't share analytics, but the feedback from walkthroughs was clear. In walkthroughs, people new to the site found programs faster and with fewer wrong turns. The admissions team also stopped getting as many basic "do you offer this course?" inquiries.
+## What to do next
 
-## What I'd do next
+- **Tree testing first.** Check the field groupings with a tree test before any visual design.
+- **Search terms.** Feed site search terms back into the labels. If students keep typing "IT", the label should probably say IT.
+- **Career entry points.** Let students start from an outcome, like "I want to be a nurse", and land on the matching programs.
+- **Program comparison.** A side-by-side of two or three programs, covering duration, requirements and fees, so students do not juggle browser tabs.
 
-- **Tree testing before visuals.** I'd validate the field groupings with a proper tree test before any visual design.
-- **Search analytics.** Feed site search terms back into labels. If students keep typing "IT", the label should probably say IT.
-- **Career-based entry points.** Let students start from an outcome, like "I want to be a nurse", and land on the matching programs.
-- **Program comparison.** A simple side-by-side of two or three programs, covering duration, requirements and fees, so students don't have to juggle browser tabs.
-
-A mega menu is just the doorway. The real design is in the room behind it.
+A mega menu is the doorway. Most of the design is in the room behind it.
 
 ## Sources
 

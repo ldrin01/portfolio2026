@@ -1,92 +1,78 @@
 ---
 title: "AI Is the Worst Thing That Happened to Creatives... Or Is It?"
 shelf: opinion
-summary: "I design with AI every day. It isn't killing creative work, but it is killing the parts of the job that were never the point, and anyone who only did those parts should be worried."
+summary: "I design with AI. It isn't killing creative work, but it is killing the parts of the job that were never the point, and anyone who only did those parts should be worried."
 order: 13
-draft: true
+draft: false
 seoTitle: ""
 seoDescription: ""
 cover: "/covers/ai-and-creatives.webp"
 ---
 
-Every few weeks someone in a design group chat posts a screenshot of a generated landing page with the caption "it's over." And every few weeks I open Figma, Claude, ChatGPT and Gemini and keep working, because the job isn't over. It moved.
+Every few weeks someone in a design group chat posts a screenshot of a generated landing page with the caption "it's over." I use Figma, Claude, ChatGPT and Gemini in my own work, so I see both sides of this. My view is that the job is not over. It moved.
 
-So here's my take, up front: **AI is the worst thing that ever happened to one kind of creative work, and one of the best things to happen to the rest.** The kind it hurts is production done without judgment: resizing, filler copy, stock-looking visuals, the forty-variant banner set. The kind it helps is everything that needs taste, context and someone willing to put their name on a decision.
+Here is my position. **AI is bad news for creative work that is only production**: resizing, filler copy, stock-looking visuals, the forty-variant banner set. It is good news for work that needs taste, context and someone willing to put their name on a decision. The sources below are why I think so.
 
-That isn't a vibe. Let's look at the receipts.
+## Most creatives already use it
 
-## Everyone is already using it
+The debate about whether creatives should use AI is mostly settled by what people do.
 
-The "should creatives use AI?" debate is mostly settled by behaviour, not argument.
+- Adobe's Creators' Toolkit Report surveyed more than 16,000 creators in eight countries with The Harris Poll in September 2025. It found that **86%** of creators actively use creative generative AI ([Adobe](https://news.adobe.com/news/2025/10/adobe-max-2025-creators-survey)).
+- Figma's 2025 AI report surveyed 2,500 product builders, and **78%** said AI tools significantly speed up their work ([Figma](https://www.figma.com/reports/ai-2025/)).
 
-- Adobe's first Creators' Toolkit Report (Harris Poll, 16,000+ creators across eight countries, September 2025) found **86%** of creators actively using creative generative AI, and **76%** saying it helped grow their business or following.
-- The top uses weren't "make me a masterpiece." They were editing, upscaling and enhancement (**55%**), generating new assets (**52%**) and ideation (**48%**).
-- Figma's 2025 AI report, which surveyed 2,500 of its users, found **78%** agree AI significantly boosts their efficiency.
+That fits how I work. I use AI for content writing, design ideation and presentation prep. I also build custom Claude Skills for design work, so the routine parts of a workflow run the same way each time.
 
-That matches how I actually work. AI is in my brainstorming, my first drafts of UX copy, my documentation, my research summaries, and the Claude Skills I build so the boring parts of a workflow run the same way every time. It's the most useful tool I've picked up in four years.
+## Fast is not the same as good
 
-## But look at the gap
+The more interesting part of the Figma report is not about speed. Many of the people surveyed said they do not yet trust AI output enough to rely on it fully. Adoption is high, and trust is still catching up.
 
-Here's the number that should get more attention than any adoption stat. In that same Figma report, **only 32%** of respondents said they can rely on AI's output. Designers were also noticeably less impressed than developers: **69%** of designers reported being satisfied with AI tools versus **82%** of developers, and only **54%** of designers said it improves the quality of their work.
+> Fast is not the same as good, and the gap between them is where a designer earns their pay.
 
-> Fast is not the same as good, and the gap between them is exactly where a designer earns their pay.
+AI gets you to something quickly. It does not know that your users are mostly on older Android phones. It does not know that legal will reject a headline, or that a "clean" layout breaks the design system in three places. A person has to know those things. That person is the job now.
 
-That gap is the whole story. AI gets you to *something* very quickly. It doesn't know that the client's users are mostly on old Android phones, that the legal team will reject that headline, or that the "clean" layout it produced breaks the design system in three places. Somebody has to know that. That somebody is the job now.
+## The fear is fair
 
-Adobe's numbers say the same thing from the other side. Creators' top barriers were cost (**38%**), unreliable output quality (**34%**) and not knowing how the model was trained (**28%**). The tools are popular and still untrustworthy, both at once.
+I do not want to wave the fear away. Some of it is earned.
 
-## The case that it really is the worst
+1. **Jobs are shifting, and not evenly.** The World Economic Forum's *Future of Jobs Report 2025* surveyed about 1,000 employers covering more than 14 million workers. Graphic designer shows up just outside the top 10 fastest-declining jobs, in 11th place by Creative Boom's reading, a first for the report ([Creative Boom](https://creativeboom.com/news/its-official-ai-is-coming-for-your-graphic-design-job)). If your work is mostly turning a brief into assets, that is a real threat.
+2. **Consent is a real problem.** Many creators worry that their work is used to train AI without permission, and a lot of training data was taken first and asked about later.
+3. **The legal ground is weak for pure output.** The U.S. Copyright Office's January 2025 report concluded that prompts alone do not make you the author of what comes out. Protection needs a human who decided enough of the expressive parts. In March 2025 the D.C. Circuit held in *Thaler v. Perlmutter* that a work made autonomously by AI cannot be registered ([Skadden](https://www.skadden.com/insights/publications/2025/03/appellate-court-affirms-human-authorship)). The Supreme Court declined to hear the appeal on March 2, 2026 ([Baker Donelson](https://www.bakerdonelson.com/supreme-court-denies-certiorari-in-thaler-v-perlmutter-ai-cannot-be-an-author-under-the-copyright-act)).
 
-I don't want to wave the fear away, because some of it is earned.
+So a plan of "prompt it, ship it, own it" has no legal footing.
 
-**Jobs are shifting, and not evenly.** The World Economic Forum's *Future of Jobs Report 2025*, built from a survey of 1,000 employers covering 14 million+ workers, put graphic designers as the 11th fastest-declining job category, a role it had called "moderately growing" in its previous edition. If your work is mostly turning a brief into assets, that's a real threat, not a hot take.
+## The same sources point the other way
 
-**Consent is a real grievance.** Adobe found **69%** of creators worry their work will be used to train AI without permission. That isn't paranoia. It's a fair reaction to an industry that scraped first and asked later.
+Read the same reports again and there is a second picture.
 
-**The legal ground is shaky for pure output.** The U.S. Copyright Office's January 2025 report on copyrightability concluded that prompts alone don't make you the author of what comes out. Protection needs a human who determined enough of the expressive elements. In March 2025 the D.C. Circuit agreed in *Thaler v. Perlmutter* that a work made autonomously by AI can't be registered, and the Supreme Court declined to hear the appeal in March 2026.
+- The WEF list of fastest-growing jobs includes **UI and UX designers at number eight**. Demand has not gone away. It is moving toward people who design systems, flows and decisions, and away from single assets.
+- The Copyright Office said that using AI to assist the creative process does not block copyright, and that human selection, arrangement and modification can be protected ([U.S. Copyright Office](https://www.copyright.gov/ai/)). The court ruling keeps the same human-authorship rule. The law is not against creatives who use AI. It is against work with no creative behind it.
+- The creators in Adobe's survey use AI as a tool inside their own work. They are asking for help, not for a replacement.
 
-So if your plan is "prompt it, ship it, own it," the law is not on your side.
+## How to use it well
 
-## Why I still land on "or is it?"
+I will not give productivity percentages, because I have not measured any. This is how I think about using it.
 
-Read those same receipts again and a different picture shows up.
+- **Start from options, not a blank page.** Begin with a few rough directions and spend the effort choosing and fixing.
+- **Let AI draft the documentation.** Handover notes, component specs and QA checklists are easy to skip. A first draft from AI, corrected by a person, is better than none.
+- **Treat judgment as the scarce part.** When anyone can generate ten options, the skill that counts is knowing which one fits this user and this brief, and explaining why to a client.
+- **Teach juniors to question confident output.** Mentoring should cover that, along with the usual tool skills.
 
-That WEF report that made designers panic? The same coverage notes it ranked **UI and UX design as the eighth fastest-growing job category.** Demand didn't vanish. It moved toward people who design systems, flows and decisions instead of single artefacts.
+## A short checklist
 
-The copyright rulings cut the same way. The Copyright Office explicitly said that **using AI to assist the creative process doesn't block copyright**, and that human selection, arrangement and modification can be protected. The D.C. Circuit said the human-authorship rule still rewards people who make work *with the help of* AI. The law isn't punishing creatives who use AI. It's punishing the absence of a creative.
+1. **Let AI do the first pass, own the last pass.** Generating is cheap. Editing, rejecting and refining is where you add value.
+2. **Keep a human hand you can point to.** Selection, arrangement and modification are where your craft and your copyright live.
+3. **Know your tool's training story.** If a client asks where a visual came from, "the AI made it" is not an answer.
+4. **Read everything before it ships.** Plenty of people say they cannot fully rely on the output.
+5. **Move up a level.** Systems, research, flows and client conversations are where the growth is. Production alone is where the decline is.
+6. **Build your own workflows.** Reusable prompts, skills you write, checklists you trust. Everyone has AI. A process is what sets you apart.
 
-And look at what creators actually use it for in Adobe's data: editing, enhancing, brainstorming. The people using these tools the most aren't asking to be replaced. They're asking for leverage.
-
-## What actually changed in my day
-
-No made-up productivity percentages here, just the honest shape of it:
-
-- **Blank pages are gone.** I rarely start from nothing. I start from three rough directions and spend my energy choosing and fixing.
-- **Documentation stopped being the thing nobody does.** Handover notes, component specs and QA checklists get drafted by AI and corrected by me.
-- **Judgment got more expensive.** When anyone can generate ten options, the scarce skill is knowing which one is right for *this* user and *this* brief, and explaining why to a client.
-- **Junior work changed.** Mentoring now includes teaching people to distrust a confident output, not just how to use auto layout.
-
-## My verdict
-
-AI is the worst thing that happened to creatives who were only ever paid for output. For everyone else it's a strong, flawed assistant that makes taste, context and accountability worth more, not less.
-
-If you want a practical checklist, this is mine:
-
-1. **Use it for the first 60%, own the last 40%.** Generation is cheap. Editing, rejecting and refining is where you add value.
-2. **Keep a human hand you can point to.** Selection, arrangement, modification: that's where your craft and your copyright live.
-3. **Know your tool's training story.** If a client asks where a visual came from, "the AI made it" isn't an answer.
-4. **Never ship unread output.** Only 32% of builders say they can rely on it. Act like it.
-5. **Move up the stack.** Systems, research, flows and client conversations are where the growth is. Production alone is where the decline is.
-6. **Build your own workflows.** Prompts you reuse, skills you write, checklists you trust. The advantage isn't having AI. Everyone has it. It's having a process.
-
-So, worst thing ever? Only if you let it make the decisions.
+So is it the worst thing that happened to creatives? Only if you let it make the decisions.
 
 ## Sources
 
 - Adobe, Creators' Toolkit Report (MAX 2025): https://news.adobe.com/news/2025/10/adobe-max-2025-creators-survey
-- Figma, 2025 AI Report perspectives: https://www.figma.com/blog/figma-2025-ai-report-perspectives/
+- Figma, 2025 AI report: https://www.figma.com/reports/ai-2025/
 - Creative Boom on the WEF Future of Jobs Report 2025: https://creativeboom.com/news/its-official-ai-is-coming-for-your-graphic-design-job
-- U.S. Copyright Office, Part 2 report announcement: https://www.copyright.gov/newsnet/2025/1060.html
-- U.S. Copyright Office, Copyright and AI hub: https://www.copyright.gov/ai/
+- U.S. Copyright Office, Copyright and Artificial Intelligence: https://www.copyright.gov/ai/
 - Skadden on Thaler v. Perlmutter (D.C. Cir., March 2025): https://www.skadden.com/insights/publications/2025/03/appellate-court-affirms-human-authorship
 - Baker Donelson on the Supreme Court denying certiorari: https://www.bakerdonelson.com/supreme-court-denies-certiorari-in-thaler-v-perlmutter-ai-cannot-be-an-author-under-the-copyright-act

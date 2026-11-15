@@ -30,7 +30,7 @@
   "talk": {
     "title": "I also get to talk about it",
     "body": [
-      "Draft: I was a guest speaker at LVCC ICT Week, back at the school where I studied. A few words here about the topic, the students, and what it felt like to stand on the other side of the room."
+      "I was a guest speaker at LVCC ICT Week, back at the school where I studied. It meant a lot to stand on the other side of the room and talk with the students."
     ],
     "photos": [
       {
@@ -70,35 +70,35 @@
   "more": {
     "title": "Before design, there was making",
     "body": [
-      "Draft: Long before I opened Figma, I was already making things. Posters, layouts, little videos, anything that let me put something on a screen or on paper."
+      "Long before I opened Figma, I was already making things: posters, layouts, little videos, anything that let me put something on a screen or on paper."
     ],
     "tools": [
       {
         "kind": "corel",
         "before": "It started with",
         "name": "CorelDRAW",
-        "body": "Draft: my first real design tool. Tarpaulins, invitations, logos for whoever asked."
+        "body": "It was my first real design tool. I made tarpaulins, invitations and logos for whoever asked."
       },
       {
         "kind": "premiere",
         "before": "then I learned to cut in",
         "name": "Premiere Pro",
-        "body": "Draft: where I learned timing, cuts and how a story moves."
+        "body": "That is where I learned timing, cuts and how a story moves."
       }
     ],
     "stories": [
       {
         "title": "Working with my dad",
-        "body": "Draft: a few lines about the work I did alongside my dad, and what it taught me about doing a job properly."
+        "body": "I worked alongside my dad, and it taught me what it means to do a job properly."
       },
       {
         "title": "Journalism",
-        "body": "Draft: writing and editing as a student journalist, and why it still shapes how I write UI copy today."
+        "body": "I wrote and edited as a student journalist, and it still shapes how I write UI copy today."
       }
     ],
     "hobbies": {
       "title": "Off the clock, I move",
-      "body": "Draft: running, biking, swimming and the gym. Every line here is a route I ran or rode.",
+      "body": "I run, bike, swim and go to the gym. Every line here is a route I ran or rode.",
       "routes": [
         {
           "image": "/pictures/about/routes/route-186.webp",
@@ -6231,26 +6231,26 @@
   "evenMore": {
     "title": "Okay, the kid with the family computer",
     "body": [
-      "Draft: before any of that, there was a kid, a family computer, and far too much free time."
+      "Before any of that, there was a kid, a family computer, and far too much free time."
     ],
     "encarta": {
       "title": "Encarta, open for hours",
-      "body": "Draft: clicking from one article to the next, way past bedtime."
+      "body": "I would click from one article to the next, way past bedtime."
     },
     "paint": {
       "title": "MS Paint for everything else",
-      "body": "Draft: where most of my first drawings lived."
+      "body": "Most of my first drawings lived there."
     },
     "gameboy": {
       "title": "A GameBoy in the bag",
-      "body": "Draft: always charged, or at least always with spare batteries."
+      "body": "It was always charged, or at least always had spare batteries."
     },
     "volcano": {
       "title": "The school project I still remember",
-      "body": "Draft: a papier-mâché Mayon Volcano, vinegar and baking soda, and a very proud kid. This is the real one."
+      "body": "A papier-mâché Mayon Volcano, vinegar and baking soda, and a very proud kid. Yes, this one is real."
     },
     "paintings": {
-      "title": "Some of my artowrks",
+      "title": "Some of my artworks",
       "items": [
         {
           "image": "/pictures/gemini-generated-image-pdccg7pdccg7pdcc.webp",
@@ -6371,11 +6371,11 @@
   "tooFar": {
     "title": "You scrolled too far… anyway,",
     "photo": "/pictures/753513229-17977409232111254-7744901448691091311-n-1.webp",
-    "alt": "Placeholder: a childhood photo",
+    "alt": "Me as a kid",
     "body": [
-      "Draft: this is me as a kid. Who I was, what I loved, and who I looked up to.",
-      "Draft: what I was dreaming of, back when the dreams were big and the computer was slow.",
-      "Draft: the hard parts, and the reason I never gave up."
+      "This is me as a kid. Most of what I love today started with that kid.",
+      "I had big dreams back then, even when the computer was slow.",
+      "Some parts were hard, and I'm still here because I never gave up."
     ]
   },
   "next": {
@@ -6383,15 +6383,15 @@
     "plans": [
       {
         "title": "Music video director",
-        "body": "Draft: why this one, and what the first one would look like."
+        "body": "I love how picture and sound can tell one story together, and editing taught me timing. A music video is where I want to put both to work."
       },
       {
         "title": "Short film director",
-        "body": "Draft: the kind of stories I want to tell."
+        "body": "I want to tell my own stories on screen, one short film at a time."
       },
       {
         "title": "Music producer",
-        "body": "Draft: where the music side comes from."
+        "body": "Music is the other half of the picture, and I want to make it myself too."
       }
     ]
   }

@@ -4,94 +4,107 @@ shelf: "work"
 summary: "Designing price displays that change with promos, member rates and
   demand, without making shoppers feel tricked."
 order: 1
-draft: true
+draft: false
 seoTitle: ""
 seoDescription: ""
 cover: "/covers/dynamic-pricing-in-e-commerse.webp"
 ---
 
-The prices online rarely stay still. There's the regular price, the payday sale, the member rate, the bundle deal, the voucher that stacks (or doesn't), and the flash sale that ends at midnight. For hotels, the price of the same room can change from one night to the next. I've designed for this kind of moving price across retail and hospitality projects, and I've learned that the hard part isn't the pricing logic. It's helping a shopper trust the number they see.
+**Role:** Senior UI/UX Designer\
+**Work:** Websites and apps for retail and hospitality clients, where prices and rates have to be easy to read\
+**Under NDA:** Industry only, no client names or figures
 
-## Context: why prices move
+Prices online rarely stay still. There is the regular price, the payday sale, the member rate, the bundle deal, the voucher that may or may not stack, and the flash sale that ends at midnight. For hotels, the same room can cost a different amount from one night to the next. The pricing logic is the business's job. The designer's job is to help the shopper trust the number on the screen.
 
-Dynamic pricing is a broad term. In the projects I've worked on, it usually means one or more of these:
+## Why prices move
 
-* **Promotional pricing:** scheduled sales, flash deals and seasonal markdowns.
-* **Segment pricing:** member, loyalty or app-only prices.
-* **Bundle and tiered pricing:** buy more, pay less per item.
-* **Demand-based pricing:** rates that rise and fall with dates and availability, common in hotels.
+Dynamic pricing is a broad term. In e-commerce and hotel booking it usually means one or more of these:
 
-Each one is reasonable on its own. The trouble comes when they pile up on one product page and the shopper has to work out what they'll actually pay.
+1. **Promotional pricing:** scheduled sales, flash deals, seasonal markdowns.
+2. **Segment pricing:** member, loyalty or app-only prices.
+3. **Bundle and tiered pricing:** buy more, pay less per item.
+4. **Demand-based pricing:** rates that rise and fall with dates and availability, common in hotels.
 
-## The problem: moving prices erode trust
+Each one is reasonable alone. The trouble starts when they pile up on one page and the shopper has to work out what they will really pay.
 
-Research on this is fairly consistent. People don't hate price changes. They hate price changes that feel hidden, unpredictable or unfair.
+## People accept changes they can see and predict
 
-The UK consumer group Which? ran focus groups on dynamic pricing and found that people judge fairness by transparency, predictability, choice and whether the higher price brings them any benefit. Price increases after someone had already been quoted a price felt especially unfair. One participant summed up the limits of disclosure: "you're telling me that I'm being ripped off but I'm still being ripped off" ([Which?](https://www.which.co.uk/policy-and-insight/article/by-fair-means-or-foul-aMgOA8Q0aQlZ)).
+Research on this points the same way. Shoppers do not object to a price changing. They object when the change feels hidden, random or unfair.
 
-A 2025 Dectech survey of 1,166 people found that framing changes how fair a price feels. A higher peak price presented as a discount from the normal price rated as fairer than the same gap presented as a peak-time penalty. Unexpected fluctuations also did far more damage than expected ones ([Dectech](https://www.dectech.co.uk/?p=8995)).
+The UK consumer group Which? ran research on dynamic pricing. People judged fairness by four things: transparency, price predictability, choice, and whether the customer gets a benefit as well as the business. A price that rose after it was already quoted felt especially unfair. Participants suggested fixing the price once a customer is in a queue. One of them said transparency alone was "surface level, like you're telling me that I'm being ripped off but I'm still being ripped off" ([Which?](https://www.which.co.uk/policy-and-insight/article/by-fair-means-or-foul-aMgOA8Q0aQlZ)).
 
-Then there's the display itself. Baymard found that 18% of desktop sites and 11% of mobile sites make the product price unnecessarily hard to find, and 14% of desktop sites place promotions far from the price ([Baymard Institute](https://baymard.com/blog/product-page-price-discounts)). On the checkout side, 12% of shoppers who abandon a cart say they couldn't see or calculate the total cost up front ([Baymard Institute](https://baymard.com/lists/cart-abandonment-rate)).
+A July 2025 Dectech survey of 1,166 people looked at wording. Fairness ratings were significantly higher when a price was framed around the times when prices are lower. Unexpected changes did far more damage than expected ones ([Dectech](https://www.dectech.co.uk/?p=8995)).
 
-In the Philippines there's a legal angle too. The Internet Transactions Act of 2023 requires online merchants to indicate the prices of what they sell, and e-retailers to show business details like name, address and contact info ([Forvis Mazars](https://www.forvismazars.com/ph/en/insights/corporate-secretarial-alerts/internet-transactions-act-of-2023)). Clear pricing isn't only good UX. It's part of compliance.
+Layout matters too:
+
+| Finding | Number | Source |
+| --- | --- | --- |
+| Desktop sites that make the price hard to find | 18% | Baymard |
+| Mobile sites that make the price hard to find | 11% | Baymard |
+| Desktop sites that put promotions far from the price | 14% | Baymard |
+| Cart abandoners who could not see or work out the total up front | 12% | Baymard |
+
+The first three come from Baymard's product page research ([Baymard Institute](https://baymard.com/blog/product-page-price-discounts)). The last one is from its cart abandonment list, where it is a share of abandoners after the "just browsing" group is removed ([Baymard Institute](https://baymard.com/lists/cart-abandonment-rate)).
+
+There is a legal side in the Philippines as well. A summary of the Internet Transactions Act of 2023 says online merchants and e-retailers must indicate the prices of what they offer, and e-retailers must publish corporate details such as name, location and contact information ([Forvis Mazars](https://www.forvismazars.com/ph/en/insights/corporate-secretarial-alerts/internet-transactions-act-of-2023)). Clear pricing is good UX and also part of compliance.
 
 > A price that changes is fine. A price that surprises is what loses the sale.
 
-## The design approach
+## What good price design looks like
 
-My goal on these projects was one honest number, with the reasons behind it visible but never in the way.
+The aim is one honest number, with the reasons behind it easy to find and never in the way.
 
 ### One price, clearly the price
 
-The final price the shopper pays is the biggest, boldest number in the buy area. If there's a discount, the original sits next to it with a strikethrough in a muted color. I follow Baymard's advice to show the saving in a clear way, and when space is tight, I pick whichever is bigger: the percentage or the peso amount.
+The price the shopper pays should be the biggest, boldest number in the buy area. If there is a discount, the original price sits beside it, struck through in a muted color. Baymard's testing found that showing both the amount and the percentage saved works best. When space is tight, its "Rule of 100" says to show whichever figure is the larger number.
 
-### Every offer lives next to the price
+### Every offer sits next to the price
 
-Promos scattered across banners, badges and descriptions make shoppers wonder whether they stack. I group all offers into one block directly under the price:
+Promos spread across banners, badges and descriptions make shoppers wonder if they stack. A better approach is to group them in one block right under the price. Each offer says:
 
-* What the offer is, in plain words ("₱200 off with code" or "Members save 10%").
-* Whether it's already applied to the price shown.
-* When it ends, if it ends.
+- what it is, in plain words ("₱200 off with code", "Members save 10%")
+- whether it is already applied to the price shown
+- when it ends, if it ends
 
-Each offer appears once. If a long page needs a reminder, it uses the same wording, so it doesn't read like a second deal.
+Each offer appears once. If a long page needs a reminder, it uses the same wording so it does not read like a second deal.
 
 ### Explain without lecturing
 
-For hotel rates, I design small, calm explanations near the date picker, such as showing that weekend nights cost more and weekday nights cost less. Following the Dectech finding, I frame lower rates as savings ("Save on weekday stays") rather than framing higher rates as surcharges.
+For hotel rates, short and calm notes near the date picker work well. They say that weekend nights cost more and weekday nights cost less. Following the Dectech result, lower rates read better as savings ("Save on weekday stays") than higher rates do as a surcharge.
 
-A price calendar works well here. Shoppers can see the pattern themselves and choose the dates that fit their budget, which gives them the sense of choice the Which? research highlights.
+A price calendar helps here. The shopper can see the pattern and pick dates that fit the budget, which gives the sense of choice that the Which? research points to.
 
-### Lock the price once it's quoted
+### Hold the price once it is quoted
 
-This is the rule I push hardest with clients. Once a shopper has a price in their cart or booking form, it holds for a reasonable window. If it has to change, the interface says so clearly before payment, never silently at the last step.
+Once a price is in the cart or booking form, it should hold for a reasonable time. If it has to change, the screen says so before payment, never silently at the last step.
 
-### Urgency, but only if it's true
+### Urgency only when it is true
 
-Countdown timers and "only 2 left" badges work because they create pressure. I'll design them only when they reflect real data. A fake timer that resets on refresh is the fastest way to lose trust, and it's the kind of thing shoppers screenshot and share.
+Countdown timers and "only 2 left" badges work because they add pressure. They should only show real data. A timer that resets on refresh loses trust fast, and shoppers notice.
 
 ## Trade-offs
 
-* **Clarity versus marketing.** Marketing teams want every promo shouted everywhere. Grouping offers into one block felt quieter to them at first. I showed them side-by-side mockups, and the cleaner version usually won on clarity.
-* **Price lock versus revenue.** Holding a quoted price can mean selling a little below the latest rate. I frame it as a trust cost the business chooses to pay.
-* **Calendar versus simplicity.** A price calendar adds interface weight on mobile. I made it collapsible, with a simple "cheapest nights" hint visible by default.
+| Choice | What it gives | What it costs |
+| --- | --- | --- |
+| One offers block | Clear stacking rules | Marketing gets a quieter page |
+| Price hold | Trust at checkout | Selling a little below the latest rate |
+| Price calendar | Shoppers see the pattern | More weight on a small mobile screen |
 
-## What came out of it
+Marketing teams often want every promo shouted everywhere. Showing the cleaner block next to the busy version makes the case better than arguing. A price hold is a real cost to the business, so it is best framed as a trust cost the business chooses to pay. On mobile, the calendar can stay collapsible, with a simple "cheapest nights" hint shown by default.
 
-I can't share client figures, but the qualitative change was noticeable. Support teams fielded fewer questions about whether a voucher applied, and in review sessions stakeholders could explain the price on a page in one sentence. For me, that's the real test: if the people running the store can't explain the number, the shopper won't trust it.
+## What comes next
 
-## What I'd do next
+- **Price component:** one component in the design system for regular, sale, member and range prices, with written rules, so every new page starts honest.
+- **Copy tests:** quick preference tests on how discounts and rate changes are worded, in English and Taglish.
+- **Price history:** for big-ticket items, a "lowest price in 30 days" note makes a discount easier to believe.
+- **Pricing checklist:** a short list that covers the Internet Transactions Act basics next to the display rules.
 
-* **Build a price component into the design system.** One component that handles regular, sale, member and range prices, with documented rules, so every new page starts honest.
-* **Test the copy.** Run quick preference tests on how discounts and rate changes are worded, in English and Taglish.
-* **Show price history.** For big-ticket items, a simple "lowest price in 30 days" note would make discounts easier to believe.
-* **Write a pricing UX checklist** for clients, covering the Internet Transactions Act basics alongside display rules.
-
-Prices can move as much as the business needs. The interface's job is to make every move easy to see and easy to understand.
+Prices can move as much as the business needs. The screen should make every move easy to see and easy to understand.
 
 ## Sources
 
-* Which?, "By fair means or foul? Consumer views on dynamic pricing": [https://www.which.co.uk/policy-and-insight/article/by-fair-means-or-foul-aMgOA8Q0aQlZ](https://www.which.co.uk/policy-and-insight/article/by-fair-means-or-foul-aMgOA8Q0aQlZ)
-* Dectech, "Dynamic Pricing: How Do Consumers Respond to Fluctuations in Price?": [https://www.dectech.co.uk/?p=8995](https://www.dectech.co.uk/?p=8995)
-* Baymard Institute, "4 Pitfalls for Displaying Price Discounts on Product Pages": [https://baymard.com/blog/product-page-price-discounts](https://baymard.com/blog/product-page-price-discounts)
-* Baymard Institute, "Cart Abandonment Rate Statistics": [https://baymard.com/lists/cart-abandonment-rate](https://baymard.com/lists/cart-abandonment-rate)
-* Forvis Mazars Philippines, "Internet Transactions Act of 2023": [https://www.forvismazars.com/ph/en/insights/corporate-secretarial-alerts/internet-transactions-act-of-2023](https://www.forvismazars.com/ph/en/insights/corporate-secretarial-alerts/internet-transactions-act-of-2023)
+- Which?, "By fair means or foul? Consumer views on dynamic pricing": https://www.which.co.uk/policy-and-insight/article/by-fair-means-or-foul-aMgOA8Q0aQlZ
+- Dectech, "Dynamic Pricing: How Do Consumers Respond to Fluctuations in Price?": https://www.dectech.co.uk/?p=8995
+- Baymard Institute, "4 Pitfalls for Displaying Price Discounts on Product Pages": https://baymard.com/blog/product-page-price-discounts
+- Baymard Institute, "Cart Abandonment Rate Statistics": https://baymard.com/lists/cart-abandonment-rate
+- Forvis Mazars Philippines, "Internet Transactions Act of 2023": https://www.forvismazars.com/ph/en/insights/corporate-secretarial-alerts/internet-transactions-act-of-2023

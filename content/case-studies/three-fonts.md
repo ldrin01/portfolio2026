@@ -3,88 +3,80 @@ title: "Three Fonts Are Greedy, Two Is Too Much, One Maybe"
 shelf: opinion
 summary: "An argument for typographic restraint: start with one good family, make a second font earn its place, and treat a third as a red flag for both design and performance."
 order: 14
-draft: true
+draft: false
 seoTitle: ""
 seoDescription: ""
 cover: "/covers/three-fonts.webp"
 ---
 
-Every design review has that moment. Someone opens the type styles panel and there are four families in it: a display serif for headings, a geometric sans for the body, a "fun" script for the hero, and a monospace that showed up for one pricing table and never left.
+Open the type styles of a long-running project and you can find four families in it: a serif for headings, a geometric sans for body text, a script for the hero, and a monospace added for one pricing table that stayed. Nobody planned that. It piled up one small decision at a time.
 
-Nobody planned it. It just accumulated. And that's my whole argument: **fonts are easy to add and expensive to keep.** Three is greedy. Two is usually more than the project needs. One, a good family used with discipline, is enough far more often than designers like to admit.
+My argument is that **fonts are easy to add and expensive to keep.** Three is greedy. Two is usually more than the project needs. One good family, used with discipline, is enough more often than designers like to admit. The title is dramatic on purpose, but I mean it.
 
-The title is a little dramatic on purpose. Here's the case with receipts.
+## Typography writers also stop at two
 
-## Even the typography people say stop at two
+Matthew Butterick wrote *Practical Typography*, a reference many working designers use. On mixing fonts he says: "Most documents can tolerate a second font. Few can tolerate a third." He adds that mixing fonts is never a requirement. It is an option ([Practical Typography](https://practicaltypography.com/mixing-fonts.html)).
 
-This isn't just minimalist taste. Matthew Butterick, whose *Practical Typography* is one of the most practical references for working designers, puts it bluntly: "Most documents can tolerate a second font. Few can tolerate a third. Almost none can tolerate four or more."
+Look at the word he picked. A second font is something a document tolerates. He also says font mixing works best when each font has a consistent role in the document.
 
-Notice the framing. A second font is something a document *tolerates*. It's not a requirement. Butterick also says mixing fonts is optional, that pairing doesn't need the serif-plus-sans formula, and that "font mixing is most successful when each font has a consistent role in the document."
-
-That last line is the test I use. If you can't say in one sentence what job the second font does that the first can't, it doesn't have a job.
+That is a good test. If you cannot say in one sentence what job the second font does that the first cannot, it has no job.
 
 > A second font is something a design tolerates. A third is something it survives.
 
-## One family already gives you a whole system
+## One family already gives you a system
 
-The usual objection is "but I need contrast." Fair. But a single well-built family gives you a lot of contrast:
+The usual objection is "I need contrast." A single well-built family gives a lot of it:
 
-- **Weight:** light, regular, medium, semibold, bold, black
-- **Size:** a real type scale, with big jumps for display and tight steps for UI
+- **Weight:** light to black, with several steps between
+- **Size:** a real type scale, with big jumps for display and small steps for UI
 - **Width and optical size,** in families that support them
 - **Case and tracking:** uppercase labels, tighter headlines, looser captions
-- **Italic** for voice, emphasis and quotes
-- **Colour and opacity** for hierarchy without changing the face
+- **Italic** for emphasis and quotes
+- **Color and opacity** for hierarchy without changing the face
 
-Variable fonts make this even easier. The 2024 Web Almanac found about **a third of sites (33–34%)** already use them. One file, a whole range of weights and widths, and every step stays in the same visual voice.
+Variable fonts help here. One file covers a range of weights and widths, and every step keeps the same voice.
 
-In my design systems work, the strongest hierarchy almost never comes from adding a typeface. It comes from a disciplined scale and clear weight rules. When hierarchy feels weak, the fix is usually spacing and size, not a new font.
+When a page feels flat, the scale, the weight rules and the spacing are the first places to look, before reaching for a new typeface.
 
-## Every font is a performance bill
+## Every font costs load time
 
-Designers tend to treat fonts as free because they're free to pick in Figma. The browser doesn't agree.
+Fonts feel free because they are free to pick in Figma. The browser still has to download each one. The HTTP Archive's Web Almanac found that about 87% of websites used web fonts in 2024, so this cost is on most pages ([Web Almanac 2024](https://almanac.httparchive.org/en/2024/fonts)).
 
-- The Web Almanac puts the **median web font file at about 39 KB**, with the 90th percentile at roughly **112–116 KB**. That's per file. Every weight and style you add is another file unless you're using a variable font.
-- Web fonts are on about **87%** of websites, so this is everyone's problem, not just enterprise sites.
-- web.dev's font guidance opens with the line I'd tattoo on every style guide: "The fastest font to deliver is a font that isn't requested in the first place."
-- Fonts also affect Core Web Vitals. Browsers "typically delay text rendering" until a web font loads, which can hit FCP and LCP. When the web font swaps in for a fallback with different metrics, you get layout shift, which counts against CLS.
+Each weight and style is another file unless the font is variable. Three families at three weights each is nine files competing for bandwidth on a phone, before the hero image starts loading.
 
-Three families at three weights each is nine files fighting for bandwidth on a phone, before your hero image even starts loading. Preloading all of them isn't a fix either, since web.dev warns preload competes with other resources.
+Fonts also touch Core Web Vitals. Browsers can hold back text until a web font loads, which can hurt how fast the first content appears. When the web font swaps in for a fallback with different metrics, the layout can shift. Preloading every font does not fix this, because web.dev warns that preload competes with other resources for bandwidth ([web.dev](https://web.dev/articles/font-best-practices)).
 
-## The counter-argument, fairly
+## When a second font is fine
 
-"One font is boring. Brands need personality." Sometimes true, and I'll defend a second font in a few cases:
+Some people say one font is boring and a brand needs personality. Sometimes that is right. A second font is easy to defend in these cases:
 
-- **A distinctive display face for headlines** paired with a quiet workhorse for body and UI. This is the classic, and it works when the display font is used *only* for display.
-- **Monospace for actual code or data,** where alignment and character distinction matter.
-- **Multi-script products.** If you support languages your main family doesn't cover, adding a matching family isn't greed, it's accessibility.
+1. **A display face for headlines** with a quiet font for body and UI. This is the classic pairing, and it works when the display font is used only for display.
+2. **Monospace for real code or data,** where alignment and clear characters matter.
+3. **Multi-script products.** If the main family does not cover a language you support, adding a matching family is access, not greed.
 
-Butterick even gives a shortcut for pairing: fonts from the same designer tend to work together. Superfamilies with matched sans and serif versions are a clean way to get two "fonts" that behave like one system.
+Fonts from the same designer also tend to work together. A superfamily with matched sans and serif versions gives you two fonts that behave like one system.
 
-What doesn't count as a reason: "the client liked it in a mood board," "it was trending on a font site," or "we needed something for the testimonial section."
+Some reasons that do not hold up: "the client liked it on a mood board," "it was trending on a font site," or "we needed something for the testimonial section."
 
-And icon fonts? Font Awesome is still one of the most-used font families on the web, per the Web Almanac. I'd count it toward your budget, and these days I'd usually swap it for SVG icons.
+Icon fonts count too. They are a font download like any other, so they belong in the font budget, and SVG icons are usually the lighter choice.
 
-## My verdict
+## A checklist for any team
 
-Start with one. Earn the second. Treat the third as a design smell.
-
-The checklist I'd hand any team:
+Start with one. Earn the second. Treat the third as a warning sign.
 
 1. **Pick one family with range,** ideally a variable font with the weights and widths you need.
-2. **Build the hierarchy with scale, weight and spacing** before you consider another face.
+2. **Build hierarchy with scale, weight and spacing** before you consider another face.
 3. **Give any second font one written job,** for example "headlines over 32px only," and enforce it in the design system.
 4. **Count weights, not just families.** Two families at five weights each is ten files.
-5. **Ship WOFF2.** web.dev notes it compresses about 30% better than WOFF.
-6. **Subset** to the characters and languages you actually use.
-7. **Match your fallback metrics** (web.dev recommends `size-adjust`) so the swap doesn't shift the layout.
-8. **Audit quarterly.** Fonts creep in through one-off sections. Delete the ones with no job.
+5. **Ship WOFF2.** web.dev says it compresses about 30% better than WOFF.
+6. **Subset** to the characters and languages you use.
+7. **Match your fallback metrics.** web.dev recommends `size-adjust` on the fallback font so the swap does not shift the layout.
+8. **Audit every quarter.** Fonts creep in through one-off sections. Delete the ones with no job.
 
-One font, used well, reads as confidence. Four fonts, used everywhere, reads as a team that never agreed on anything.
+One font used well looks confident. Four fonts used everywhere look like a team that never agreed.
 
 ## Sources
 
 - Matthew Butterick, *Practical Typography*, "Mixing fonts": https://practicaltypography.com/mixing-fonts.html
 - HTTP Archive, Web Almanac 2024, Fonts chapter: https://almanac.httparchive.org/en/2024/fonts
 - web.dev, Best practices for fonts: https://web.dev/articles/font-best-practices
-- web.dev, Web Vitals: https://web.dev/articles/vitals

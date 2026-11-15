@@ -210,7 +210,7 @@ onBeforeUnmount(() => {
         <div class="face back" aria-hidden="true">
           <span class="slot" />
           <div class="stripe" />
-          <p class="fine">This card belongs to {{ card.company }}. If found, please return it to the nearest design desk.</p>
+          <p class="fine">This card belongs to {{ card.company.replace(/\.$/, '') }}. If found, please return it to the nearest design desk.</p>
           <div class="sign"><span>Authorised</span><b>{{ card.name }}</b></div>
           <div class="code big">
             <i v-for="(w, i) in bars" :key="i" :style="{ width: `${w * 2.6}px`, opacity: i % 2 ? 0 : 1 }" />

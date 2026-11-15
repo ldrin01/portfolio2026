@@ -3,73 +3,75 @@ title: "One Pharmacy, Three Kinds of Trust"
 shelf: work
 summary: "A pharmaceutical distributor needed web and mobile commerce for patients, doctors and its own team. Each group needed different rules, and each had a different reason to trust the platform."
 order: 19
-draft: true
+draft: false
 seoTitle: ""
 seoDescription: ""
 cover: "/covers/pharma-three-users.webp"
 ---
 
-| | |
-| --- | --- |
-| **Industry** | Healthcare: pharmaceuticals |
-| **My role** | Lead Designer |
-| **Scope** | Website, web app, mobile app, e-commerce flows, design system |
-| **Tools** | Figma |
-| **Team** | TODO: size and roles |
-| **Timeline** | TODO: months and phases |
+**Role:** Lead Designer\
+**Work:** Web and mobile e-commerce for a pharmaceutical distributor, with medicine subscriptions, prescription (Rx) orders, a loyalty system and a doctor incentive program, plus a design system\
+**Under NDA:** Industry only (healthcare, pharmaceuticals), no client names or figures
 
-## The problem
+Buying medicine online is not like buying shoes. A wrong size of shoe is a small problem. A wrong medicine is a big one. That changes how every screen should be thought through.
 
-Buying medicine online is not like buying shoes. A patient wants to know the medicine is real, the order is right and the refill won't run out. A doctor wants to prescribe without extra work. A distributor wants repeat business.
+## Three groups, three sets of worries
 
-The platform had to support medicine subscriptions, prescription (Rx) orders, a loyalty system for customers, and an incentive program for doctors. Three groups, three sets of rules, one platform.
+The platform supports medicine subscriptions, prescription orders, a loyalty system for customers, and an incentive program for doctors. That is three groups on one platform, and they do not want the same things.
 
-## My role
+| Group | What they want | What they worry about |
+| --- | --- | --- |
+| Patients | The right medicine, delivered, and a refill that does not run out | Getting the wrong item, or losing control of an order |
+| Doctors | To prescribe without extra work | Wasting time |
+| The distributor | Repeat business | Compliance |
 
-I led the design across web and mobile. I worked with the system analysts to separate the three user groups and decide which screens, rules and wording belonged to each. TODO: add anything specific you owned, such as the Rx upload flow or the incentive rules.
+Writing this table before drawing any screens, together with the system analysts, means the business rules and the design start from the same list.
 
-## Process
+> People trust things they know how to stop.
 
-1. **Split the users before the screens.** I wrote out what each group needs to do and what they worry about. The patient worries about getting the right medicine. The doctor worries about wasting time. The distributor worries about compliance.
-2. **Design the patient journey first.** Subscriptions and Rx ordering are the core of the product, so they came first.
+## A sensible order of work
+
+1. **Split the users before the screens.** Each group gets its own needs, its own wording and its own flows. If they are mixed early, every screen ends up serving nobody well.
+2. **Start with the patient journey.** Subscriptions and Rx ordering are the core of the product, so they come first.
 3. **Add loyalty on top, carefully.** Rewards on medicine need a different tone than rewards on coffee.
-4. **Design the doctor program separately.** It is a different relationship, so it got its own flows, language and content.
+4. **Design the doctor program separately.** It is a different relationship, so it gets its own flows, language and content.
 
-TODO: add a review or test you ran, with whom, and what you changed.
+## Rx ordering is its own flow
 
-## Key decisions
+A prescription order has a step that a normal cart does not: proof that you are allowed to buy the item. That step works best when it is explicit and comes early. A patient should not fill a cart and only then find out they need a document.
 
-### 1. Rx ordering is its own flow
+It adds friction. In this context, it is the right friction. The other option is a surprise at the end, and that feels worse and also looks unsafe.
 
-A prescription order has an extra step that a normal cart doesn't: proof that you are allowed to buy the item. I made that step explicit and early, so a patient doesn't fill a cart and then find out they need a document.
+## Subscriptions the customer can control
 
-**Trade-off:** it adds friction, but in this context it is the right friction.
+A refill subscription is only comfortable if the customer feels in charge of it. Skip, pause and change date should be easy to find, not hidden in settings. Fewer visible choices help too. Hick's Law says the more options you show, the longer it takes to decide ([Laws of UX](https://lawsofux.com/hicks-law/)), so the main controls should stay few and clear.
 
-### 2. Subscriptions that are easy to control
+## A different tone for each group
 
-A refill subscription is only comfortable if the customer feels in charge of it: skip, pause, change date. I designed those controls to be easy to find, because people trust things they know how to stop.
+- **Patients:** plain, careful language. No jokes near medicine.
+- **Doctors:** efficient, professional language. They are busy and want the point.
+- **Loyalty and incentives:** rewards are fine, but playful copy is not. Points on a prescription medicine should feel calm.
 
-### 3. Different tone for different groups
+Wording is part of trust here. The same word can sound friendly on a shopping app and careless on a pharmacy one.
 
-Patients get plain, careful language. Doctors get efficient, professional language. The loyalty and incentive features use rewards, but they do not use playful copy near medicine.
+## The moments that need the most care
 
-TODO: if you remember a specific wording decision, a rule from the client, or a compliance requirement that changed a screen, add it here. This is the kind of detail that makes a case study believable.
+Designing for trust means finding the moments where a user feels worried. In this kind of product, three stand out:
 
-## Outcome
+- Uploading a prescription
+- Setting up a refill
+- Entering a doctor's details
 
-- Delivered web and mobile e-commerce covering subscriptions, Rx orders, a loyalty system and a doctor incentive program
-- TODO: live? Date?
-- TODO: a real number or client comment if there is one
+These need the clearest labels, a visible next step and a plain explanation of what happens after.
 
-## What I'd do differently
+## What to check next
 
-TODO: your answer. Prompts: What would you test with real patients earlier? Which group was hardest to design for?
+- Test the Rx upload flow with real patients early, before the rest is built around it.
+- Spend time with doctors early. Their flows are the easiest to get wrong from the outside.
+- Check the wording for each group with people from that group, not only with the team.
 
-## Why this project matters to me
-
-Designing for trust means thinking about the moments where a user feels worried. In this project those moments were uploading a prescription, setting up a refill and entering a doctor's details. I spent the most time on those.
+Medicine is a purchase made with some worry. Good design shows people what is happening and lets them stay in control.
 
 ## Sources
 
-- Baymard Institute, "Cart Abandonment Rate Statistics": https://baymard.com/lists/cart-abandonment-rate
 - Laws of UX, "Hick's Law": https://lawsofux.com/hicks-law/
