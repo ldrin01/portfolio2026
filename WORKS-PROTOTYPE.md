@@ -63,7 +63,7 @@ Written 2026-11-10 so any session (or the owner) can pick this up or back-track.
 2. **Detail page** per work: long discreet title on the left, 50×50 light grid on the right, modular data cards below (type, label, value). Use structural facts (e.g. "3 sites, 1 structure", "2 apps"), **not** real client metrics (NDA).
 3. **Real light-grid pipeline:** build-time script that takes an image, averages to 50×50, auto-levels, dithers, stores the cells and average colours. Per-project invert and threshold options.
 4. **Blank Role/Tool list** for the 25 projects was offered but not sent.
-5. **Move into the Nuxt app:** components under `app/`, content under `content/`. Follow the loader rule (nothing shows over the DRINWORKS loader; wait for `loaderDone`) and read `~/Code/CMS-RULES.md` before any admin/CMS work.
+5. **Move into the Nuxt app:** components under `app/`, content under `content/`. Follow the loader rule (nothing shows over the DRINWORKS loader; wait for `loaderDone`) and read `~/Code/my-work/template/CMS-RULES.md` before any admin/CMS work.
 6. **Real NDA page** on the site (the prototype's `nda-prototype.html` is a stand-in).
 7. Verify animations and dragging on a real device (only tested with headless Chrome and synthetic events so far).
 
